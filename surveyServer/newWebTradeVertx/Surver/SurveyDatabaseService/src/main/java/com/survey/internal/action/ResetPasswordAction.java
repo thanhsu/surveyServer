@@ -1,0 +1,170 @@
+package com.survey.internal.action;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+import com.survey.ProcessorInit;
+import com.survey.constant.EventBusDiscoveryConst;
+import com.survey.dbservice.dao.UserDao;
+import com.survey.utils.CodeMapping;
+import com.survey.utils.FieldName;
+import com.survey.utils.Log;
+import com.survey.utils.SurveyMailCenter;
+import com.survey.utils.SurveyToken;
+import com.survey.utils.VertxServiceCenter;
+
+import io.vertx.core.Future;
+import io.vertx.core.json.JsonObject;
+import io.vertx.servicediscovery.Record;
+
+public class ResetPasswordAction extends InternalSurveyBaseAction {
+
+	@Override
+	public void doProccess() {
+		String lvStep = getMessageBody().getString(FieldName.STEP);
+		switch (lvStep) {
+		case "1":
+			resetPasswordFirst();
+			break;
+		case "2":
+			resetSecondStep();
+			break;
+		default:
+			break;
+		}
+
+	}
+
+	private void resetPasswordFirst() {
+		String lvUsername = getMessageBody().getString(FieldName.USERNAME);
+		String lvEmail = getMessageBody().getString(FieldName.EMAIL);
+
+		UserDao lvDao = new UserDao();
+		lvDao.doGetUserInfobyUserName(lvUsername);
+
+		lvDao.getMvFutureResponse().setHandler(res -> {
+
+			if (res.succeeded()) {
+				JsonObject msg = res.result();
+				if (msg.getString(FieldName.CODE).equals(CodeMapping.U0000.toString())) {
+					// Check Email
+					try {
+						String email = msg.getJsonObject(FieldName.DATA).getString(FieldName.EMAIL);
+						JsonObject reset1st = new JsonObject();
+						SimpleDateFormat sdf = new SimpleDateFormat("yyyy:MM:dd HH:MM:SS");
+						Date lvNow = new Date();
+						lvNow.setMinutes(lvNow.getMinutes() + 10);
+						String lvExprired = sdf.format(lvNow);
+						if (email.equals(lvEmail)) {
+							String token = SurveyToken.getInstance().registerToken(lvUsername);
+							String link = ProcessorInit.mvConfig.getString("SurveyHost") + "/resetpassword/2?username="
+									+ lvUsername + "&token=" + token;
+							// Send link to Email
+							if (SurveyMailCenter.getInstance().sendEmail(lvEmail, "ResetPassword-ISurvey", "",
+									"Reset password your account by link: " + link + "\n Your link expired at: "
+											+ lvExprired)) {
+								reset1st.put(FieldName.CODE, CodeMapping.C0000.toString()).put(FieldName.MESSAGE,
+										"Check your email inbox");
+								// Store token
+								storeResetToken(lvUsername, token, lvNow);
+							} else {
+								reset1st.put(FieldName.CODE, CodeMapping.U8888.toString()).put(FieldName.MESSAGE,
+										CodeMapping.U8888.value());
+							}
+
+							response.complete(reset1st);
+						} else {
+							reset1st.put(FieldName.CODE, CodeMapping.U7777.toString()).put(FieldName.MESSAGE,
+									CodeMapping.U7777.value());
+						}
+					} catch (Exception e) {
+						// TODO: handle exception
+					}
+				} else {
+					response.complete(msg);
+				}
+			} else {
+				response.fail(res.cause());
+			}
+			response.completer();
+
+		});
+	}
+
+	private void storeResetToken(String username, String token, Date expired) {
+		JsonObject tmp = new JsonObject().put("token", token).put("expired", expired.getTime());
+		VertxServiceCenter.getInstance().getSharedData().getClusterWideMap(VertxServiceCenter.ResetPasswordSharedData,
+				resultHandler -> {
+					resultHandler.result().put(username, tmp, completionHandler -> {
+						if (completionHandler.succeeded()) {
+							Log.print("Caching register request success for username:  " + username, Log.ACCESS_LOG);
+						} else {
+							Log.print(
+									"Caching register request failed. Cause:" + completionHandler.cause().getMessage());
+						}
+					});
+				});
+	}
+
+	private Future<Boolean> checkToken(String lvToken, String username, Date now) {
+		Future<Boolean> lvResult = Future.future();
+		VertxServiceCenter.getInstance().getSharedData().getClusterWideMap(VertxServiceCenter.ResetPasswordSharedData,
+				resultHandler -> {
+					if (resultHandler.succeeded() && resultHandler.result() != null) {
+						resultHandler.result().get(username, tokenData -> {
+							if (tokenData.succeeded() && tokenData.result() != null) {
+								JsonObject lvData = (JsonObject) tokenData.result();
+								if (lvToken.equals(lvData.getString("token"))) {
+									long lvExpired = lvData.getLong("expired");
+									long lvSpend = now.getTime() - (lvExpired + 30000);
+									if (lvSpend < 0) {
+										lvResult.complete(true);
+									} else {
+										lvResult.complete(false);
+									}
+								} else {
+									lvResult.complete(false);
+								}
+							} else {
+								lvResult.complete(false);
+							}
+						});
+					} else {
+						lvResult.complete(false);
+					}
+				});
+		return lvResult;
+	}
+
+	private void resetSecondStep() {
+		String lvToken = getMessageBody().getString(FieldName.TOKEN);
+
+		Date lvNow = new Date();
+		String lvUserName = getMessageBody().getString(FieldName.USERNAME);
+		String lvNewPassword = getMessageBody().getString(FieldName.PASSWORD);
+		checkToken(lvToken, lvUserName, lvNow).setHandler(handler -> {
+			messageResponse = new JsonObject();
+			if (handler.succeeded() && handler.result()) {
+				JsonObject resetPasswordRequest = new JsonObject().put(FieldName.ACTION, "resetpassword")
+						.put(FieldName.USERNAME, lvUserName).put(FieldName.PASSWORD, lvNewPassword);
+				com.survey.dbservices.action.ResetPasswordAction lvResetPasswordAction = new com.survey.dbservices.action.ResetPasswordAction();
+				lvResetPasswordAction.doProcess(resetPasswordRequest);
+				lvResetPasswordAction.getMvResponse().setHandler(res -> {
+					if (res.succeeded() & res.result() != null) {
+						response.complete(res.result());
+					} else {
+						messageResponse.put(FieldName.CODE, CodeMapping.C1111.toString()).put(FieldName.MESSAGE,
+								"Request Error");
+						response.complete(messageResponse);
+					}
+				});
+			} else {
+				messageResponse.put(FieldName.CODE, CodeMapping.U9999.toString()).put(FieldName.MESSAGE,
+						CodeMapping.U9999.value());
+				response.complete(messageResponse);
+			}
+
+		});
+	}
+
+}
