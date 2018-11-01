@@ -1,0 +1,33 @@
+package com.survey.utils;
+
+import com.survey.dbservice.dao.UtilsDao;
+
+import io.vertx.core.json.JsonObject;
+
+public class Utils {
+	public static void putNotNull(final JsonObject data, String key, Object value) {
+		if (value != null) {
+			data.put(key, value);
+		}
+	}
+
+	public static boolean checkWithdraw(int amount, double balance) {
+		if (amount < balance) {
+			return true;
+		}
+		return false;
+	}
+
+	public static boolean autoApprovelCashWithdraw(String paymentmethod, double amount) {
+		try {
+			UtilsDao lvDao = new UtilsDao();
+			lvDao.retrieveCashMethodDetail(paymentmethod).setHandler(handler->{
+				
+			});
+		} catch (Exception e) {
+			
+		}
+
+		return false;
+	}
+}

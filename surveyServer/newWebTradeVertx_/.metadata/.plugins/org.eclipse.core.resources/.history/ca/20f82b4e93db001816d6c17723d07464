@@ -1,0 +1,26 @@
+package com.survey.internal.action;
+
+import com.survey.dbservice.dao.SurveyDao;
+import com.survey.utils.FieldName;
+
+import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
+
+public class UpdateSurveyDataAction extends InternalSurveyBaseAction {
+
+	@Override
+	public void doProccess() {
+
+		String lvSurveyID = getMessageBody().getString(FieldName.SURVEYID);
+		JsonObject setting = getMessageBody().getJsonObject(FieldName.SETTING);
+		JsonArray question = getMessageBody().getJsonArray(FieldName.QUESTIONDATA);
+		JsonObject themeData = getMessageBody().getJsonObject(FieldName.THEME);
+		JsonObject rule = getMessageBody().getJsonObject(FieldName.RULEDATA);
+
+		SurveyDao lvSurveyDao = new SurveyDao();
+		lvSurveyDao.UpdateSurvey(lvSurveyID, question, setting, rule, themeData, getMessageBody().getString(FieldName.TITLE));
+		response = lvSurveyDao.getMvFutureResponse();
+
+	}
+
+}

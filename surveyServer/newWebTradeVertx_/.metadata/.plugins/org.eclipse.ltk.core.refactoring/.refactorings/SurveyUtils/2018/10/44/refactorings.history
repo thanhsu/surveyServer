@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Copy element &apos;key&apos; to &apos;config&apos;&#x0A;- Original project: &apos;SurveyUtils&apos;&#x0A;- Destination element: &apos;config&apos;&#x0A;- Original element: &apos;key&apos;" description="Copy folder" element1="config/key" files="0" flags="589830" folders="1" id="org.eclipse.jdt.ui.copy" policy="org.eclipse.jdt.ui.copyResources" stamp="1540696586992" target="/SurveyProcessorService/config" units="0" version="1.0"/>
+</session>

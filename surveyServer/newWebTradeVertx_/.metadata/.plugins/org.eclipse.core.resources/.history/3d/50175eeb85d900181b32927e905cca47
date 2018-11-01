@@ -1,0 +1,20 @@
+package test.BackUpMongoDB;
+
+import io.vertx.core.json.JsonObject;
+
+/**
+ * Hello world!
+ *
+ */
+public class App {
+	public static void main(String[] args) {
+		System.out.println("Hello World!");
+		BaseDaoConnection.getInstance().getMongoClient().find("", new JsonObject(), handler -> {
+			if (handler.succeeded()) {
+				
+			} else {
+
+			}
+		});
+	}
+}

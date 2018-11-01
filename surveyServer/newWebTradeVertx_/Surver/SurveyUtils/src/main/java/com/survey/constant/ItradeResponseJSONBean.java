@@ -1,0 +1,39 @@
+package com.survey.constant;
+
+import java.io.Serializable;
+
+public class ItradeResponseJSONBean implements Serializable, JacksonEncoder.Encodable {
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
+  private static final long serialCersionUID = 1L;
+  private final String RESULT_SUCCESS = "success";
+  String status;
+  int code;
+  Object result = new Object();
+
+  public ItradeResponseJSONBean(String status, int code, Object obj) {
+    super();
+    this.status = status;
+    this.code = code;
+    String resultKey = "";
+    if (obj == null) {
+      result = null;
+    } else {
+      result = obj;
+    }
+  }
+
+  public String getStatus() {
+    return this.status;
+  }
+
+  public void setStatus(String stt) {
+    this.status = stt;
+  }
+
+  public Object getResult() {
+    return this.result;
+  }
+}

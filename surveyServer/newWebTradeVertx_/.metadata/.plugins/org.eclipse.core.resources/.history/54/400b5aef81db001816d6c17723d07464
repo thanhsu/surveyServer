@@ -1,0 +1,14 @@
+package com.survey.confirm.actions;
+
+import io.vertx.core.json.JsonObject;
+
+public class CreateUser extends BaseConfirmAction {
+
+	@Override
+	public void doProcess(JsonObject msg) {
+		// TODO Auto-generated method stub
+		
+	}
+	
+
+}

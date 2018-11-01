@@ -1,0 +1,17 @@
+package com.survey.internal.action;
+
+import com.survey.utils.FieldName;
+
+public class PushlishSurveyAction extends InternalSurveyBaseAction {
+
+	@Override
+	public void doProccess() {
+		String surveyID= getMessageBody().getString(FieldName.SURVEYID);
+		String userID = getMessageBody().getString(FieldName.USERID);
+		String username = getMessageBody().getString(FieldName.USERNAME);
+		
+		
+		
+	}
+
+}

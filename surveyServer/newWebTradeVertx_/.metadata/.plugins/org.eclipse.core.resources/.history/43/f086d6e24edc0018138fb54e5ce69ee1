@@ -1,0 +1,6 @@
+package com.survey.dbservice.dao;
+
+public class SurveyPushlistDao extends SurveyBaseDao {
+	
+
+}

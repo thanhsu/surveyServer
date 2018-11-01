@@ -1,0 +1,25 @@
+package com.survey.utils;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import com.survey.confirm.actions.BaseConfirmAction;
+import com.survey.confirm.actions.CreateUser;
+import com.survey.internal.action.InternalSurveyBaseAction;
+
+public class SurveyProcessConstant {
+	private static SurveyProcessConstant instance;
+	public static HashMap<String, BaseConfirmAction> confirmActionMapping = new HashMap<>();
+	public static final Map<String, InternalSurveyBaseAction> mvActionMapping = new HashMap<>();
+	public static synchronized SurveyProcessConstant getInstance() {
+		if (instance == null) {
+			instance = new SurveyProcessConstant();
+			instance.init();
+		}
+		return instance;
+	}
+
+	public void init() {
+		confirmActionMapping.put("create_account", new CreateUser());
+	}
+}

@@ -1,0 +1,5 @@
+package com.survey.constant;
+
+public enum PaypalrecipientType {
+
+}

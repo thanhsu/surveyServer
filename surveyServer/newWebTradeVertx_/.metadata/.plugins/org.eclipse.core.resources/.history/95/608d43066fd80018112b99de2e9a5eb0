@@ -1,0 +1,169 @@
+package com.survey.utils;
+
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.security.GeneralSecurityException;
+import java.security.InvalidKeyException;
+import java.security.KeyFactory;
+import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.security.interfaces.RSAPrivateKey;
+import java.security.interfaces.RSAPublicKey;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.X509EncodedKeySpec;
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import org.apache.commons.codec.binary.Base64;
+import io.vertx.core.json.JsonObject;
+
+public class RSAEncrypt {
+	private static RSAEncrypt intance;
+	private String mvpublicKeyPath;
+	@SuppressWarnings("unused")
+	private PublicKey publicKey;
+	private PrivateKey privateKey;
+	private RSAPublicKey RsaPublicKey;
+	private RSAPrivateKey RsaPrivateKey;
+	private String charset;
+
+	public static RSAEncrypt getIntance() {
+		if (intance == null) {
+			synchronized (RSAEncrypt.class) {
+				intance = new RSAEncrypt();
+			}
+		}
+		return intance;
+	}
+
+	public void init(JsonObject config) {
+		mvpublicKeyPath = config.getString("PublicKeyPath");
+		charset = config.getString("charset");
+		try {
+			// publicKey = readPublicKey(mvpublicKeyPath);
+			try {
+				RsaPublicKey = getPublicKeyFromString(getKey(mvpublicKeyPath));
+				RsaPrivateKey = getPrivateKeyFromString(getKey(config.getString("PrivateKeyPath")));
+			} catch (GeneralSecurityException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public PublicKey readPublicKey(String publicKeyPath)
+			throws IOException, NoSuchAlgorithmException, InvalidKeySpecException, ClassNotFoundException {
+		// PEMReader pemReader = new PEMReader(new FileReader("file.pem"));
+		// Object obj = pemReader.readObject();
+		// pemReader.close();
+		// if (obj instanceof X509Certificate) {
+		// // Just in case your file contains in fact an X.509 certificate,
+		// // useless otherwise.
+		// obj = ((X509Certificate)obj).getPublicKey();
+		// }
+		// if (obj instanceof RSAPublicKey) {
+		// // ... use the getters to get the BigIntegers.
+		// }
+		//
+		byte[] keyBytes = Files.readAllBytes(Paths.get(publicKeyPath));
+
+		X509EncodedKeySpec spec = new X509EncodedKeySpec(keyBytes);
+		KeyFactory kf = KeyFactory.getInstance("RSA");
+		return kf.generatePublic(spec);
+
+	}
+
+	public byte[] readFileBytes(String filename) throws IOException {
+		Path path = Paths.get(filename);
+		return Files.readAllBytes(path);
+	}
+
+	public String encrypt(String plaintext) throws NoSuchAlgorithmException, NoSuchPaddingException,
+			InvalidKeyException, IllegalBlockSizeException, BadPaddingException, UnsupportedEncodingException {
+		Cipher cipher = Cipher.getInstance("RSA");
+		cipher.init(Cipher.ENCRYPT_MODE, RsaPublicKey);
+		byte[] tmp = cipher.doFinal(plaintext.getBytes(Charset.forName(charset)));
+
+		return Base64.encodeBase64String(tmp);
+	}
+
+	public String decrypt(String text) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException,
+			IllegalBlockSizeException, BadPaddingException {
+		Cipher cipher = Cipher.getInstance("RSA");
+		cipher.init(Cipher.DECRYPT_MODE, RsaPrivateKey);
+		byte[] tmp = cipher.doFinal(text.getBytes(Charset.forName(charset)));
+		return Base64.encodeBase64String(tmp);
+	}
+
+	public RSAPublicKey getPublicKeyFromString(String key) throws IOException, GeneralSecurityException {
+		String publicKeyPEM = key;
+
+		// Remove the first and last lines
+		publicKeyPEM = publicKeyPEM.replace("-----BEGIN PUBLIC KEY-----\n", "");
+		publicKeyPEM = publicKeyPEM.replace("-----END PUBLIC KEY-----\n", "");
+
+		// Base64 decode data
+		byte[] encoded = org.apache.commons.codec.binary.Base64.decodeBase64(publicKeyPEM);
+
+		KeyFactory kf = KeyFactory.getInstance("RSA");
+		RSAPublicKey pubKey = (RSAPublicKey) kf.generatePublic(new X509EncodedKeySpec(encoded));
+		return pubKey;
+	}
+
+	public RSAPrivateKey getPrivateKeyFromString(String key) throws NoSuchAlgorithmException, InvalidKeySpecException {
+		String privateKeyPEM = key;
+
+		// Remove the first and last lines
+		privateKeyPEM = privateKeyPEM.replace("-----BEGIN PRIVATE KEY-----n", "");
+		privateKeyPEM = privateKeyPEM.replace("-----END PRIVATE KEY-----", "");
+
+		// Base64 decode data
+		byte[] encoded = Base64.decodeBase64(privateKeyPEM);
+
+		KeyFactory kf = KeyFactory.getInstance("RSA");
+		RSAPrivateKey privKey = (RSAPrivateKey) kf.generatePrivate(new PKCS8EncodedKeySpec(encoded));
+		return privKey;
+	}
+
+	public static String getKey(String filename) throws IOException {
+		// Read key from file
+		String strKeyPEM = "";
+		BufferedReader br = new BufferedReader(new FileReader(filename));
+		String line;
+		while ((line = br.readLine()) != null) {
+			strKeyPEM += line + "\n";
+		}
+		br.close();
+		return strKeyPEM;
+	}
+
+	public static void main(String[] args) {
+		String input = "asdf123456";
+		System.out.println(input);
+		RSAEncrypt.getIntance().init(new JsonObject().put("PublicKeyPath", "config/key/public.pem")
+				.put("PrivateKeyPath", "config/key/private.pem").put("charset", "UTF-8"));
+
+		try {
+			String encode = RSAEncrypt.getIntance().encrypt(input);
+			System.out.println("x: " + encode);
+
+			String decode = RSAEncrypt.getIntance().decrypt(encode);
+			System.out.println("Decrypt: " + decode);
+
+		} catch (IOException | GeneralSecurityException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+}

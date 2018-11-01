@@ -1,0 +1,33 @@
+package com.survey.dbservice.dao;
+
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+
+import com.survey.utils.FieldName;
+
+import io.vertx.core.json.JsonObject;
+
+public class CashDepositDao extends SurveyBaseDao {
+	private static final String DepositCollectionName = "deposit";
+
+	public CashDepositDao() {
+		setCollectionName(DepositCollectionName);
+	}
+
+	public void storeNewDepositRequest(String targetUserID, String privateToken, String method, double amount,String ccy,
+			String remark, boolean isApproval) {
+		Timestamp lvNow = Timestamp.valueOf(LocalDateTime.now());
+		JsonObject deposit = new JsonObject();
+		deposit.put(FieldName.USERID, targetUserID).put(FieldName.TOKEN, privateToken).put(FieldName.AMOUNT, amount)
+				.put(FieldName.STATE, "A").put(FieldName.SETTLESTATUS, "S").put(FieldName.INPUTTIME, lvNow);
+		this.saveDocument(deposit);
+	}
+
+	public void retrieveAllDeposit(Timestamp fromTime, Timestamp toTime, String userID) {
+		//Json
+	}
+
+	public void updateSettlesStatus(String id, String status) {
+
+	}
+}

@@ -1,0 +1,5 @@
+package com.survey;
+
+public class InternalConfirmVerticle {
+
+}

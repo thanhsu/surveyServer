@@ -1,0 +1,7 @@
+package com.survey.confirm.actions;
+
+import io.vertx.core.json.JsonObject;
+
+public abstract class BaseConfirmAction {
+	public abstract void doProcess(JsonObject msg);
+}

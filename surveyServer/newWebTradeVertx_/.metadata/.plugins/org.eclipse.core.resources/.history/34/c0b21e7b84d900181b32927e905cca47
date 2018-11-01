@@ -1,0 +1,25 @@
+package test.BackUpMongoDB;
+
+import com.survey.dbservice.dao.BaseDaoConnection;
+
+import io.vertx.core.Future;
+import io.vertx.core.json.JsonObject;
+
+/**
+ * Hello world!
+ *
+ */
+public class App {
+	public static void main(String[] args) {
+		System.out.println("Hello World!");
+		Future<String> result = Future.future();
+		BaseDaoConnection.getInstance().getMongoClient().find("", new JsonObject(), handler -> {
+			if (handler.succeeded()) {
+				result.complete(handler.result());
+			} else {
+				result.fail(handler.cause());
+				result.complete();
+			}
+		});
+	}
+}

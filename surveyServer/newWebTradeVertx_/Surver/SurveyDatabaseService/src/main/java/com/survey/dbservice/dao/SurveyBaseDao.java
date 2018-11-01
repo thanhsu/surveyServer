@@ -1,0 +1,104 @@
+package com.survey.dbservice.dao;
+
+import java.util.List;
+
+import com.survey.utils.FieldName;
+
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
+import io.vertx.core.Handler;
+import io.vertx.core.json.Json;
+import io.vertx.core.json.JsonObject;
+import io.vertx.ext.mongo.UpdateOptions;
+
+public class SurveyBaseDao {
+
+	protected Future<JsonObject> mvFutureResponse = Future.future();
+
+	private JsonObject mvResponse = new JsonObject();
+	private String CollectionName = "";
+
+	public void CompleteGenerateResponse(String code, String message, Object data) {
+		mvResponse = new JsonObject();
+		mvResponse.put(FieldName.CODE, code);
+		mvResponse.put(FieldName.MESSAGE, message);
+		mvResponse.put(FieldName.DATA, data);
+		mvFutureResponse.complete(mvResponse);
+		mvFutureResponse.completer();
+	}
+
+	public void CompleteGenerateResponse(String code, String message, JsonObject data, Future<JsonObject> result) {
+		mvResponse = new JsonObject();
+		mvResponse.put(FieldName.CODE, code);
+		mvResponse.put(FieldName.MESSAGE, message);
+		mvResponse.put(FieldName.DATA, data);
+		result.complete(mvResponse);
+		result.completer();
+	}
+
+	public void queryDocument(JsonObject query, Handler<AsyncResult<List<JsonObject>>> handler) {
+		BaseDaoConnection.getInstance().getMongoClient().find(CollectionName, query, handler);
+	}
+
+	public Future<JsonObject> findOneByID(String id) {
+		mvFutureResponse = Future.future();
+		BaseDaoConnection.getInstance().getMongoClient().findOne(CollectionName,
+				new JsonObject().put(FieldName._ID, id), null, resultHandler -> {
+					if (resultHandler.succeeded() && resultHandler.result() != null) {
+						mvFutureResponse.complete(resultHandler.result());
+					} else {
+						mvFutureResponse.fail("null");
+					}
+				});
+		return mvFutureResponse;
+	}
+
+	public void saveDocument(JsonObject data, Handler<AsyncResult<String>> handler) {
+		BaseDaoConnection.getInstance().getMongoClient().save(CollectionName, data, handler);
+	}
+
+	public Future<String> saveDocumentReturnID(JsonObject data) {
+		Future<String> result = Future.future();
+		BaseDaoConnection.getInstance().getMongoClient().save(CollectionName, data, handler -> {
+			if (handler.succeeded()) {
+				result.complete(handler.result());
+			} else {
+				result.fail(handler.cause());
+			}
+		});
+		return result;
+	}
+
+	public void saveDocument(JsonObject data) {
+		BaseDaoConnection.getInstance().getMongoClient().save(CollectionName, data, handler -> {
+		});
+	}
+
+	public void updateDocument(JsonObject query, JsonObject data, UpdateOptions option,
+			Handler<AsyncResult<Void>> handler) {
+		JsonObject lvupdateData = new JsonObject().put("$set", data);
+		BaseDaoConnection.getInstance().getMongoClient().updateWithOptions(getCollectionName(), query, lvupdateData,
+				option == null ? new UpdateOptions().setUpsert(false) : option, handler);
+	}
+
+	public JsonObject getMvResponse() {
+		return mvResponse;
+	}
+
+	public void setMvResponse(JsonObject mvResponse) {
+		this.mvResponse = mvResponse;
+	}
+
+	public String getCollectionName() {
+		return CollectionName;
+	}
+
+	public void setCollectionName(String collectionName) {
+		CollectionName = collectionName;
+	}
+
+	public Future<JsonObject> getMvFutureResponse() {
+		return mvFutureResponse;
+	}
+
+}

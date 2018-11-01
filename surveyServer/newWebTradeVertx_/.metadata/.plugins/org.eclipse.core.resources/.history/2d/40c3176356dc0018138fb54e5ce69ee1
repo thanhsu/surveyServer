@@ -1,0 +1,10 @@
+package com.survey.internal.action;
+
+public class CheckPermissionAnswerSurveyAction extends InternalSurveyBaseAction {
+	@Override
+	public void doProccess() {
+		String username;
+		String surveyID;
+		
+	}
+}

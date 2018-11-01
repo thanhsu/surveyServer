@@ -1,0 +1,16 @@
+package com.survey.confirm.actions;
+
+import com.survey.utils.FieldName;
+
+import io.vertx.core.json.JsonObject;
+
+public class CreateUser extends BaseConfirmAction {
+
+	@Override
+	public void doProcess(JsonObject msg) {
+		String username = msg.getString(FieldName.USERNAME);
+		String sucess = msg.getValue(FieldName.SUCCESS);
+
+	}
+
+}

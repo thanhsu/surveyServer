@@ -1,0 +1,15 @@
+package com.survey.dbservice.dao;
+
+import io.vertx.core.json.JsonObject;
+
+public class CashTransactionDao extends SurveyBaseDao {
+	public static final String cashtransactioncollection="cashtransaction";
+	
+	public CashTransactionDao() {
+		setCollectionName(cashtransactioncollection);
+	}
+	
+	public void newTransaction(String username, String tranID, JsonObject tranData) {
+		
+	}
+}

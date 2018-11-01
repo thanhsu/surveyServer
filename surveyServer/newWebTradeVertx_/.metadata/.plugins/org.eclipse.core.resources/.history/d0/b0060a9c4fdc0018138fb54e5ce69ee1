@@ -1,0 +1,19 @@
+package com.survey.dbservice.dao;
+
+import io.vertx.core.Future;
+
+public class SurveyPushlishDao extends SurveyBaseDao {
+	public static final String collectionname = "surveypushlish";
+	
+	public SurveyPushlishDao() {
+		setCollectionName(collectionname);
+	}
+	
+	public Future<String> newPushlishAction(String surveyID, double limitResp, float pointPerOne,
+			float initialFund, boolean noti, float limitFund){
+		Future<String> lvResult = Future.future();
+		
+		return lvResult;
+	}
+	
+}

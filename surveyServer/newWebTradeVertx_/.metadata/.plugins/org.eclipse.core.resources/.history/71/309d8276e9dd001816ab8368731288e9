@@ -1,0 +1,5 @@
+package com.survey.confirm.action;
+
+public class ConfirmBaseAction {
+
+}

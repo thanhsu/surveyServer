@@ -1,0 +1,8 @@
+package com.survey.dbservice.dao;
+
+public class ProxyLogDao extends SurveyBaseDao {
+	public static final String collectionName="ethe_proxy_log";
+	public ProxyLogDao() {
+		setCollectionName(collectionName);
+	}
+}

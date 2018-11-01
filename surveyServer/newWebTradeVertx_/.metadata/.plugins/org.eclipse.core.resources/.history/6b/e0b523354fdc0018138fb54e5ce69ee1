@@ -1,0 +1,8 @@
+package com.survey.dbservice.dao;
+
+public class SurveyPushlishDao extends SurveyBaseDao {
+	public static final String collectionname = "surveypushlish";
+	
+	public Su
+	
+}

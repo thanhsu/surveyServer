@@ -1,0 +1,10 @@
+package com.survey.internal.action;
+
+public class DoCheckSurveyAction extends InternalSurveyBaseAction {
+	@Override
+	public void doProccess() {
+		String username;
+		String surveyID;
+		
+	}
+}

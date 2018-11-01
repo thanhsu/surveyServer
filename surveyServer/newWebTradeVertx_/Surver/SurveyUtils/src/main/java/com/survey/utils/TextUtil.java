@@ -1,0 +1,42 @@
+package com.survey.utils;
+
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+
+
+public class TextUtil {
+	
+	public static String composeMessage(String template, Map<String,String> data) {
+		String result = template;
+		try{
+			String regex="\\$\\{(.+?)\\}";
+			Pattern pattern = Pattern.compile(regex);
+			Matcher matcher = pattern.matcher(template);
+			StringBuffer sb = new StringBuffer();
+			while(matcher.find()) {
+				String name= matcher.group(1);
+				String value=(String)data.get(name);
+				if(value==null) {
+					value="";
+				}else {
+					value = value.replaceAll("\\$", "\\\\\\$");
+				}
+				matcher.appendReplacement(sb, value);
+			}
+			matcher.appendTail(sb);
+			result = sb.toString();
+			
+		}catch(Exception e) {
+			
+			Log.println(e.toString(), Log.ERROR_LOG);
+		}
+		
+		return result;
+	}
+	public static boolean isNullStr(Object pStr) {
+	    return isNullStr(pStr == null ? null : pStr.toString());
+	  }
+}
+

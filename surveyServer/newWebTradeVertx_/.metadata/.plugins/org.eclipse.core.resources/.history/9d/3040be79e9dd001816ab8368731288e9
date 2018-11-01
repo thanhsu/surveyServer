@@ -1,0 +1,7 @@
+package com.survey.confirm.action;
+
+public abstract class ConfirmBaseAction {
+	public void process() {
+		
+	}
+}

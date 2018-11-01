@@ -1,0 +1,424 @@
+package com.txtech.wtrade.util.format;
+
+/**
+ * Title: TextFormatter Description: This class formats the input values in the pre-defined format
+ * Copyright: Copyright (c) 2002 Company: SYSTEK IT Ltd.
+ * 
+ * @author
+ * @version 1.0
+ * @since 2002.12.06
+ */
+
+import java.io.UnsupportedEncodingException;
+import java.math.BigDecimal;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+import com.systekit.winvest.hks.util.Utils;
+
+public class TextFormatter {
+
+  public static String HK_CURRENCY_SYMBOL = "HK$";
+  public static String US_CURRENCY_SYMBOL = "US$";
+  public static String HTML_RED = "#FF0000";
+  public static String HTML_BLACK = "#000000";
+  public static DecimalFormat origPriceFormat = new DecimalFormat("######0.0");
+  public static DecimalFormat newPriceFormat = new DecimalFormat("######0");
+
+
+  public static Locale[] alSupported = Locale.getAvailableLocales();
+  public static String[] asDNames = new String[alSupported.length];
+
+  public static String trimString(String pValue) {
+    if (pValue == null) {
+      return "";
+    }
+    return pValue.trim();
+  }
+
+  public static String formatNumberByCurrency(String pNumeric, String pSymbol, String pFormat, String pPosition) {
+
+
+    DecimalFormat lvDecimalFormat = new DecimalFormat(pFormat);
+    String lvFormattedString = "";
+
+    if (pNumeric != null && pNumeric.trim().length() != 0) {
+      lvFormattedString = lvDecimalFormat.format(Double.parseDouble(pNumeric));
+      if (pSymbol != null && pPosition != null && !pSymbol.trim().equals("")) {
+        if (pPosition.equals("B")) {
+          lvFormattedString = pSymbol.concat(lvFormattedString);
+        } else {
+          lvFormattedString = lvFormattedString.concat(pSymbol);
+        }
+      }
+    }
+
+    return lvFormattedString;
+  }
+
+  public static BigDecimal parseBigDecimal(String pValue) {
+    return parseBigDecimal(pValue, false);
+  }
+
+  public static BigDecimal parseBigDecimal(String pValue, boolean pShowException) {
+    BigDecimal lvResult;
+    try {
+      lvResult = new BigDecimal(pValue == null ? "0" : "".equals(pValue) ? "0" : pValue);
+    } catch (Exception ex) {
+      lvResult = new BigDecimal(0);
+      if (pShowException) {
+        ex.printStackTrace();
+      }
+    }
+    return lvResult;
+  }
+
+  public static String formatNumber(String value, String prefix, String formatStr) {
+    String formattedString = "";
+
+    try {
+      if (value != null && value.trim().length() != 0) {
+        Double dValue = new Double(value);
+
+        /***
+         * comment by May on 07-01-2004 DecimalFormat df = new DecimalFormat(prefix + formatStr + ";-" +
+         * prefix + formatStr);
+         **************************************/
+        /*** added by May on 07-01-2004 ***/
+        DecimalFormat df = new DecimalFormat(prefix + formatStr + ";" + prefix + "(" + formatStr + ")");
+        // DecimalFormat df = new DecimalFormat(prefix + formatStr + ";" + prefix + "-" + formatStr);
+        /*******************************************/
+        formattedString = df.format(dValue);
+      }
+
+    } catch (NumberFormatException ne) {
+      formattedString = "NaN";
+    }
+    return formattedString;
+  }
+
+  public static String formatByPriceDecimal(String pValue, String pPriceDecimal) {
+    return convertPriceByPriceDeciaml(pValue, pPriceDecimal);
+  }
+
+
+  public static String convertPriceByPriceDeciaml(String pValue, String pDecimal) {
+    String lvRetStr = "";
+    if (("".equals(pValue)) || (pValue == null)) {
+      return lvRetStr;
+    }
+    int lvDecimalSize = Integer.parseInt(pDecimal);
+    DecimalFormat lvFormat = new DecimalFormat();
+
+    String lvFormatOrig = "###,###,##0";
+    if (lvDecimalSize > 0) {
+      lvFormatOrig = lvFormatOrig + ".";
+    }
+    for (int i = 0; i < lvDecimalSize; i++) {
+      lvFormatOrig = lvFormatOrig + "0";
+    }
+    lvFormat.applyPattern(lvFormatOrig);
+    try {
+      lvRetStr = lvFormat.format(Double.parseDouble(pValue.replaceAll(",", "")));
+    } catch (Exception e) {
+      lvRetStr = pValue;
+    }
+    return lvRetStr;
+  }
+
+  // BEGIN - TASK#: CL00029 - Charlie Liu 20081023
+  public static String formatNumber_IWS(String value, String prefix, String formatStr) {
+    String formattedString = "";
+
+    try {
+      value = Utils.isNullStr(value) ? "0" : value;
+      if (value.trim().equals("-"))
+        value = "0";
+      if (value != null && value.trim().length() != 0) {
+        Double dValue = new Double(value);
+
+        /***
+         * comment by May on 07-01-2004 DecimalFormat df = new DecimalFormat(prefix + formatStr + ";-" +
+         * prefix + formatStr);
+         **************************************/
+        /*** added by May on 07-01-2004 ***/
+        // DecimalFormat df = new DecimalFormat(prefix + formatStr + ";" + prefix + "(" + formatStr + ")");
+        DecimalFormat df = new DecimalFormat(prefix + formatStr + ";" + prefix + "-" + formatStr);
+        /*******************************************/
+        formattedString = df.format(dValue);
+      }
+
+    } catch (NumberFormatException ne) {
+      formattedString = "NaN";
+    }
+    return formattedString;
+  }
+  // END - TASK# CL00029
+
+  public static String formatNumber(String value, String prefix) {
+    return formatNumber(value, prefix, "#,##0.00");
+  }
+
+  public static String formatNumber(String value) {
+    return formatNumber(value, "");
+  }
+
+  public static String formatClientID(String pClientID, String pFormat) {
+    if (pFormat.equals(""))
+      return pClientID;
+
+    String lvFormattedClientID = "";
+    int lvLastClientIDPosition = 0;
+    for (int i = 0; i < pFormat.length() && lvLastClientIDPosition < pClientID.length(); i++) {
+      if (pFormat.charAt(i) == 'X') {
+        lvFormattedClientID += pClientID.charAt(lvLastClientIDPosition);
+        lvLastClientIDPosition++;
+      } else {
+        lvFormattedClientID += pFormat.charAt(i);
+      }
+    }
+    if (lvLastClientIDPosition < pClientID.length())
+      lvFormattedClientID += pClientID.substring(lvLastClientIDPosition);
+    return lvFormattedClientID;
+  }
+
+  public static String toHKCurrency(String value) {
+    return formatNumber(value, HK_CURRENCY_SYMBOL);
+  }
+
+  public static String toUSCurrency(String value) {
+    return formatNumber(value, US_CURRENCY_SYMBOL);
+  }
+
+  public static String getHtmlColor(String value) {
+
+    Double dValue;
+    try {
+      dValue = new Double(value);
+    } catch (NumberFormatException ne) {
+      return HTML_RED;
+    }
+    if (dValue.doubleValue() >= 0) {
+      return HTML_BLACK;
+    } else {
+      return HTML_RED;
+    }
+  }
+
+  public static String getFormattedTime(String sTime, String formatStr) {
+    try {
+      SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+      return getFormattedTime(dateFormatter.parse(sTime), formatStr);
+    } catch (Exception e) {
+      return "";
+    }
+  }
+
+  // BEGIN - TASK#: CL00029 - Charlie Liu 20081023
+  public static String getFormattedTime_IWS(String sTime, String formatStr) {
+    try {
+      SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+      return getFormattedTime(dateFormatter.parse(sTime), formatStr);
+    } catch (Exception e) {
+      return "";
+    }
+  }
+
+  public static String getFormatedDate(String sDate, String destFormat, String sourceFormat) {
+    try {
+      SimpleDateFormat dateFormatter = new SimpleDateFormat(sourceFormat);
+
+      // Date today = dateFormatter.parse(sDate);
+      return getFormattedTime(dateFormatter.parse(sDate), destFormat);
+    } catch (Exception e) {
+      return "";
+    }
+  }
+
+  // END - TASK# CL00029
+
+  public static String getFormattedTime(Date sDate, String formatStr) {
+    String convertedDate = "";
+    try {
+      SimpleDateFormat dateFormatter = new SimpleDateFormat(formatStr); // HH:mm:ss
+      convertedDate = dateFormatter.format(sDate);
+    } catch (Exception e) {
+      ;
+    }
+    return convertedDate;
+  }
+
+  /*
+   * public static void main(String[] argv) { String n = argv[0];
+   * System.out.println(TextFormatter.formatNumber(n));
+   * System.out.println(TextFormatter.toHKCurrency(n));
+   * System.out.println(TextFormatter.toUSCurrency(n)); }
+   */
+
+  /*** added by May on 27-01-2004 ***/
+  public static String convertPrice(String price) {
+    // commented by mingl
+    // double tempPrice;
+    //
+    // tempPrice = (origPriceFormat.parse(price,new ParsePosition(0))).doubleValue();
+    //
+    // return newPriceFormat.format(tempPrice);
+    return price;
+  }
+
+  /*****************************************/
+
+  /**
+   * Converts string for displaying in web (for chinese char)
+   * 
+   * @param pValue
+   * @return converted string
+   */
+  public static String convertChineseStrToHTMLString(String pValue) {
+    String lvStr = pValue == null ? "" : pValue;
+    String lvReturn = "";
+
+    char[] lvCharArr = lvStr.toCharArray();
+
+    for (int i = 0; i < lvCharArr.length; i++)
+      lvReturn += "&#" + (int) lvCharArr[i];
+
+    return lvReturn;
+  }
+
+  /**
+   * Converts string encoding for web (for chinese char)
+   * 
+   * @deprecated (Use convertChineseToHTMLString Instead
+   * @param pValue
+   * @return converted string
+   */
+  public static String convertChineseStrEncoding(String pValue) {
+    String lvStr = pValue == null ? "" : pValue;
+    String lvReturn = "";
+
+    try {
+      lvReturn = new String(pValue.getBytes("MS950"));
+    } catch (UnsupportedEncodingException ex) {
+      ex.printStackTrace();
+    } finally {
+      return lvReturn;
+    }
+  }
+
+  /**
+   * Split the input string by a string
+   * 
+   * @param pInput
+   * @param pStr
+   * @return string array
+   */
+  public static String[] split(String pInput, String pStr) {
+
+    int strLength = pStr.length();
+    int tokenCount = 0;
+    int strIndex = -strLength;
+    do {
+      strIndex = pInput.indexOf(pStr, strIndex + strLength);
+      tokenCount++;
+    } while (strIndex >= 0);
+
+    String[] tokens = new String[tokenCount];
+
+    int tokenIndex = 0;
+    strIndex = -strLength;
+
+    do {
+      int index = pInput.indexOf(pStr, strIndex + strLength);
+      if (index < 0) {
+        tokens[tokenIndex] = pInput.substring(strIndex + strLength);
+      } else {
+        tokens[tokenIndex] = pInput.substring(strIndex + strLength, index);
+      }
+      strIndex = index;
+      tokenIndex++;
+    } while (strIndex >= 0);
+
+    return tokens;
+  }
+
+  public static String formatHKSStockID(String pStockID) {
+    int lvNumberofZero = 5 - pStockID.trim().length();
+    String lvReturnString = pStockID;
+    for (int i = 0; i < lvNumberofZero; i++) {
+      lvReturnString += "0" + pStockID;
+    }
+    return lvReturnString;
+  }
+
+  // Begin Task #: - TTL-GZ-ZZW-00019 Wind Zhao 20091230 [iTrade R5] Numeric locale for Vietnam
+  /**
+   * 
+   * This method accept language,country, format value, min fraction digits,max fraction digits,
+   * Symbol and SymbolPosition
+   * 
+   * @param pLanguage is provide a language to new loacale
+   * @param pCountry is provide a country to new loacale
+   * @param pFormatValue is the value which need to format
+   * @param pMinDecimalPlaces is control min decimal places will be keep
+   * @param pMaxDecimalPlaces is control max decimal places will be keep
+   * @param pSymbol is currency symbol
+   * @param pSymbolPosition the position of the currency symbol
+   * @return lvResult is a String which format by lvCurrencyFormatter with a currency symbol
+   */
+  public static String formatLocaleCurrency(String pLanguage, String pCountry, String pFormatValue, int pMaxDecimalPlaces,
+      int pMinDecimalPlaces, String pSymbol, String pSymbolPosition) {
+    String lvResult;
+    String lvFormatValue = formatLocaleNumber(pLanguage, pCountry, pFormatValue, pMaxDecimalPlaces, pMinDecimalPlaces);
+    if (pSymbol != null) {
+      if (pSymbolPosition.equals("B")) {
+        lvResult = pSymbol.concat(lvFormatValue);
+      } else {
+        lvResult = lvFormatValue.concat(pSymbol);
+      }
+    } else {
+      lvResult = lvFormatValue;
+    }
+    return lvResult;
+  }
+
+  /**
+   * 
+   * This method accept language,country,format value, min fraction digits and max fraction digits
+   * 
+   * @param pLanguage is provide a language to new loacale
+   * @param pCountry is provide a country to new loacale
+   * @param pFormatValue is the value which need to format
+   * @param pMinDecimalPlaces is control min decimal places will be keep
+   * @param pMaxDecimalPlaces is control max decimal places will be keep
+   * @return a String which format by lvNumberFormatter
+   */
+  public static String formatLocaleNumber(String pLanguage, String pCountry, String pFormatValue, int pMaxDecimalPlaces,
+      int pMinDecimalPlaces) {
+    Double lvTempDouble;
+    if (Utils.isNullStr(pFormatValue) || pFormatValue.trim().equals("")) {
+      pFormatValue = "0";
+    }
+    try {
+      lvTempDouble = Double.parseDouble(pFormatValue);
+    } catch (Exception e) {
+      lvTempDouble = new Double(0);
+    }
+    NumberFormat lvNumberFormatter = NumberFormat.getNumberInstance(new Locale(pLanguage, pCountry));
+    if (pMinDecimalPlaces > -1 && pMaxDecimalPlaces > -1 && pMaxDecimalPlaces >= pMinDecimalPlaces) {
+      lvNumberFormatter.setMinimumFractionDigits(pMinDecimalPlaces);
+      lvNumberFormatter.setMaximumFractionDigits(pMaxDecimalPlaces);
+    }
+    return lvNumberFormatter.format(lvTempDouble);
+  }
+
+  public static int avgPriceAppendDigit = 2;
+
+  public static String formatAvgByPriceDecimal(String pValue, String pPriceDecimal) {
+    int lvPriceDecimal = Integer.parseInt(pPriceDecimal) + avgPriceAppendDigit;
+
+    return convertPriceByPriceDeciaml(pValue, "" + lvPriceDecimal);
+  }
+}

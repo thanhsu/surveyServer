@@ -1,0 +1,52 @@
+package com.survey.internal.action;
+
+import java.io.UnsupportedEncodingException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+
+import com.survey.dbservice.dao.CashDepositDao;
+import com.survey.dbservice.dao.UtilsDao;
+import com.survey.utils.CodeMapping;
+import com.survey.utils.FieldName;
+import com.survey.utils.MessageDefault;
+import com.survey.utils.RSAEncrypt;
+
+import io.vertx.core.json.JsonObject;
+
+//Only create and store payments
+//Store payment and get deposit ID
+public class DepositAction extends BaseSurveyInternalAction {
+	@Override
+	public void doProccess() {
+		CashDepositDao lvCashDepositDao = new CashDepositDao();
+		String userid = getMessageBody().getString(FieldName.USERID);
+		
+		UtilsDao lvUtilsDao = new UtilsDao();
+		lvUtilsDao.retrieveEthePointValue(false).setHandler(point->{
+			try {
+				String exchangeRate = point.result().getString(FieldName.VALUE);
+				String privateToken = RSAEncrypt.getIntance().encrypt(userid);
+				lvCashDepositDao.storeNewDepositRequest(getMessageBody().getString(FieldName.USERNAME), privateToken, "",
+						getMessageBody().getDouble(FieldName.AMOUNT), getMessageBody().getString(FieldName.CCY),
+						getMessageBody().getString(FieldName.REMARK), false, exchangeRate).setHandler(handler -> {
+							if (handler.succeeded()) {
+								String id = handler.result();
+								this.response.complete(new JsonObject().put(FieldName.CODE, CodeMapping.C0000.toString()).put(FieldName.DATA, new JsonObject().put("success", true).put(FieldName.PRIVATETOKEN, privateToken).put(FieldName.TRANID, id)));
+							} else {
+								this.response.complete(MessageDefault.RequestFailed(handler.cause().getMessage()));
+							}
+						});
+			} catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchPaddingException | IllegalBlockSizeException
+					| BadPaddingException | UnsupportedEncodingException e) {
+				this.response.complete(MessageDefault.ParamError("UserID is NULL!"));
+				e.printStackTrace();
+			}
+		});
+		
+	}
+
+}

@@ -1,0 +1,85 @@
+package com.survey.paypal;
+
+import com.survey.constant.EventBusDiscoveryConst;
+import com.survey.utils.FieldName;
+import com.survey.utils.controller.MicroServiceVerticle;
+
+import io.vertx.core.Context;
+import io.vertx.core.Future;
+import io.vertx.core.Vertx;
+import io.vertx.core.eventbus.EventBus;
+import io.vertx.core.json.JsonObject;
+
+public class ServiceInit extends MicroServiceVerticle {
+	EventBus mvEventBus;
+	public static String approvalURL;
+	public static String cancelURL;
+
+	@Override
+	public void init(Vertx vertx, Context context) {
+		super.init(vertx, context);
+		mvEventBus = vertx.eventBus();
+		approvalURL = config().getString("approvalUrl");
+		cancelURL = config().getString("cancelUrl");
+		PaypalConnection.getInstance().init(config().getJsonObject("PaypalConfig"), vertx);
+	}
+
+	@Override
+	public void start(Future<Void> startFuture) throws Exception {
+		super.start(startFuture);
+		mvEventBus.consumer((EventBusDiscoveryConst.PAYPALGATEWAYDISCOVERY.value()), r -> {
+			JsonObject request = (JsonObject) r.body();
+			String action = request.getString("action");
+			JsonObject value = request.getJsonObject("value");
+			if (action.equals("deposit")) {
+				depositHandler(value).setHandler(handler->{
+					if(handler.succeeded()) {
+						r.reply(new JsonObject().put("success", true).put("data", handler.result()));
+					}else {
+						r.reply(new JsonObject().put("success", false).put("cause", handler.cause().getMessage()));
+					}
+				});
+			} else if (action.equals("withdraw")) {
+				withdrawHandler(value);
+			}
+
+		});
+
+		publishEventBusService(EventBusDiscoveryConst.PAYPALGATEWAYDISCOVERY.name(),
+				EventBusDiscoveryConst.PAYPALGATEWAYDISCOVERY.value(), completionHandler -> {
+
+				});
+	}
+
+	private Future<JsonObject> depositHandler(JsonObject msg) {
+		Future<JsonObject> lvResult =Future.future();
+		String username = msg.getString(FieldName.USERNAME);
+		String tranID = msg.getString(FieldName.TRANID);
+		double amount = msg.getDouble(FieldName.AMOUNT);
+		String ccy = msg.getString(FieldName.CCY);
+		String remark = msg.getString(FieldName.REMARK);
+		String token = msg.getString(FieldName.PRIVATETOKEN);
+		String lvApprovalUrl = approvalURL + token;
+		String lvCancelUrl = cancelURL + token;
+		PaypalConnection.getInstance().createPaymentSDK(tranID, "0", String.valueOf(amount), String.valueOf(amount), "0", "Deposit", remark, ccy, new JsonObject(), lvCancelUrl,lvApprovalUrl).setHandler(handler->{
+			if(handler.succeeded()) {
+				lvResult.complete(handler.result());
+			}else {
+				lvResult.fail(handler.cause().getMessage());
+			}
+		});
+		return lvResult;
+	}
+
+	private JsonObject withdrawHandler(JsonObject msg) {
+		String username = msg.getString(FieldName.USERNAME);
+		double amount = msg.getDouble(FieldName.AMOUNT);
+		String ccy = msg.getString(FieldName.CCY);
+		String remark = msg.getString(FieldName.REMARK);
+		String token = msg.getString(FieldName.PRIVATETOKEN);
+		String lvApprovalUrl = approvalURL + token;
+		String lvCancelUrl = cancelURL + token;
+		String tagetUser = msg.getString(FieldName.TARGETPAYPALID);
+		return null;
+	}
+}

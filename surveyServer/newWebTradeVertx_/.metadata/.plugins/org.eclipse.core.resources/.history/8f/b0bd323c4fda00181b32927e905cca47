@@ -1,0 +1,31 @@
+package com.survey.internal.action;
+
+import com.survey.dbservice.dao.UserDao;
+import com.survey.utils.CodeMapping;
+import com.survey.utils.FieldName;
+import com.survey.utils.MessageDefault;
+
+import io.vertx.core.json.JsonObject;
+import io.vertx.ext.mongo.UpdateOptions;
+
+public class UpdateUserInfoAction extends BaseSurveyInternalAction {
+
+	@Override
+	public void doProccess() {
+		String userID = getMessageBody().getString(FieldName.USERID);
+		JsonObject newUserInfoData = getMessageBody().getJsonObject(FieldName.DATA);
+		UserDao lvDao = new UserDao();
+		lvDao.updateDocument(new JsonObject().put(FieldName._ID, userID), newUserInfoData, new UpdateOptions(false), handler->{
+			if(handler.succeeded()) {
+				lvDao.doGetUserInfo(userID);
+				lvDao.getMvFutureResponse().setHandler(handler1->{
+					response.complete(handler1.result());
+				});
+			}else {
+				response.complete(MessageDefault.);
+			}
+		});
+		
+	}
+
+}

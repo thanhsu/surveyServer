@@ -1,0 +1,14 @@
+package com.survey.internal.action;
+
+import com.survey.utils.FieldName;
+
+public class RetrievePointValueAction extends BaseSurveyInternalAction {
+
+	@Override
+	public void doProccess() {
+		boolean isHistory = getMessageBody().getBoolean(FieldName.ISHISTORY) == null ? false
+				: getMessageBody().getBoolean(FieldName.ISHISTORY);
+		
+	}
+
+}

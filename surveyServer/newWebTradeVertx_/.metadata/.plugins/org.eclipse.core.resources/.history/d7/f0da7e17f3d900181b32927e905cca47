@@ -1,0 +1,21 @@
+package com.survey.internal.action;
+
+import com.survey.dbservice.dao.UserDao;
+import com.survey.utils.FieldName;
+
+public class ActiveUserAction extends BaseSurveyInternalAction {
+
+	@Override
+	public void doProccess() {
+		UserDao lvUserDao = new UserDao();
+		lvUserDao.doGetUserInfobyUserName(getMessageBody().getString(FieldName.USERNAME));
+		lvUserDao.getMvFutureResponse().setHandler(handler->{
+			if(handler.succeeded()) {
+				
+			}else {
+				
+			}
+		});
+	}
+
+}

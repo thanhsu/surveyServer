@@ -1,0 +1,80 @@
+package com.survey.internal.action;
+
+import com.survey.constant.EventBusDiscoveryConst;
+import com.survey.dbservice.dao.ProxyLogDao;
+import com.survey.dbservice.dao.SurveyDao;
+import com.survey.utils.CodeMapping;
+import com.survey.utils.FieldName;
+import com.survey.utils.Log;
+import com.survey.utils.MessageDefault;
+import com.survey.utils.VertxServiceCenter;
+
+import io.vertx.core.Future;
+import io.vertx.core.json.JsonObject;
+
+public class PushlishSurveyAction extends InternalSurveyBaseAction {
+
+	@Override
+	public void doProccess() {
+		String surveyID = getMessageBody().getString(FieldName.SURVEYID);
+		String userID = getMessageBody().getString(FieldName.USERID);
+		String username = getMessageBody().getString(FieldName.USERNAME);
+
+		double limitResp = getMessageBody().getDouble(FieldName.LIMITRESPONSE);
+		float pointPerOne = getMessageBody().getFloat(FieldName.PAYOUT);
+
+		float initialFund = getMessageBody().getFloat(FieldName.INITIALFUND);
+		boolean notifi = getMessageBody().getBoolean(FieldName.NOTIFY);
+		float limitFund = getMessageBody().getFloat(FieldName.LIMITFUND);
+		SurveyDao lvSurveyDao = new SurveyDao();
+		// Check account balance
+		Future<JsonObject> lvAccountBalance = Future.future();
+		VertxServiceCenter.getInstance().sendNewMessage(EventBusDiscoveryConst.ETHEREUMPROXYDISCOVERY.name(),
+				getMessageBody(), lvAccountBalance);
+		lvAccountBalance.setHandler(handler -> {
+			if (handler.succeeded() && handler.result() != null) {
+				// Check account balance
+				JsonObject accountbalance = handler.result();
+				if (accountbalance.getValue("success").toString().equals("1")) {
+					float balance = Float.parseFloat(accountbalance.getString("balance"));
+					if (balance < initialFund) {
+						this.CompleteGenerateResponse(CodeMapping.S7777.toString(), CodeMapping.S7777.value(),
+								getMessageBody().put("accountbalance", accountbalance), response);
+					} else {
+						SurveyDao lvSurveyDao1 = new SurveyDao();
+						lvSurveyDao1.pushlishSurvey(surveyID, username, limitResp, pointPerOne, initialFund, notifi,
+								limitFund);
+						lvSurveyDao1.getMvFutureResponse().setHandler(create -> {
+							if (create.result().getString(FieldName.CODE).equals(CodeMapping.C0000.toString())) {
+								response.complete(create.result());
+								// Send to servey
+								Future<JsonObject> lvPushlish = Future.future();
+								VertxServiceCenter.getInstance().sendNewMessage(
+										EventBusDiscoveryConst.ETHEREUMPROXYDISCOVERY.name(), getMessageBody(),
+										lvPushlish);
+								lvPushlish.setHandler(x -> {
+									if (x.succeeded()) {
+										ProxyLogDao lv = new ProxyLogDao();
+										lv.storeNewRequest("pushlish", getMessageBody(), x.result());
+									} else {
+										Log.print("Cannot Proxy action pushlish survey to ethereum survey!Cause: "
+												+ x.cause().getMessage());
+									}
+								});
+							} else {
+								response.complete(create.result());
+							}
+						});
+					}
+				} else {
+					response.complete(MessageDefault.PermissionError());
+				}
+
+			} else {
+				response.complete(MessageDefault.RequestFailed("Cannot check account balance now!"));
+			}
+		});
+
+	}
+
+}

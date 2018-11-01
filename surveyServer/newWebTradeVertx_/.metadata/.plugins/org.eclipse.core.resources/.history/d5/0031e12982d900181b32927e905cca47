@@ -1,0 +1,21 @@
+package com.survey.internal.action;
+
+import com.survey.dbservice.dao.CashDepositDao;
+import com.survey.utils.FieldName;
+
+//Only create and store payments
+//Store payment and get deposit ID
+public class DepositAction extends BaseSurveyInternalAction {
+	@Override
+	public void doProccess() {
+		CashDepositDao lvCashDepositDao = new CashDepositDao();
+		String privateToken = "";
+		lvCashDepositDao.storeNewDepositRequest(getMessageBody().getString(FieldName.USERNAME), privateToken, "",
+				getMessageBody().getDouble(FieldName.AMOUNT), getMessageBody().getString(FieldName.CCY),
+				getMessageBody().getString(FieldName.REMARK), false);
+		lvCashDepositDao.getMvFutureResponse().setHandler(handler->{
+			
+		});
+	}
+
+}

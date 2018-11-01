@@ -1,0 +1,29 @@
+package com.survey.internal.action;
+
+import com.survey.dbservice.dao.SurveySubmitDao;
+import com.survey.utils.CodeMapping;
+import com.survey.utils.FieldName;
+import com.survey.utils.MessageDefault;
+
+import io.vertx.core.json.JsonObject;
+
+public class AnswerSurveyAction extends InternalSurveyBaseAction {
+
+	@Override
+	public void doProccess() {
+		String surveyID = getMessageBody().getString(FieldName.SURVEYID);
+		String username = getMessageBody().getString(FieldName.USERNAME);
+		JsonObject answerdata = getMessageBody().getJsonObject(FieldName.DATA);
+		SurveySubmitDao lvSurveySubmitDao = new SurveySubmitDao();
+		lvSurveySubmitDao.newSurveyResult(username, answerdata, surveyID).setHandler(id->{
+			if(id.succeeded()) {
+				this.CompleteGenerateResponse(CodeMapping.C0000.toString(), CodeMapping.C0000.value(), null, response);
+			}else {
+				response.complete(MessageDefault.RequestFailed(id.cause().getMessage())));
+			}
+		});
+		
+
+	}
+
+}

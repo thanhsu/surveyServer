@@ -1,0 +1,14 @@
+package com.survey.internal.action;
+
+import com.survey.utils.FieldName;
+
+public class CancelCashAction extends InternalSurveyBaseAction {
+
+	@Override
+	public void doProccess() {
+		String tranID = getMessageBody().getString(FieldName.TRANID);
+		String userID= getMessageBody().getString(FieldName.USERID);
+		
+	}
+	
+}

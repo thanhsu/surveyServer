@@ -1,0 +1,127 @@
+package com.survey.internal.action;
+
+import com.survey.constant.SurveyRequestName;
+import com.survey.dbservice.dao.SurveyDao;
+import com.survey.dbservice.dao.SurveySubmitDao;
+import com.survey.dbservices.action.RetrieveMySurvey;
+import com.survey.utils.CodeMapping;
+import com.survey.utils.FieldName;
+
+import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
+
+public class RetrieveSurveyAction extends InternalSurveyBaseAction {
+
+	@Override
+	public void doProccess() {
+		String actionRequest = getMessageBody().getString(FieldName.METHOD);
+		switch (actionRequest) {
+		// getAllPublic Servey
+		case SurveyRequestName.RETRIEVE_PUBLIC:
+			this.retrievepublic(getMessageBody());
+			break;
+		case SurveyRequestName.RETRIEVE_MYSURVEY:
+			this.retrievemysurvey(getMessageBody());
+			break;
+		case SurveyRequestName.RETRIEVE_SEARCH:
+			this.searchSurvey(getMessageBody());
+			break;
+		case SurveyRequestName.RETRIEVE_SUBMIT:
+			this.retrieveSubmittedSurvey(getMessageBody());
+			break;
+
+		case SurveyRequestName.CREATE:
+			this.createSurvey(getMessageBody());
+			break;
+		case SurveyRequestName.UPDATE:
+			this.updateSurvey(getMessageBody());
+			break;
+
+		default:
+			break;
+		}
+	}
+
+	public void retrievepublic(JsonObject request) {
+		JsonObject rs = new JsonObject();
+		rs.put(FieldName.ENABLE, "N").put(FieldName.STATE, "A");
+		searchSurvey(rs);
+	}
+
+	public void retrievemysurvey(JsonObject request) {
+		RetrieveMySurvey lvRetrieveMySurvey = new RetrieveMySurvey();
+		lvRetrieveMySurvey.doProcess(request);
+		lvRetrieveMySurvey.getMvResponse().setHandler(rs -> {
+			if (rs.succeeded()) {
+				response.complete(rs.result());
+			} else {
+				response.fail(rs.cause().getMessage());
+			}
+		});
+	}
+
+	public void retrieveSubmittedSurvey(JsonObject request) {
+		JsonObject rs = new JsonObject();
+		rs.put(FieldName.USERNAME, request.getString(FieldName.USERNAME));
+		rs.put(FieldName.ACTION, "retrievesubmitsurvey");
+		SurveySubmitDao lvSurveySubmitDao = new SurveySubmitDao();
+		lvSurveySubmitDao.getAllServeyDone(request.getString(FieldName.USERNAME));
+		response = lvSurveySubmitDao.getMvFutureResponse();
+	}
+
+	public void searchSurvey(JsonObject reqeuest) {
+		JsonObject searchValue = reqeuest.getJsonObject(FieldName.SEARCH);
+		SurveyDao lvSurveyDao = new SurveyDao();
+		lvSurveyDao.retrieveSurvey(searchValue, h -> {
+			JsonObject lvTmp = new JsonObject();
+			if (h.succeeded()) {
+				lvTmp.put(FieldName.CODE, CodeMapping.C0000.toString()).put(FieldName.DATA, h.result());
+			} else {
+				lvTmp.put(FieldName.CODE, CodeMapping.C1111.toString()).put(FieldName.MESSAGE, h.cause().getMessage());
+			}
+			response.complete(lvTmp);
+		});
+	}
+
+	public void createSurvey(JsonObject data) {
+		/*
+		 * SurveyDao lvSurveyDao = new SurveyDao();
+		 * lvSurveyDao.createSurvey(data.getString(FieldName.USERNAME),
+		 * data.getString(FieldName.TITLE),
+		 * data.getString(FieldName.CATEGORYID)).setHandler(res -> { JsonObject lvTmp =
+		 * new JsonObject(); if (res.succeeded()) { lvTmp.put(FieldName.CODE,
+		 * CodeMapping.C0000.toString()).put(FieldName.DATA, new
+		 * JsonObject().put(FieldName.SURVEYID, res.result())); } else {
+		 * lvTmp.put(FieldName.CODE,
+		 * CodeMapping.C1111.toString()).put(FieldName.MESSAGE,
+		 * res.cause().getMessage()); } response.complete(lvTmp); });
+		 */
+	}
+
+	public void updateSurvey(JsonObject data) {
+		/*
+		 * String lvSurveyID = data.getString(FieldName.SURVEYID); JsonObject setting =
+		 * data.getJsonObject(FieldName.SETTING); JsonArray question =
+		 * data.getJsonArray(FieldName.QUESTIONDATA); JsonObject themeData =
+		 * data.getJsonObject(FieldName.THEME); JsonObject rule =
+		 * data.getJsonObject(FieldName.RULEDATA);
+		 * 
+		 * SurveyDao lvSurveyDao = new SurveyDao(); lvSurveyDao.UpdateSurvey(lvSurveyID,
+		 * question, setting, rule, themeData); response =
+		 * lvSurveyDao.getMvFutureResponse();
+		 */
+	}
+
+	public void activeSurvey(JsonObject data) {
+		String userid = data.getString(FieldName.USERID);
+		String username = data.getString(FieldName.USERNAME);
+		String surveyID = data.getString(FieldName.SURVEYID);
+		int limitResp = data.getInteger(FieldName.MAXRESPONSE);
+		String macAddress = data.getString(FieldName.MACADDRESS);
+		double point = data.getDouble(FieldName.POINT);
+		double initialFund = data.getDouble(FieldName.INITIALFUND);
+		double limitFund = data.getDouble(FieldName.LIMITFUND);
+
+	}
+
+}

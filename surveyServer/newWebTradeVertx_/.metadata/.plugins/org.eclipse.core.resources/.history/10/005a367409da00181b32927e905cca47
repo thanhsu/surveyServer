@@ -1,0 +1,39 @@
+package com.survey.internal.action;
+
+import com.survey.dbservice.dao.UserDao;
+import com.survey.utils.CodeMapping;
+import com.survey.utils.FieldName;
+import com.survey.utils.SurveyMailCenter;
+import io.vertx.core.json.JsonObject;
+
+public class ChangePasswordAction extends BaseSurveyInternalAction {
+
+	@Override
+	public void doProccess() {
+		JsonObject body = getMessageBody();
+
+		String lvUserName = body.getString(FieldName.USERNAME);
+		String lvOldPassword = body.getString(FieldName.OLDPASSWORD);
+		String lvNewPassword = body.getString(FieldName.PASSWORD);
+		UserDao lvUserDao = new UserDao();
+		lvUserDao.changePassword(lvUserName, lvOldPassword, lvNewPassword).setHandler(res -> {
+			if (res.succeeded()) {
+				JsonObject msg = res.result();
+				if (msg.getString(FieldName.CODE).equals(CodeMapping.R0000.toString())) {
+					response.complete(msg);
+					// Register Success Do Sent Email
+					if (SurveyMailCenter.getInstance().sendEmail(getMessageBody().getString(FieldName.EMAIL),
+							"Register-ISurvey", "", "Register success. Access your account by link")) {
+
+					}
+				} else {
+					response.complete(msg);
+				}
+			} else {
+				response.fail(res.cause());
+			}
+			response.completer();
+		});
+	}
+
+}

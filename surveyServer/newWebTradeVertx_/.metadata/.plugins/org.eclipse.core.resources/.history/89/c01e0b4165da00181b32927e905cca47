@@ -1,0 +1,82 @@
+package com.survey.internal.action;
+
+import java.io.UnsupportedEncodingException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+
+import com.survey.constant.EventBusDiscoveryConst;
+import com.survey.dbservice.dao.CashWithdrawDao;
+import com.survey.dbservice.dao.UtilsDao;
+import com.survey.utils.CodeMapping;
+import com.survey.utils.FieldName;
+import com.survey.utils.MessageDefault;
+import com.survey.utils.RSAEncrypt;
+import com.survey.utils.Utils;
+import com.survey.utils.VertxServiceCenter;
+
+import io.vertx.core.Future;
+import io.vertx.core.json.JsonObject;
+
+public class WithdrawAction extends InternalSurveyBaseAction {
+
+	@Override
+	public void doProccess() {
+		String userid = getMessageBody().getString(FieldName.USERID);
+		String username = getMessageBody().getString(FieldName.USERNAME);
+		int amount = getMessageBody().getInteger(FieldName.AMOUNT);
+		// Check balance
+		Future<JsonObject> lvGetAccountBalance = Future.future();
+		VertxServiceCenter.getInstance().sendNewMessage(EventBusDiscoveryConst.ETHEREUMPROXYDISCOVERY.name(),
+				getMessageBody(), lvGetAccountBalance);
+		lvGetAccountBalance.setHandler(balance -> {
+			if (balance.succeeded()) {
+				double etheAmount = balance.result().getDouble("balance");
+				if (Utils.checkWithdraw(amount, etheAmount)) {
+					CashWithdrawDao lvCashWithdrawDao = new CashWithdrawDao();
+					UtilsDao lvUtilsDao = new UtilsDao();
+
+					lvUtilsDao.retrieveEthePointValue(false).setHandler(point -> {
+						try {
+							String exchangeRate = point.result().getString(FieldName.VALUE);
+							String privateToken = RSAEncrypt.getIntance().encrypt(userid);
+							lvCashWithdrawDao
+									.storeNewWithdrawRequest(userid, privateToken, "",
+											getMessageBody().getInteger(FieldName.AMOUNT),
+											getMessageBody().getString(FieldName.CCY),
+											getMessageBody().getString(FieldName.REMARK), false, exchangeRate)
+									.setHandler(handler -> {
+										if (handler.succeeded()) {
+											String id = handler.result();
+											this.response.complete(
+													new JsonObject().put(FieldName.CODE, CodeMapping.C0000.toString())
+															.put(FieldName.DATA,
+																	new JsonObject().put("success", true)
+																			.put(FieldName.PRIVATETOKEN, privateToken)
+																			.put(FieldName.TRANID, id)));
+										} else {
+											this.response.complete(
+													MessageDefault.RequestFailed(handler.cause().getMessage()));
+										}
+									});
+						} catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchPaddingException
+								| IllegalBlockSizeException | BadPaddingException | UnsupportedEncodingException e) {
+							this.response.complete(MessageDefault.ParamError("UserID is NULL!"));
+							e.printStackTrace();
+						}
+					});
+				} else {
+					this.CompleteGenerateResponse(CodeMapping.W1111.toString(), CodeMapping.W1111.value(),
+							balance.result(), response);
+				}
+			} else {
+				this.response.complete(MessageDefault.RequestFailed(balance.cause().getMessage()));
+			}
+		});
+
+	}
+
+}

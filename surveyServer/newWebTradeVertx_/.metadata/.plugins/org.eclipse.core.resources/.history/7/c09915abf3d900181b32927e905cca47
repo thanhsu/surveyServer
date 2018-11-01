@@ -1,0 +1,23 @@
+package com.survey.internal.action;
+
+import com.survey.dbservice.dao.UserDao;
+import com.survey.utils.CodeMapping;
+import com.survey.utils.FieldName;
+import com.survey.utils.MessageDefault;
+
+public class ActiveUserAction extends BaseSurveyInternalAction {
+
+	@Override
+	public void doProccess() {
+		UserDao lvUserDao = new UserDao();
+		lvUserDao.doGetUserInfobyUserName(getMessageBody().getString(FieldName.USERNAME));
+		lvUserDao.getMvFutureResponse().setHandler(handler -> {
+			if (handler.succeeded()) {
+
+			} else {
+				response.complete(MessageDefault.RequestFailed(CodeMapping.U000A.toString(), CodeMapping.U000A.value()));
+			}
+		});
+	}
+
+}

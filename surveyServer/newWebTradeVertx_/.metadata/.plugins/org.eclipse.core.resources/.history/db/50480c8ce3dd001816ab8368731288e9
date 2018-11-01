@@ -1,0 +1,348 @@
+package com.survey.constant;
+
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import org.atmosphere.cpr.AtmosphereResource;
+import org.atmosphere.cpr.AtmosphereResourceFactory;
+import org.atmosphere.cpr.Broadcaster;
+import org.atmosphere.cpr.BroadcasterFactory;
+import org.atmosphere.cpr.MetaBroadcaster;
+
+import com.survey.utils.Log;
+
+import io.vertx.core.Future;
+import io.vertx.core.Vertx;
+import io.vertx.core.shareddata.AsyncMap;
+import io.vertx.core.shareddata.SharedData;
+
+public class ITradeAtmosphereAPI {
+  public static final String TOPIC_PROTOCOL = "/push/${module}/${action}/${session}";
+  public static final String CONTRACT_SERVICE = "service";
+  public static final String CONTRACT_ACTION = "action";
+  public static final String CONTRACT_MODULE = "module";
+  public static final String CONTRACT_SESSION = "session";
+  public static final String SESSION_FNO = "watchlist";
+  public static final String USER_SESSION_SHARE = "atmosphereSession";
+  public static final String TOPIC_WATCHLIST = "stockinfo";
+  public static final String TOPIC_NOTIFICATION = "notification";
+
+
+  private static SharedData mvSharedData;
+  public static AsyncMap<String, String> mvSessionMapping;
+  public static AsyncMap<String, MetaBroadcaster> mvSubAccMetaBroad;
+  private volatile static ITradeAtmosphereAPI instance;
+
+  BroadcasterFactory mvBroadcasterFactory;
+  AtmosphereResourceFactory mvAtmosphereResourceFactory;
+  MetaBroadcaster mvMetaBroadcaster;
+
+  Object lock0 = new Object();
+  Object lock1 = new Object();
+  Object lock2 = new Object();
+
+  private ITradeAtmosphereAPI() {
+
+  }
+
+  public static ITradeAtmosphereAPI getInstance() {
+    if (instance == null) {
+      synchronized (ITradeAtmosphereAPI.class) {
+        if (instance == null) {
+          instance = new ITradeAtmosphereAPI();
+        }
+      }
+    }
+    return instance;
+  }
+
+  public ITradeAtmosphereAPI setBroadcasterFactory(final BroadcasterFactory pFactory) {
+    if (this.mvBroadcasterFactory == null) {
+      synchronized (lock0) {
+        if (this.mvAtmosphereResourceFactory == null) {
+          this.mvBroadcasterFactory = pFactory;
+        }
+      }
+    }
+    return this;
+  }
+
+  public ITradeAtmosphereAPI setSharedData(SharedData pSharedData) {
+    ITradeAtmosphereAPI.mvSharedData = pSharedData;
+    return this;
+  }
+
+  public static SharedData getSharedData() {
+    return mvSharedData;
+  }
+
+  public ITradeAtmosphereAPI setMetaBroadcaster(final MetaBroadcaster pMetaBroadcaster) {
+    if (this.mvMetaBroadcaster == null) {
+      synchronized (lock2) {
+        if (this.mvMetaBroadcaster == null) {
+          this.mvMetaBroadcaster = pMetaBroadcaster;
+        }
+      }
+    }
+    return this;
+  }
+
+  public ITradeAtmosphereAPI setResourceFactory(final AtmosphereResourceFactory pAtmosphereResourceFactory) {
+    if (this.mvAtmosphereResourceFactory == null) {
+      synchronized (lock1) {
+        if (this.mvAtmosphereResourceFactory == null) {
+          this.mvAtmosphereResourceFactory = pAtmosphereResourceFactory;
+        }
+      }
+    }
+    return this;
+  }
+
+  /*
+   * Push Message to Client ID
+   */
+  public boolean pushTopic(final String module, final String clientId, final String topic, Object o) {
+    HashMap<String, String> data = new HashMap<>();
+    data.put(CONTRACT_SESSION, clientId);
+    data.put(CONTRACT_ACTION, topic);
+    data.put(CONTRACT_MODULE, module);
+    String lvBid = contract(data);
+    Broadcaster lvBroadcaster = lookupBroadcaster(lvBid, false);
+    if (lvBroadcaster == null) {
+      Log.println("[ITradeAtmosphere] Client ID " + clientId + " not found in list stock . Removed", Log.ACCESS_LOG);
+      return false;
+    } else {
+      return broadcast(lvBroadcaster, o, topic);
+    }
+  }
+
+  // public boolean pushTopicWatchList(final String module, final String action, final String session,
+  // Object o) {
+  // HashMap<String, String> data = new HashMap<>();
+  // data.put(CONTRACT_SESSION, session);
+  // data.put(CONTRACT_ACTION, TOPIC_WATCHLIST);
+  // data.put(CONTRACT_MODULE, module);
+  // String lvBid = contract(data);
+  // Broadcaster lvBroadcaster = lookupBroadcaster(lvBid, false);
+  // if (lvBroadcaster == null) {
+  // Log.println("[ITradeAtmosphere] Action " + action + " not found in list stock . Removed",
+  // Log.ACCESS_LOG);
+  // return false;
+  // } else {
+  // return broadcast(lvBroadcaster, o, action);
+  // }
+  // }
+  // Will Broadcast to ALL
+  public boolean pushTopicWatchList(final String module, final String action, final String session, Object o) {
+    HashMap<String, String> data = new HashMap<>();
+    data.put(CONTRACT_SESSION, session);
+    data.put(CONTRACT_ACTION, TOPIC_WATCHLIST);
+    data.put(CONTRACT_MODULE, module);
+    String lvBid = contract(data);
+    this.mvMetaBroadcaster.broadcastTo(lvBid, o);
+    return true;
+    // Broadcaster lvBroadcaster = lookupBroadcaster(lvBid, false);
+    // if (lvBroadcaster == null) {
+    // Log.println("[ITradeAtmosphere] Action " + action + " not found in list stock . Removed",
+    // Log.ACCESS_LOG);
+    // return false;
+    // } else {
+    // return broadcast(lvBroadcaster, o, action);
+    // }
+  }
+
+  public boolean pushTopicWinvestor(final String module, final String action, final String session, Object o) {
+    HashMap<String, String> data = new HashMap<>();
+    data.put(CONTRACT_SESSION, session);
+    data.put(CONTRACT_ACTION, action);
+    data.put(CONTRACT_MODULE, module);
+    String lvBid = contract(data);
+    this.mvMetaBroadcaster.broadcastTo(lvBid, o);
+    return true;
+    // Broadcaster lvBroadcaster = lookupBroadcaster(lvBid, false);
+    // if (lvBroadcaster == null) {
+    // Log.println("[ITradeAtmosphere] Action " + action + " not found in list stock . Removed",
+    // Log.ACCESS_LOG);
+    // return false;
+    // } else {
+    // return broadcast(lvBroadcaster, o, action);
+    // }
+  }
+  
+  // public boolean pushTopicNotification(final String module, final String action, final String
+  // session, Object o) {
+  // HashMap<String, String> data = new HashMap<>();
+  // data.put(CONTRACT_SESSION, session);
+  // data.put(CONTRACT_ACTION, TOPIC_NOTIFICATION);
+  // data.put(CONTRACT_MODULE, module);
+  // String lvBid = contract(data);
+  // Broadcaster lvBroadcaster = lookupBroadcaster(lvBid, false);
+  // if (lvBroadcaster == null) {
+  // Log.println("[ITradeAtmosphere] Action " + action + " not found in list stock . Removed",
+  // Log.ACCESS_LOG);
+  // return false;
+  // } else {
+  // return broadcast(lvBroadcaster, o, action);
+  // }
+  // }
+
+  // Will Broacast to ALL
+  public boolean pushTopicNotification(final String module, final String action, final String session, Object o) {
+    HashMap<String, String> data = new HashMap<>();
+    data.put(CONTRACT_SESSION, session);
+    data.put(CONTRACT_ACTION, TOPIC_NOTIFICATION);
+    data.put(CONTRACT_MODULE, module);
+    String lvBid = contract(data);
+
+    // Broadcaster lvBroadcaster = lookupBroadcaster(lvBid, false);
+    // if (lvBroadcaster == null) {
+    // Log.println("[ITradeAtmosphere] Action " + action + " not found in list stock . Removed",
+    // Log.ACCESS_LOG);
+    // return false;
+    // } else {
+    // return broadcast(lvBroadcaster, o, action);
+    // }
+    //lookupBroadcaster(lvBid, false).broadcast(o);
+    this.mvMetaBroadcaster.broadcastTo(lvBid, o);
+    return true;
+
+  }
+
+  /*
+   * Push for watch List topic: watchlist
+   */
+  public boolean pushFnoWatchlist(final String module, final String action, Object o) {
+    return pushTopicWatchList(module, action, SESSION_FNO, o);
+  }
+
+  // TODO must checking if connection
+  public Future<String> subscribeTopic(AtmosphereResource resource, String clientID, String... pTopics) {
+    final Future<String> lvFuture = Future.future();
+    mvSharedData.getClusterWideMap(USER_SESSION_SHARE, result -> {
+      if (result.succeeded()) {
+        result.result().get(clientID, data -> {
+          if (data.succeeded() && data.result() != null) {
+            ITradeUserPushBean lvITradeUser = (ITradeUserPushBean) data.result();
+            for (String lvTopic : pTopics) {
+              if (!lvITradeUser.getMvTopic().contains(lvTopic)) {
+                lvITradeUser.getMvTopic().add(lvTopic);
+              }
+            }
+            result.result().replace(clientID, lvITradeUser, res -> {
+              if (res.succeeded()) {
+                lvFuture.complete("Success");
+                Log.print("UPDATE new topic SUCCESSED: " + clientID + " Topic: " + pTopics.toString());
+              } else {
+                lvFuture.fail("Error. Cause:" + res.cause());
+                lvFuture.complete();
+                Log.print("UPDATE new topic FAILED: " + clientID + " Topic: " + pTopics.toString() + " . Cause: " + res.cause());
+              }
+            });
+          } else {
+            ITradeUserPushBean lvITradeUser = new ITradeUserPushBean();
+            lvITradeUser.setMvClientID(clientID);
+            lvITradeUser.setMvLoginIP(resource.getRequest().getLocalAddr());
+            List<String> lvTmp = Arrays.asList(pTopics);
+            lvITradeUser.setMvTopic(lvTmp);
+            lvITradeUser.setMvUUID(resource.uuid());
+            result.result().put(clientID, lvITradeUser, res -> {
+              if (res.succeeded()) {
+                lvFuture.complete("Success");
+                Log.print("CREATE new topic SUCCESSED: " + clientID + " Topic: " + pTopics.toString());
+
+              } else {
+                lvFuture.fail("Error. Cause:" + res.cause());
+                lvFuture.complete();
+                Log.print("CREATE new topic FAILED: " + clientID + " Topic: " + pTopics.toString() + " .Cause: " + res.cause());
+              }
+            });
+          }
+        });
+      } else {
+        lvFuture.fail(result.cause());
+        lvFuture.complete();
+      }
+    });
+    return lvFuture;
+  }
+
+  public void saveUUID(String clienid, String uuid) {
+    mvSharedData.getClusterWideMap(USER_SESSION_SHARE, result -> {
+      result.result().putIfAbsent(clienid, uuid, res -> {
+        if (res.succeeded()) {
+          Log.print("SUCCESSED Shared User: " + clienid + " with UUID Session: " + uuid);
+        } else {
+          Log.print("FAILED Shared User: " + clienid + " with UUID Session: " + uuid + " . CAUSE: " + res.cause());
+        }
+      });
+    });
+  }
+
+  public Future<Object> offer(AtmosphereResource pResource, String pClientID) {
+    final Future<Object> mvFuture = Future.future();
+    mvSharedData.getClusterWideMap(USER_SESSION_SHARE, data -> {
+      if (data.succeeded()) {
+        data.result().putIfAbsent(pClientID, pResource.uuid(), res -> {
+          mvFuture.complete(res.result());
+        });
+      } else {
+        mvFuture.fail(data.cause());
+      }
+    });
+    return mvFuture;
+  }
+
+  private String contract(HashMap<String, String> data) {
+    HashMap<String, String> padding = data;
+    String contract = null;
+    if (data.get(CONTRACT_SERVICE) == null) {
+      padding.put(CONTRACT_SERVICE, CONTRACT_SERVICE);
+    }
+    if (data.get(CONTRACT_ACTION) == null) {
+      padding.put(CONTRACT_ACTION, "commet");
+    }
+    if (data.get(CONTRACT_MODULE) == null) {
+      padding.put(CONTRACT_MODULE, "itrade");
+    }
+    if (data.get(CONTRACT_SESSION) == null) {
+      padding.put(CONTRACT_SESSION, "");
+    }
+ 
+    contract = TextUtil.composeMessage(TOPIC_PROTOCOL, padding);
+
+    while (contract.endsWith("/")) {
+      contract = contract.substring(0, contract.length() - 1);
+    }
+    contract = contract.replace("//", "/");
+    return contract;
+  }
+  
+  private boolean broadcast(Broadcaster broadcaster, Object jsonObject, String action) {
+    // ItradeResponseJSONBean lvResponseJSONBean = new ItradeResponseJSONBean(action, 0, jsonObject);
+    if (broadcaster.getAtmosphereResources().size() > 0 && broadcaster != null) {
+      broadcaster.broadcast(jsonObject);
+      return true;
+    }
+    return false;
+
+  }
+
+  private Broadcaster lookupBroadcaster(final String s, boolean paraBool) {
+    try {
+      Broadcaster b = getDefaultAtmosBroadcasterFactory().lookup(s, paraBool);
+      return b;
+    } catch (NullPointerException e) {
+      Log.print("[ITradeAtmosphereAPI] Null Pointer Exception when lookup for: " + s, Log.ERROR_LOG);
+      return null;
+    }
+  }
+
+  public AtmosphereResourceFactory getAtmosphereResourceFactory() {
+    return this.mvAtmosphereResourceFactory;
+  }
+
+  public BroadcasterFactory getDefaultAtmosBroadcasterFactory() {
+    return this.mvBroadcasterFactory;
+  }
+
+}

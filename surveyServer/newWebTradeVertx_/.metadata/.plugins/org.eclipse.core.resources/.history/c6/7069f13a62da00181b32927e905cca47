@@ -1,0 +1,10 @@
+package com.survey.internal.action;
+
+public class WithdrawAction extends BaseSurveyInternalAction {
+
+	@Override
+	public void doProccess() {
+		
+	}
+
+}

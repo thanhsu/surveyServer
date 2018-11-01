@@ -1,0 +1,34 @@
+package com.survey.internal.action;
+
+import com.survey.utils.FieldName;
+import com.survey.utils.MessageDefault;
+import com.survey.utils.RSAEncrypt;
+
+public class PaymentAction extends BaseSurveyInternalAction {
+	@Override
+	public void doProccess() {
+		String dw = getMessageBody().getString(FieldName.DW);
+		String userID = getMessageBody().getString(FieldName.USERID);
+		String privateToke = getMessageBody().getString(FieldName.PRIVATETOKEN);
+		String discoveryKey = getMessageBody().getString(FieldName.DISCOVERYKEY);
+		String trandID = getMessageBody().getString(FieldName.TRANID);
+		
+		switch (dw) {
+		case "deposit":
+			
+			break;
+		case "withdraw":
+
+			break;
+		default:
+			this.response.complete(MessageDefault.ActionNotFound());
+			break;
+		}
+	}
+	
+	private boolean checkToken (String userID, String privateToken ) {
+		String decode = RSAEncrypt.getIntance().decrypt(privateToken);
+		return decode.equals(userID);
+	}
+
+}

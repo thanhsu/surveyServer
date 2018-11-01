@@ -1,0 +1,16 @@
+package com.survey.internal.action;
+
+import com.survey.dbservice.dao.UtilsDao;
+import com.survey.utils.MessageDefault;
+
+public class RetrieveCashMethodAction extends BaseSurveyInternalAction {
+
+	@Override
+	public void doProccess() {
+		UtilsDao lvDao = new UtilsDao();
+		lvDao.retrieveCashMethod().setHandler(handler->{
+				response.complete(handler.result());
+		});
+	}
+
+}

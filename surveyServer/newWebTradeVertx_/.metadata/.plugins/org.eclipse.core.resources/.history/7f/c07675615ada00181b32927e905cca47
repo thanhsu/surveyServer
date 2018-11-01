@@ -1,0 +1,11 @@
+package com.survey.internal.action;
+
+public class AccountBalanceProxyAction extends BaseSurveyInternalAction {
+
+	@Override
+	public void doProccess() {
+		// TODO Auto-generated method stub
+
+	}
+
+}

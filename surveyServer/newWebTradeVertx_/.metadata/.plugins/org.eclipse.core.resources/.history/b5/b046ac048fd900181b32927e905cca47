@@ -1,0 +1,59 @@
+package com.survey.internal.action;
+
+import java.io.UnsupportedEncodingException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+
+import com.survey.dbservice.dao.CashDepositDao;
+import com.survey.utils.FieldName;
+import com.survey.utils.MessageDefault;
+import com.survey.utils.RSAEncrypt;
+
+public class PaymentAction extends BaseSurveyInternalAction {
+	@Override
+	public void doProccess() {
+		String dw = getMessageBody().getString(FieldName.DW);
+		String userID = getMessageBody().getString(FieldName.USERID);
+		String privateToke = getMessageBody().getString(FieldName.PRIVATETOKEN);
+		String discoveryKey = getMessageBody().getString(FieldName.DISCOVERYKEY);
+		String trandID = getMessageBody().getString(FieldName.TRANID);
+
+		switch (dw) {
+		case "deposit":
+			if (checkToken(userID, privateToke)) {
+				CashDepositDao lvCashDepositDao = new CashDepositDao();
+			} else {
+				this.response.complete(MessageDefault.PermissionError());
+			}
+			break;
+		case "withdraw":
+			if (checkToken(userID, privateToke)) {
+
+			} else {
+				this.response.complete(MessageDefault.PermissionError());
+			}
+			break;
+		default:
+			this.response.complete(MessageDefault.ActionNotFound());
+			break;
+		}
+	}
+
+	private boolean checkToken(String userID, String privateToken) {
+		String decode;
+		try {
+			decode = RSAEncrypt.getIntance().decrypt(privateToken);
+			return decode.equals(userID);
+		} catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchPaddingException | IllegalBlockSizeException
+				| BadPaddingException | UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return false;
+	}
+
+}

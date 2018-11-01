@@ -1,0 +1,8 @@
+package com.survey.internal.action;
+
+public class Snippet {
+	public static void main(String[] args) {
+		new JsonObject().put(FieldName.CODE, CodeMapping.C1111.toString()).put(FieldName.MESSAGE, cause)
+	}
+}
+

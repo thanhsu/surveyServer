@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Rename compilation unit &apos;com.survey.paypal.utils.PaypalBean.java&apos; to &apos;OrderBean.java&apos;&#x0A;- Original project: &apos;ServeyProcessor&apos;&#x0A;- Original element: &apos;com.survey.paypal.utils.PaypalBean.java&apos;&#x0A;- Renamed element: &apos;com.survey.paypal.utils.OrderBean.java&apos;" description="Rename compilation unit &apos;PaypalBean.java&apos;" flags="2" id="org.eclipse.jdt.ui.rename.compilationunit" input="/src\/main\/java&lt;com.survey.paypal.utils{PaypalBean.java" name="OrderBean.java" references="false" stamp="1539867419311" version="1.0"/>
+</session>
