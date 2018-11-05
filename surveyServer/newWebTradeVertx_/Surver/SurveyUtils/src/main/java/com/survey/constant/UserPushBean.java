@@ -3,7 +3,7 @@ package com.survey.constant;
 import java.io.Serializable;
 import java.util.List;
 
-public class ITradeUserPushBean implements Serializable {
+public class UserPushBean implements Serializable {
   /**
    * 
    */

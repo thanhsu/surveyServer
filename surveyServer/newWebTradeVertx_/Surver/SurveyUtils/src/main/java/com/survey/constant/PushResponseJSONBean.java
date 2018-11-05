@@ -2,7 +2,7 @@ package com.survey.constant;
 
 import java.io.Serializable;
 
-public class ItradeResponseJSONBean implements Serializable, JacksonEncoder.Encodable {
+public class PushResponseJSONBean implements Serializable, JacksonEncoder.Encodable {
   /**
    *
    */
@@ -13,7 +13,7 @@ public class ItradeResponseJSONBean implements Serializable, JacksonEncoder.Enco
   int code;
   Object result = new Object();
 
-  public ItradeResponseJSONBean(String status, int code, Object obj) {
+  public PushResponseJSONBean(String status, int code, Object obj) {
     super();
     this.status = status;
     this.code = code;

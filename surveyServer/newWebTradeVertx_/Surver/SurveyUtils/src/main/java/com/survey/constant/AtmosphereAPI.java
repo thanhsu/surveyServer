@@ -17,7 +17,7 @@ import io.vertx.core.Vertx;
 import io.vertx.core.shareddata.AsyncMap;
 import io.vertx.core.shareddata.SharedData;
 
-public class ITradeAtmosphereAPI {
+public class AtmosphereAPI {
 	public static final String TOPIC_PROTOCOL = "/push/${module}/${action}/${session}";
 	public static final String CONTRACT_SERVICE = "service";
 	public static final String CONTRACT_ACTION = "action";
@@ -31,7 +31,7 @@ public class ITradeAtmosphereAPI {
 	private static SharedData mvSharedData;
 	public static AsyncMap<String, String> mvSessionMapping;
 	public static AsyncMap<String, MetaBroadcaster> mvSubAccMetaBroad;
-	private volatile static ITradeAtmosphereAPI instance;
+	private volatile static AtmosphereAPI instance;
 
 	BroadcasterFactory mvBroadcasterFactory;
 	AtmosphereResourceFactory mvAtmosphereResourceFactory;
@@ -41,22 +41,22 @@ public class ITradeAtmosphereAPI {
 	Object lock1 = new Object();
 	Object lock2 = new Object();
 
-	private ITradeAtmosphereAPI() {
+	private AtmosphereAPI() {
 
 	}
 
-	public static ITradeAtmosphereAPI getInstance() {
+	public static AtmosphereAPI getInstance() {
 		if (instance == null) {
-			synchronized (ITradeAtmosphereAPI.class) {
+			synchronized (AtmosphereAPI.class) {
 				if (instance == null) {
-					instance = new ITradeAtmosphereAPI();
+					instance = new AtmosphereAPI();
 				}
 			}
 		}
 		return instance;
 	}
 
-	public ITradeAtmosphereAPI setBroadcasterFactory(final BroadcasterFactory pFactory) {
+	public AtmosphereAPI setBroadcasterFactory(final BroadcasterFactory pFactory) {
 		if (this.mvBroadcasterFactory == null) {
 			synchronized (lock0) {
 				if (this.mvAtmosphereResourceFactory == null) {
@@ -67,8 +67,8 @@ public class ITradeAtmosphereAPI {
 		return this;
 	}
 
-	public ITradeAtmosphereAPI setSharedData(SharedData pSharedData) {
-		ITradeAtmosphereAPI.mvSharedData = pSharedData;
+	public AtmosphereAPI setSharedData(SharedData pSharedData) {
+		AtmosphereAPI.mvSharedData = pSharedData;
 		return this;
 	}
 
@@ -76,7 +76,7 @@ public class ITradeAtmosphereAPI {
 		return mvSharedData;
 	}
 
-	public ITradeAtmosphereAPI setMetaBroadcaster(final MetaBroadcaster pMetaBroadcaster) {
+	public AtmosphereAPI setMetaBroadcaster(final MetaBroadcaster pMetaBroadcaster) {
 		if (this.mvMetaBroadcaster == null) {
 			synchronized (lock2) {
 				if (this.mvMetaBroadcaster == null) {
@@ -87,7 +87,7 @@ public class ITradeAtmosphereAPI {
 		return this;
 	}
 
-	public ITradeAtmosphereAPI setResourceFactory(final AtmosphereResourceFactory pAtmosphereResourceFactory) {
+	public AtmosphereAPI setResourceFactory(final AtmosphereResourceFactory pAtmosphereResourceFactory) {
 		if (this.mvAtmosphereResourceFactory == null) {
 			synchronized (lock1) {
 				if (this.mvAtmosphereResourceFactory == null) {
@@ -230,7 +230,7 @@ public class ITradeAtmosphereAPI {
 			if (result.succeeded()) {
 				result.result().get(clientID, data -> {
 					if (data.succeeded() && data.result() != null) {
-						ITradeUserPushBean lvITradeUser = (ITradeUserPushBean) data.result();
+						UserPushBean lvITradeUser = (UserPushBean) data.result();
 						for (String lvTopic : pTopics) {
 							if (!lvITradeUser.getMvTopic().contains(lvTopic)) {
 								lvITradeUser.getMvTopic().add(lvTopic);
@@ -248,7 +248,7 @@ public class ITradeAtmosphereAPI {
 							}
 						});
 					} else {
-						ITradeUserPushBean lvITradeUser = new ITradeUserPushBean();
+						UserPushBean lvITradeUser = new UserPushBean();
 						lvITradeUser.setMvClientID(clientID);
 						lvITradeUser.setMvLoginIP(resource.getRequest().getLocalAddr());
 						List<String> lvTmp = Arrays.asList(pTopics);
