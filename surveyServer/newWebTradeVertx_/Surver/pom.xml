@@ -169,10 +169,10 @@
 		</plugins>
 	</build>
 	<modules>
-		<module>SurveyUtils</module>
+		<!-- <module>SurveyUtils</module>
 		<module>SurveyDatabaseService</module>
 		<module>ServeyProcessor</module>
     <module>SurveyEtheProxyService</module>
-    <module>PaypalGatewayService</module>
+    <module>PaypalGatewayService</module> -->
 	</modules>
 </project>
