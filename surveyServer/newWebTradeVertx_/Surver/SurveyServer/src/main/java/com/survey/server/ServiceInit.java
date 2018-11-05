@@ -1,5 +1,6 @@
 package com.survey.server;
 
+import com.survey.utils.Log;
 import com.survey.utils.VertxServiceCenter;
 
 import io.vertx.core.AbstractVerticle;
@@ -12,7 +13,8 @@ public class ServiceInit extends AbstractVerticle {
 	@Override
 	public void init(Vertx vertx, Context context) {
 		super.init(vertx, context);
-
+		Log.setMvConfig(config());
+		Log.setSysTrace();
 	}
 
 	@Override

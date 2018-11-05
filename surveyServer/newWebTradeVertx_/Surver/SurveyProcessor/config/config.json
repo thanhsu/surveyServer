@@ -15,7 +15,8 @@
 	"log.SMTPHost": "mail.tx-tech.com",
 	"DBConnectionConfig": {
 		"db_name": "surveytesting",
-		"connection_string": "mongodb://admin:12wqasxz@ds237808.mlab.com:37808/surveytesting"
+		 "connection_string": "mongodb://admin:12wqasxz@ds237808.mlab.com:37808/surveytesting" 
+		/* "connection_string": "mongodb://localhost:27017" */
 	},
 	"ActionMapping": [
 		"login-com.survey.dbservices.action.UserLogin",

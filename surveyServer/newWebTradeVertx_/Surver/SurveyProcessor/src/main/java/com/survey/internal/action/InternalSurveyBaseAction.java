@@ -57,6 +57,14 @@ public abstract class InternalSurveyBaseAction {
 		mvResponse.put(FieldName.DATA, data);
 		result.complete(mvResponse);
 	}
+	
+	public void CompleteGenerateResponse(String code, String message, Object data, Future<JsonObject> result) {
+		JsonObject mvResponse = new JsonObject();
+		mvResponse.put(FieldName.CODE, code);
+		mvResponse.put(FieldName.MESSAGE, message);
+		mvResponse.put(FieldName.DATA, data);
+		result.complete(mvResponse);
+	}
 
 	public JsonObject getMessageBody() {
 		return messageBody;

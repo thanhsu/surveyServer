@@ -6,8 +6,8 @@ import org.atmosphere.config.service.DeliverTo.DELIVER_TO;
 import org.atmosphere.cpr.*;
 import org.atmosphere.interceptor.*;
 import com.hazelcast.com.eclipsesource.json.JsonObject;
-import com.survey.constant.ITradeAtmosphereAPI;
-import com.survey.constant.ItradeResponseJSONBean;
+import com.survey.constant.AtmosphereAPI;
+import com.survey.constant.PushResponseJSONBean;
 import com.survey.utils.Log;
 
 import atmosphere.decoder.ProtocolDecoder;
@@ -45,14 +45,14 @@ public class PushManager {
   @DeliverTo(DELIVER_TO.RESOURCE)
   public Object onReady(final AtmosphereResource resource) {
     Log.print("Browser:" + resource.uuid() + " connected!", Log.DEBUG_LOG);
-    final ItradeResponseJSONBean lvResBean = new ItradeResponseJSONBean("1010", 1, null);
+    final PushResponseJSONBean lvResBean = new PushResponseJSONBean("1010", 1, null);
 
     resource.getResponse().addHeader("Access-Control-Allow-Origin", "*");
-    ITradeAtmosphereAPI lvAPI = ITradeAtmosphereAPI.getInstance();
+    AtmosphereAPI lvAPI = AtmosphereAPI.getInstance();
     lvAPI.setBroadcasterFactory(factory).setMetaBroadcaster(metaBroadcaster).setResourceFactory(resourceFactory);
     String pTopics = resource.getRequest().getRequestURI();
     // ITradeAtmosphereAPI.getInstance().subscribeTopic(resource, mvClientID, pTopics);
-    Future<String> lvFuture = ITradeAtmosphereAPI.getInstance().subscribeTopic(resource, mvClientID, pTopics);
+    Future<String> lvFuture = AtmosphereAPI.getInstance().subscribeTopic(resource, mvClientID, pTopics);
     lvFuture.setHandler(handler -> {
       if (handler.succeeded()) {
         // System.out.println("Subcribe Topic Success");
@@ -64,13 +64,13 @@ public class PushManager {
   }
 
   @Message(encoders = {JacksonEncoder.class}, decoders = {ProtocolDecoder.class})
-  public ItradeResponseJSONBean onTopicSubscribe(AtmosphereResource resource) {
-    final ItradeResponseJSONBean lvResBean = new ItradeResponseJSONBean("1010", 1, null);
+  public PushResponseJSONBean onTopicSubscribe(AtmosphereResource resource) {
+    final PushResponseJSONBean lvResBean = new PushResponseJSONBean("1010", 1, null);
     Log.print("Browser:" + resource.uuid() + " connected!", Log.DEBUG_LOG);
-    ITradeAtmosphereAPI lvAPI = ITradeAtmosphereAPI.getInstance();
+    AtmosphereAPI lvAPI = AtmosphereAPI.getInstance();
     lvAPI.setBroadcasterFactory(factory).setMetaBroadcaster(metaBroadcaster).setResourceFactory(resourceFactory);
     String pTopics = resource.getRequest().getRequestURI();
-    Future<String> lvFuture = ITradeAtmosphereAPI.getInstance().subscribeTopic(resource, mvClientID, pTopics);
+    Future<String> lvFuture = AtmosphereAPI.getInstance().subscribeTopic(resource, mvClientID, pTopics);
     lvFuture.setHandler(handler -> {
       if (handler.succeeded()) {
         // System.out.println("Subcribe Topic Success");
@@ -82,7 +82,7 @@ public class PushManager {
   }
 
   @Message(encoders = {JacksonEncoder.class}, decoders = {ProtocolDecoder.class})
-  public ItradeResponseJSONBean onBroadcastMessage(ItradeResponseJSONBean respBean) {
+  public PushResponseJSONBean onBroadcastMessage(PushResponseJSONBean respBean) {
     return respBean;
   }
 

@@ -1,5 +1,6 @@
 package com.survey.server;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -72,7 +73,21 @@ public class WebServer extends MicroServiceVerticle {
 				.handler(SessionHandler.create(mvLocalSessionStored).setSessionTimeout(lvSessionTimeout));
 
 		// userinfomation routing
+		router.get("/:page").handler(rtx -> {
+			String lvName = rtx.pathParam("page") + ".html";
+			try {
+				if (new File("./webroot/" + lvName).exists()) {
+					rtx.response().sendFile("./webroot/" + lvName);
+				} else {
+					rtx.next();
+				}
+			} catch (Exception e) {
+				rtx.next();
+			}
+		});
+		router.post("/register").handler(this::handlerRegister);
 		router.post("/login").handler(this::handlerLogin);
+
 		router.route("/survey/:action").handler(this::handlerSurveyAction);
 		router.get("/activeuser").handler(this::handlerActiveAccount);
 		router.post("/cash/:method/:action").handler(this::handlerCashAction);
@@ -97,16 +112,16 @@ public class WebServer extends MicroServiceVerticle {
 		}
 
 		this.mvHttpServer = vertx.createHttpServer(httpOption);
-		 Log.println("Starting Service Push", Log.TRANSACTION_LOG);
-		    VertxAtmosphere.Builder lvBuilder = new VertxAtmosphere.Builder();
-		    try {
-		      lvBuilder.resource(PushManager.class).httpServer(this.mvHttpServer).url("/push/:module/:action/:clientID").webroot("webroot")
-		          .initParam(ApplicationConfig.WEBSOCKET_CONTENT_TYPE, "application/json").vertx(this.vertx).build();
-		    } catch (Exception e) {
-		      e.printStackTrace();
-		    }
-		
-		
+		Log.println("Starting Service Push", Log.TRANSACTION_LOG);
+		VertxAtmosphere.Builder lvBuilder = new VertxAtmosphere.Builder();
+		try {
+			lvBuilder.resource(PushManager.class).httpServer(this.mvHttpServer).url("/push/:module/:action/:clientID")
+					.webroot("webroot").initParam(ApplicationConfig.WEBSOCKET_CONTENT_TYPE, "application/json")
+					.vertx(this.vertx).build();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
 		this.mvHttpServer.requestHandler(router::accept).listen(lvPort, res -> {
 			if (res.succeeded()) {
 				System.out.println("******************Init WTrade Services Listening*******************");
@@ -367,12 +382,61 @@ public class WebServer extends MicroServiceVerticle {
 				});
 	}
 
+	private void handlerRegister(RoutingContext rtx) {
+		// Check Message
+		JsonObject messageBody = rtx.getBodyAsJson();
+		messageBody.put("action", "register");
+		discovery.getRecord(
+				new JsonObject().put("name", EventBusDiscoveryConst.SURVEYINTERNALPROCESSORTDISCOVERY.toString()),
+				resultHandler -> {
+					if (resultHandler.succeeded() && resultHandler.result() != null) {
+						Record record = resultHandler.result();
+						mvEventBus.<JsonObject>send(record.getLocation().getString("endpoint"), messageBody, res -> {
+							if (res.succeeded()) {
+								JsonObject resp = res.result().body();
+								doResponseNoRenewCookie(rtx, Json.encodePrettily(resp));
+							} else {
+								doResponse(rtx, MessageDefault.RequestFailed(CodeMapping.C1111.toString(),
+										res.cause().getMessage()));
+							}
+						});
+
+					} else {
+						doResponse(rtx, MessageDefault.RequestFailed(resultHandler.cause().getMessage()));
+					}
+				});
+	}
+
 	private void handlerAdminConfirm(RoutingContext rtx) {
 		if (rtx.request().method().toString().equalsIgnoreCase("post")) {
-			JsonObject message = rtx.getBodyAsJson();	
+			JsonObject message = rtx.getBodyAsJson();
 			rtx.response().end("Received");
-			String action = message.getString("action");
-			
+			VertxServiceCenter.getInstance().getDiscovery().getRecord(
+					new JsonObject().put("name", EventBusDiscoveryConst.SURVEYCONFIRMPROCESSORDISCOVERY.toString()),
+					resultHandler -> {
+						if (resultHandler.succeeded() && resultHandler.result() != null) {
+							Record record = resultHandler.result();
+							VertxServiceCenter.getEventbus().<JsonObject>send(record.getLocation().getString("endpoint"),
+									message, res -> {
+										if (res.succeeded()) {
+											if (res.result().body().getString(FieldName.CODE)
+													.equals(CodeMapping.C0000.toString())) {
+												rtx.response().end("Confirm success");
+											} else {
+												rtx.response().end("Confirm Failed");
+											}
+										} else {
+											rtx.response().end("Confirm Failed");
+											/*
+											 * doResponse(rtx,
+											 * MessageDefault.RequestFailed(resultHandler.cause().getMessage()));
+											 */
+										}
+									});
+						} else {
+							doResponse(rtx, MessageDefault.RequestFailed(resultHandler.cause().getMessage()));
+						}
+					});
 		} else {
 
 		}

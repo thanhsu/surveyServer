@@ -1,8 +1,8 @@
 package com.survey.constant;
 
 public class SurveyRequestName {
-	public static final String RETRIEVE_PUBLIC = "retrivepublic";
-	public static final String RETRIEVE_MYSURVEY = "retrivemysurvey";
+	public static final String RETRIEVE_PUBLIC = "retrievepublic";
+	public static final String RETRIEVE_MYSURVEY = "retrievemysurvey";
 	public static final String RETRIEVE_SUBMIT = "retrievesubmit";
 	public static final String RETRIEVE_SEARCH = "search";
 	public static final String RETRIVE_LOCK = "retrivelock";

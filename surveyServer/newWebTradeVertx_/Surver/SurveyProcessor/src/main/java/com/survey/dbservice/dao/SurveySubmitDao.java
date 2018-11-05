@@ -27,6 +27,20 @@ public class SurveySubmitDao extends SurveyBaseDao {
 		});
 	}
 
+	public Future<Integer> countAllSubmitResult(String surveyID) {
+		Future<Integer> lvResult = Future.future();
+		this.queryDocument(new JsonObject().put(FieldName.SURVEYID, surveyID), handler -> {
+			if (handler.succeeded() && handler.result() != null) {
+				System.out.println("Count ID " + surveyID + " total" + handler.result().size());
+				lvResult.complete(handler.result().size());
+			} else {
+				System.out.println("Count Fail");
+				lvResult.complete(0);
+			}
+		});
+		return lvResult;
+	}
+
 	public void retrieveAllSurveyComplete(String userID) {
 		this.queryDocument(new JsonObject().put(FieldName.USERID, userID), handler -> {
 			this.CompleteGenerateResponse(CodeMapping.C0000.toString(), "", handler.result());

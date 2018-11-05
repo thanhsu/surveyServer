@@ -37,6 +37,7 @@ public enum CodeMapping {
 	S6666("Survey not allow for submit now"),
 	S7777("Initial Fun greater than account balance"),
 	S8888("Survey Closed or Deleted"),
+	S9999("Pushlish reject. Because Survey was pushlished"),
 	
 	D1111("Deposit Not Found"),
 	

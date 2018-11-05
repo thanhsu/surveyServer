@@ -14,7 +14,7 @@
 package atmosphere.decoder;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.survey.constant.ItradeResponseJSONBean;
+import com.survey.constant.PushResponseJSONBean;
 
 import org.atmosphere.config.managed.Decoder;
 import java.io.IOException;
@@ -22,14 +22,14 @@ import java.io.IOException;
 /**
  * Decode a String into a {@link ChatProtocol}.
  */
-public class ProtocolDecoder implements Decoder<String, ItradeResponseJSONBean> {
+public class ProtocolDecoder implements Decoder<String, PushResponseJSONBean> {
 
 	private final ObjectMapper mapper = new ObjectMapper();
 
 	@Override
-	public ItradeResponseJSONBean decode(String s) {
+	public PushResponseJSONBean decode(String s) {
 		try {
-			return mapper.readValue(s, ItradeResponseJSONBean.class);
+			return mapper.readValue(s, PushResponseJSONBean.class);
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}

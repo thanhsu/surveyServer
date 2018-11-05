@@ -11,7 +11,8 @@ public class NewSurveyAction extends InternalSurveyBaseAction {
 	public void doProccess() {
 		SurveyDao lvSurveyDao = new SurveyDao();
 		lvSurveyDao.createSurvey(getMessageBody().getString(FieldName.USERNAME),
-				getMessageBody().getString(FieldName.TITLE), getMessageBody().getJsonArray(FieldName.LISTCATEGORYID))
+				getMessageBody().getString(FieldName.TITLE), getMessageBody().getJsonArray(FieldName.LISTCATEGORYID)
+				,getMessageBody().getString(FieldName.DESCRIPTION))
 				.setHandler(res -> {
 					JsonObject lvTmp = new JsonObject();
 					if (res.succeeded()) {

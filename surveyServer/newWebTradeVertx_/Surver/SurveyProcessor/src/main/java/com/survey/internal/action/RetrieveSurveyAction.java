@@ -1,12 +1,17 @@
 package com.survey.internal.action;
 
+import java.util.HashMap;
+import java.util.List;
+
 import com.survey.constant.SurveyRequestName;
 import com.survey.dbservice.dao.SurveyDao;
+import com.survey.dbservice.dao.SurveyPushlishDao;
 import com.survey.dbservice.dao.SurveySubmitDao;
-import com.survey.dbservices.action.RetrieveMySurvey;
 import com.survey.utils.CodeMapping;
 import com.survey.utils.FieldName;
 
+import io.vertx.core.CompositeFuture;
+import io.vertx.core.Future;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 
@@ -30,6 +35,15 @@ public class RetrieveSurveyAction extends InternalSurveyBaseAction {
 			this.retrieveSubmittedSurvey(getMessageBody());
 			break;
 
+		case "test": {
+			this.test(getMessageBody());
+			break;
+		}
+
+		case SurveyRequestName.DETAIL:
+			this.retrieveDetailSurvey(getMessageBody());
+			break;
+
 		case SurveyRequestName.CREATE:
 			this.createSurvey(getMessageBody());
 			break;
@@ -44,20 +58,53 @@ public class RetrieveSurveyAction extends InternalSurveyBaseAction {
 
 	public void retrievepublic(JsonObject request) {
 		JsonObject rs = new JsonObject();
-		rs.put(FieldName.ENABLE, "N").put(FieldName.STATE, "A");
-		searchSurvey(rs);
+		rs.put(FieldName.STATUS, "N").put(FieldName.STATE, "A");
+		SurveyDao lvDao = new SurveyDao();
+		Future<JsonObject> lvResult = Future.future();
+		Future<Long> count = Future.future();
+		CompositeFuture lvComp = CompositeFuture.all(lvResult, count);
+		lvComp.setHandler(handler -> {
+			// lvResult.result().getJsonObject("data").put("total", count.result());
+			response.complete(lvResult.result().put("total", count.result()));
+		});
+		lvDao.retriveCountTotalResponseData(rs).setHandler(handler -> {
+			count.complete(handler.result());
+		});
+		lvDao.retriveAndCountTotalResponseData(request.getString(FieldName.USERNAME), rs,
+				new JsonObject().put(FieldName.QUESTIONDATA, 0));
+		lvDao.getMvFutureResponse().setHandler(handler -> {
+			lvResult.complete(handler.result());
+		});
 	}
 
 	public void retrievemysurvey(JsonObject request) {
-		RetrieveMySurvey lvRetrieveMySurvey = new RetrieveMySurvey();
-		lvRetrieveMySurvey.doProcess(request);
-		lvRetrieveMySurvey.getMvResponse().setHandler(rs -> {
-			if (rs.succeeded()) {
-				response.complete(rs.result());
-			} else {
-				response.fail(rs.cause().getMessage());
-			}
+		Future<JsonObject> lvResult = Future.future();
+		Future<Long> count = Future.future();
+		CompositeFuture lvComp = CompositeFuture.all(lvResult, count);
+		lvComp.setHandler(handler -> {
+			// lvResult.result().getJsonObject("data").put("total", count.result());
+			response.complete(lvResult.result().put("total", count.result()));
 		});
+
+		SurveyDao lvDao = new SurveyDao();
+		lvDao.retriveCountTotalResponseData(
+				new JsonObject().put(FieldName.USERNAME, request.getString(FieldName.USERNAME))).setHandler(handler -> {
+					count.complete(handler.result());
+				});
+		lvDao.retriveAndCountTotalResponseData(request.getString(FieldName.USERNAME),
+				new JsonObject().put(FieldName.USERNAME, request.getString(FieldName.USERNAME)),
+				new JsonObject().put(FieldName.QUESTIONDATA, 0));
+		lvDao.getMvFutureResponse().setHandler(handler -> {
+			lvResult.complete(handler.result());
+
+		});
+		/*
+		 * RetrieveMySurvey lvRetrieveMySurvey = new RetrieveMySurvey();
+		 * lvRetrieveMySurvey.doProcess(request);
+		 * lvRetrieveMySurvey.getMvResponse().setHandler(rs -> { if (rs.succeeded()) {
+		 * response.complete(rs.result()); } else {
+		 * response.fail(rs.cause().getMessage()); } });
+		 */
 	}
 
 	public void retrieveSubmittedSurvey(JsonObject request) {
@@ -69,19 +116,129 @@ public class RetrieveSurveyAction extends InternalSurveyBaseAction {
 		response = lvSurveySubmitDao.getMvFutureResponse();
 	}
 
+	public void retrieveDetailSurvey(JsonObject request) {
+		JsonObject rs = new JsonObject();
+		rs.put(FieldName.USERNAME, request.getString(FieldName.USERNAME));
+		rs.put(FieldName._ID, request.getString(FieldName.SURVEYID));
+		SurveyDao lvSurveyDao = new SurveyDao();
+		lvSurveyDao.retriveAndCountTotalResponseData(
+				request.getString(FieldName.USERNAME) == null ? "" : request.getString(FieldName.USERNAME), rs, null);
+		lvSurveyDao.getMvFutureResponse().setHandler(handler -> {
+			response.complete(handler.result());
+		});
+	}
+
 	public void searchSurvey(JsonObject reqeuest) {
+		int record = reqeuest.getInteger(FieldName.RECORD) == null ? 0 : reqeuest.getInteger(FieldName.RECORD);
+		long lastsurveyinputtime = reqeuest.getLong(FieldName.INPUTTIME) == null ? 0
+				: reqeuest.getLong(FieldName.INPUTTIME);
 		JsonObject searchValue = reqeuest.getJsonObject(FieldName.SEARCH) == null ? new JsonObject()
 				: reqeuest.getJsonObject(FieldName.SEARCH);
 		SurveyDao lvSurveyDao = new SurveyDao();
-		lvSurveyDao.retrieveSurvey(searchValue, h -> {
-			JsonObject lvTmp = new JsonObject();
-			if (h.succeeded()) {
-				lvTmp.put(FieldName.CODE, CodeMapping.C0000.toString()).put(FieldName.DATA, h.result());
+		String title = searchValue.getString(FieldName.TITLE);
+		JsonArray category = searchValue.getJsonArray(FieldName.LISTCATEGORYID);
+		JsonObject point = searchValue.getJsonObject(FieldName.POINT);
+		JsonObject createdate = searchValue.getJsonObject(FieldName.PUSHLISHDATE);
+		JsonObject query = new JsonObject();
+		if (lastsurveyinputtime != 0) {
+			query.put(FieldName.INPUTTIME, new JsonObject().put("$lt", lastsurveyinputtime));
+		}
+		if (title != null) {
+			query.put(FieldName.TITLE, new JsonObject().put("$regex", title));
+		}
+		if (category != null) {
+			query.put(FieldName.LISTCATEGORYID, category);
+		}
+
+		if (createdate != null) {
+			query.put(FieldName.PUSHLISHDATE, createdate);
+		}
+		Future<JsonArray> listData = Future.future();
+
+		Future<JsonArray> listData2 = Future.future();
+
+		CompositeFuture lvAllData = CompositeFuture.all(listData, listData2);
+
+		lvAllData.setHandler(handler -> {
+			if (handler.succeeded()) {
+				HashMap<String, JsonObject> data = new HashMap<>();
+				for (int i = 0; i < listData.result().size(); i++) {
+					data.put(listData.result().getJsonObject(i).getString(FieldName._ID),
+							listData.result().getJsonObject(i));
+				}
+
+				for (int i = 0; i < listData2.result().size(); i++) {
+					if (!data.containsKey(listData2.result().getJsonObject(i).getString(FieldName._ID))) {
+						listData.result().add(listData2.result().getJsonObject(i));
+					}
+				}
+				// listData.result().getList().subList(0, record);
+				if (record != 0) {
+					JsonObject responseDT = new JsonObject();
+					responseDT.put(FieldName.CODE, CodeMapping.C0000.toString());
+					responseDT.put(FieldName.MESSAGE, "");
+					responseDT.put("PageRemain", (listData.result().size() / record));
+					if (record >= listData.result().size()) {
+						responseDT.put(FieldName.DATA, listData.result());
+					} else {
+						responseDT.put(FieldName.DATA, listData.result().getList().subList(0, record));
+					}
+					response.complete(responseDT);
+					/*
+					 * this.CompleteGenerateResponse(CodeMapping.C0000.toString(), "",
+					 * listData.result().getList().subList(0, record), response);
+					 */
+				} else {
+					this.CompleteGenerateResponse(CodeMapping.C0000.toString(), "", listData.result(), response);
+				}
 			} else {
-				lvTmp.put(FieldName.CODE, CodeMapping.C1111.toString()).put(FieldName.MESSAGE, h.cause().getMessage());
+				this.CompleteGenerateResponse(CodeMapping.C0000.toString(), "", new JsonArray(), response);
 			}
-			response.complete(lvTmp);
 		});
+		if (query.isEmpty()) {
+			listData.complete(new JsonArray());
+		} else {
+			lvSurveyDao.retriveAndCountTotalResponseData(
+					reqeuest.getString(FieldName.USERNAME) == null ? "" : reqeuest.getString(FieldName.USERNAME), query,
+					new JsonObject().put(FieldName.QUESTIONDATA, 0));
+			lvSurveyDao.getMvFutureResponse().setHandler(handler -> {
+				listData.complete(handler.result().getJsonArray(FieldName.DATA));
+			});
+		}
+
+		if (point != null) {
+			// get list survey from pushlish collection and retrieve search
+			SurveyPushlishDao lvDao = new SurveyPushlishDao();
+			lvDao.retrieveSearchPushlishSuvey(point).setHandler(handler2 -> {
+				if (handler2.succeeded()) {
+					List<JsonObject> lvTmp = handler2.result();
+					JsonArray listID = new JsonArray();
+					for (int i = 0; i < lvTmp.size(); i++) {
+						listID.add(lvTmp.get(i).getString(FieldName.SURVEYID));
+					}
+					if (listID.isEmpty()) {
+						listData2.complete(new JsonArray());
+					} else {
+						SurveyDao lvSurveyDao2 = new SurveyDao();
+						JsonObject query2 = new JsonObject().put(FieldName._ID, new JsonObject().put("$in", listID));
+						if (lastsurveyinputtime != 0) {
+							query2.put(FieldName.INPUTTIME, new JsonObject().put("$lt", lastsurveyinputtime));
+						}
+						lvSurveyDao2.retriveAndCountTotalResponseData(
+								reqeuest.getString(FieldName.USERNAME) == null ? ""
+										: reqeuest.getString(FieldName.USERNAME),
+								query2, new JsonObject().put(FieldName.QUESTIONDATA, 0));
+						lvSurveyDao2.getMvFutureResponse().setHandler(handler -> {
+							listData2.complete(handler.result().getJsonArray(FieldName.DATA));
+						});
+					}
+				} else {
+					listData2.complete(new JsonArray());
+				}
+			});
+		} else {
+			listData2.complete(new JsonArray());
+		}
 	}
 
 	public void createSurvey(JsonObject data) {
@@ -113,16 +270,15 @@ public class RetrieveSurveyAction extends InternalSurveyBaseAction {
 		 */
 	}
 
-	public void activeSurvey(JsonObject data) {
-		String userid = data.getString(FieldName.USERID);
-		String username = data.getString(FieldName.USERNAME);
-		String surveyID = data.getString(FieldName.SURVEYID);
-		int limitResp = data.getInteger(FieldName.MAXRESPONSE);
-		String macAddress = data.getString(FieldName.MACADDRESS);
-		double point = data.getDouble(FieldName.POINT);
-		double initialFund = data.getDouble(FieldName.INITIALFUND);
-		double limitFund = data.getDouble(FieldName.LIMITFUND);
+	public void test(JsonObject request) {
+		SurveyDao lvDao = new SurveyDao();
+		lvDao.retriveAndCountTotalResponseData(request.getString(FieldName.USERNAME),
+				new JsonObject().put(FieldName.USERNAME, request.getString(FieldName.USERNAME)),
+				new JsonObject().put(FieldName.QUESTIONDATA, 0));
+		lvDao.getMvFutureResponse().setHandler(handler -> {
+			response.complete(handler.result());
 
+		});
 	}
 
 }

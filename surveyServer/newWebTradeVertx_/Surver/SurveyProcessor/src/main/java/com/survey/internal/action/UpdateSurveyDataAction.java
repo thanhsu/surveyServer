@@ -15,7 +15,7 @@ public class UpdateSurveyDataAction extends InternalSurveyBaseAction {
 		JsonObject setting = getMessageBody().getJsonObject(FieldName.SETTING);
 		JsonArray question = getMessageBody().getJsonArray(FieldName.QUESTIONDATA);
 		JsonObject themeData = getMessageBody().getJsonObject(FieldName.THEME);
-		JsonObject rule = getMessageBody().getJsonObject(FieldName.RULEDATA);
+		JsonObject rule = getMessageBody().getJsonObject(FieldName.RULE);
 
 		SurveyDao lvSurveyDao = new SurveyDao();
 		lvSurveyDao.UpdateSurvey(lvSurveyID, question, setting, rule, themeData,

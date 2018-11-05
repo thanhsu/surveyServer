@@ -2,12 +2,14 @@ package com.survey.dbservice.dao;
 
 import java.util.List;
 
+import com.mongodb.client.model.Aggregates;
 import com.survey.utils.FieldName;
 
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.json.Json;
+import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.mongo.UpdateOptions;
 
@@ -39,6 +41,16 @@ public class SurveyBaseDao {
 	public void queryDocument(JsonObject query, Handler<AsyncResult<List<JsonObject>>> handler) {
 		BaseDaoConnection.getInstance().getMongoClient().find(CollectionName, query, handler);
 	}
+	
+//	public void runCommand() {
+//		JsonArray lvJsonArr= new JsonArray();
+//		JsonObject command = new JsonObject()
+//				  .put("aggregate", this.CollectionName)
+//				  .put("pipeline",lvJsonArr);
+//		BaseDaoConnection.getInstance().getMongoClient().
+//		runCommand(commandName, command, resultHandler)
+//		
+//	}
 
 	public Future<JsonObject> findOneByID(String id) {
 		mvFutureResponse = Future.future();

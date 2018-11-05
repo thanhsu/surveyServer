@@ -49,7 +49,7 @@ public class FieldName {
 	public static final String SETTLESTATUS = "settlestatus";
 	public static final String SETTINGID = "settingid";
 	public static final String SETTING = "setting";
-	public static final String RULEDATA = "rule";
+	public static final String RULE = "rule";
 	public static final String THEMEID = "themeid";
 	public static final String THEME = "theme";
 
@@ -59,7 +59,7 @@ public class FieldName {
 	public static final String UPDATETIME = "updatetime";
 	public static final String MAXRESPONSE = "maxresponse";
 	public static final String POINT = "point";
-	public static final String PAYOUT="payout";
+	public static final String PAYOUT = "payout";
 	public static final String INITIALFUND = "initialfund";
 	public static final String LIMITFUND = "limitfund";
 	public static final String LIMITRESPONSE = "limitresponse";
@@ -80,7 +80,9 @@ public class FieldName {
 	public static final String SUCCESS = "success";
 	public static final String MESSAGEREQUEST = "messagerequest";
 	public static final String MESSSAGERESPONSE = "messageresponse";
-	public static final String NOTIFY="notify";
-
-
+	public static final String NOTIFY = "notify";
+	public static final String CAREER = "career";
+	public static final String PUSHLISHDATE = "pushlishdate";
+	public static final String ISSTOP = "isstop";
+	public static final String RECORD ="record";
 }

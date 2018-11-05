@@ -169,4 +169,9 @@ public class PaymentAction extends InternalSurveyBaseAction {
 		}
 		return false;
 	}
+
+	private String generateTransferDetail(String username, String tranID, String amount) {
+		return "Nộp tiền vào tài khoản " + username + " mã giao dịch " + tranID + " số tiền " + amount;
+	}
+
 }

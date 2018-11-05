@@ -30,7 +30,7 @@ public class PushlishSurveyAction extends InternalSurveyBaseAction {
 		// Check account balance
 		Future<JsonObject> lvAccountBalance = Future.future();
 		VertxServiceCenter.getInstance().sendNewMessage(EventBusDiscoveryConst.ETHEREUMPROXYDISCOVERY.name(),
-				getMessageBody(), lvAccountBalance);
+				new JsonObject().put(FieldName.ACTION, "userinfo").put(FieldName.USERNAME,username), lvAccountBalance);
 		lvAccountBalance.setHandler(handler -> {
 			if (/*handler.succeeded() && handler.result() != null*/true) {
 				// Check account balance
