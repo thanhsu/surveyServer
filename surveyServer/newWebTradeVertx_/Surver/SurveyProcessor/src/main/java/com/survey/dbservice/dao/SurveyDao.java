@@ -14,6 +14,7 @@ import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
+import io.vertx.ext.mongo.UpdateOptions;
 
 public class SurveyDao extends SurveyBaseDao {
 	private static final String SurveyCollectionName = "survey_datas";
@@ -209,8 +210,10 @@ public class SurveyDao extends SurveyBaseDao {
 									null);
 						} else {
 							if (surveyData.getString(FieldName.STATUS).equals("N")) {
-								// Survey đã dc pushlish - > reject yêu cầu pushlish nếu muốn cập nhật tăng số tiền thì có thể nộp tiền hoặc rút tiền
-								this.CompleteGenerateResponse(CodeMapping.S9999.toString(), CodeMapping.S9999.value(), null);
+								// Survey đã dc pushlish - > reject yêu cầu pushlish nếu muốn cập nhật tăng số
+								// tiền thì có thể nộp tiền hoặc rút tiền
+								this.CompleteGenerateResponse(CodeMapping.S9999.toString(), CodeMapping.S9999.value(),
+										null);
 							} else {
 								// Tao moi thong tin pushlish
 								SurveyPushlishDao lvSurveyPushlishDao = new SurveyPushlishDao();
@@ -322,4 +325,38 @@ public class SurveyDao extends SurveyBaseDao {
 		});
 		return lvResult;
 	}
+
+	public Future<String> copyTempSurvey(String username, String tempID) {
+		Future<String> newSurveyID = Future.future();
+		this.findOneByID(tempID).setHandler(handler -> {
+			if (handler.succeeded() && handler.result() != null) {
+				JsonObject tmp = handler.result();
+				if (tmp.getBoolean(FieldName.ISTEMP)) {
+					tmp.put(FieldName.ISTEMP, false);
+					tmp.put(FieldName.USERNAME, username);
+					tmp.put(FieldName.STATE, "A");
+					tmp.put(FieldName.STATUS, "L");
+					this.saveDocumentReturnID(tmp).setHandler(newSv -> {
+						newSurveyID.complete(newSv.result());
+					});
+				} else {
+					newSurveyID.fail("Source Survey is not Template");
+				}
+			} else {
+				newSurveyID.complete(null);
+			}
+		});
+		return newSurveyID;
+	}
+	
+	public Future<Void> deleteSurvey(String username, String surveyID, String remark){
+		Future<Void> deleteResult = Future.future();
+		JsonObject del = new JsonObject();
+		del.put(FieldName.STATUS, "D");
+		del.put(FieldName.DELETEREMARK, remark);
+		this.updateDocument(new JsonObject().put(FieldName.USERNAME, username).put(FieldName._ID, surveyID), del, new UpdateOptions(), handler->{
+			deleteResult.complete();
+		});
+		return deleteResult;
+	} 
 }

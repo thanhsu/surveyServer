@@ -84,5 +84,8 @@ public class FieldName {
 	public static final String CAREER = "career";
 	public static final String PUSHLISHDATE = "pushlishdate";
 	public static final String ISSTOP = "isstop";
-	public static final String RECORD ="record";
+	public static final String RECORD = "record";
+	public static final String TEMPSURVEYID = "tempsurveyid";
+	public static final String LISTSURVEYID = "listsurveyid";
+	public static final String DELETEREMARK = "deleteremark";
 }

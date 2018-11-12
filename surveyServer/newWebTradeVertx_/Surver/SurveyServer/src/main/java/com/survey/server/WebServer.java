@@ -3,7 +3,9 @@ package com.survey.server;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.atmosphere.cpr.ApplicationConfig;
 import org.atmosphere.vertx.VertxAtmosphere;
@@ -21,6 +23,7 @@ import io.netty.handler.codec.base64.Base64;
 import io.vertx.core.Context;
 import io.vertx.core.Future;
 import io.vertx.core.Vertx;
+import io.vertx.core.buffer.Buffer;
 import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.http.HttpHeaders;
 import io.vertx.core.http.HttpMethod;
@@ -32,8 +35,10 @@ import io.vertx.core.net.JksOptions;
 import io.vertx.ext.web.Cookie;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
+import io.vertx.ext.web.Session;
 import io.vertx.ext.web.handler.BodyHandler;
 import io.vertx.ext.web.handler.CookieHandler;
+import io.vertx.ext.web.handler.CorsHandler;
 import io.vertx.ext.web.handler.SessionHandler;
 import io.vertx.ext.web.handler.StaticHandler;
 import io.vertx.ext.web.sstore.LocalSessionStore;
@@ -68,9 +73,25 @@ public class WebServer extends MicroServiceVerticle {
 		long lvSessionTimeout = config().getLong("HttpSessionTimeout");
 		HttpServerOptions httpOption = new HttpServerOptions();
 		Router router = Router.router(this.vertx);
+		
+		Set<String> allowedHeaders = new HashSet<>();
+	    allowedHeaders.add("Access-Control-Allow-Origin");
+	    allowedHeaders.add("origin");
+	    allowedHeaders.add("Content-Type");
+	    allowedHeaders.add("accept");
+
+	    Set<HttpMethod> allowedMethods = new HashSet<>();
+	    allowedMethods.add(HttpMethod.GET);
+	    allowedMethods.add(HttpMethod.POST);
+	    allowedMethods.add(HttpMethod.OPTIONS);
+	    allowedMethods.add(HttpMethod.DELETE);
+	    allowedMethods.add(HttpMethod.PATCH);
+	    allowedMethods.add(HttpMethod.PUT);
+	    
 		mvLocalSessionStored = LocalSessionStore.create(this.vertx);
 		router.route().handler(BodyHandler.create()).handler(CookieHandler.create())
-				.handler(SessionHandler.create(mvLocalSessionStored).setSessionTimeout(lvSessionTimeout));
+				.handler(SessionHandler.create(mvLocalSessionStored).setSessionTimeout(lvSessionTimeout))
+				.handler(CorsHandler.create("*").allowedHeaders(allowedHeaders).allowedMethods(allowedMethods));
 
 		// userinfomation routing
 		router.get("/:page").handler(rtx -> {
@@ -85,27 +106,55 @@ public class WebServer extends MicroServiceVerticle {
 				rtx.next();
 			}
 		});
-		router.post("/register").handler(this::handlerRegister);
-		router.post("/login").handler(this::handlerLogin);
+		router.route("/api/register").handler(this::handlerRegister);
+		router.route("/api/login").handler(this::handlerLogin);
 
-		router.route("/survey/:action").handler(this::handlerSurveyAction);
-		router.get("/activeuser").handler(this::handlerActiveAccount);
-		router.post("/cash/:method/:action").handler(this::handlerCashAction);
-		router.route("/resetpassword/:step").handler(this::handlerResetPassword);
-		router.route("/admin/confirm").handler(this::handlerAdminConfirm);
+		router.route("/api/survey/:action").handler(this::handlerSurveyAction);
+		router.get("/api/activeuser").handler(this::handlerActiveAccount);
+		router.post("/api/cash/:method/:action").handler(this::handlerCashAction);
+		router.route("/api/resetpassword/:step").handler(this::handlerResetPassword);
+		router.route("/api/admin/confirm").handler(this::handlerAdminConfirm);
+		
+		router.route("/m").handler(RoutingContext -> {
+			Session session = RoutingContext.session();
+			if(!session.data().isEmpty()) {
+				RoutingContext.response().sendFile("./webroot/index.html");
+			}
+			else {
+				redirectTo(RoutingContext, "/login");
+			}
+		});
+		router.route("/m/:s").handler(RoutingContext -> {
+			Session session = RoutingContext.session();
+			if(!session.data().isEmpty()) {
+				RoutingContext.response().sendFile("./webroot/index.html");
+			}
+			else {
+				redirectTo(RoutingContext, "/login");
+			}
+		});
+		
+		router.route("/").handler(RoutingContext -> {
+			Session session = RoutingContext.session();
+			if(!session.data().isEmpty()) {
+				redirectTo(RoutingContext, "/m");
+			}
+			else {
+				RoutingContext.response().sendFile("./webroot/home.html");
+			}
+		});
+		
 		router.route().handler(RoutingContext -> {
 			if (this.mvStaticHandler == null) {
 				this.mvStaticHandler = StaticHandler.create("webroot");
 				this.mvStaticHandler.setCachingEnabled(false);
-				this.mvStaticHandler.setIndexPage("index.html").handle(RoutingContext);
-			} else {
-				if (RoutingContext.request().path().equals("/signin")) {
-					RoutingContext.reroute("/");
-				} else {
-					this.mvStaticHandler.handle(RoutingContext);
-				}
+				this.mvStaticHandler.setIndexPage("home.html").handle(RoutingContext);
+			} 
+			else {
+				this.mvStaticHandler.handle(RoutingContext);
 			}
 		});
+		
 		if (config().getBoolean("enabledSSL")) {
 			httpOption.setSsl(true).setKeyStoreOptions(new JksOptions().setPassword(config().getString("SSLPassword"))
 					.setPath(config().getString("SSLKey")));
@@ -146,6 +195,8 @@ public class WebServer extends MicroServiceVerticle {
 							if (res.succeeded()) {
 								JsonObject resp = res.result().body();
 								if (resp.getString(FieldName.CODE).equals(CodeMapping.C0000.toString())) {
+									Session session = pvRtx.session();
+									session.put("loginData", resp.getValue("data"));
 									loginSuccessResponse(pvRtx, resp, pvRtx.session().id());
 								} else {
 									doResponseNoRenewCookie(pvRtx, Json.encodePrettily(resp));
@@ -440,5 +491,15 @@ public class WebServer extends MicroServiceVerticle {
 		} else {
 
 		}
+	}
+	
+	private void redirectTo(RoutingContext rtx, String url) {
+		String host = new String( rtx.request().host().toString() );
+		Boolean isSSL = rtx.request().isSSL();
+		
+		String uri = (isSSL ? "https": "http") + "://" + host + url;
+		String html = new String("<script>window.location = \""+ uri +"\"</script>");
+		Buffer buffer = Buffer.buffer(html);
+		rtx.response().setChunked(true).putHeader("Content-Type", "text/html").setStatusCode(200).write(buffer).end();
 	}
 }

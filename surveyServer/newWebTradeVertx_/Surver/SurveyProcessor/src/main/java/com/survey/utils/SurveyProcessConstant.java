@@ -10,7 +10,10 @@ import com.survey.internal.action.CancelCashAction;
 import com.survey.internal.action.CashEnquiryAction;
 import com.survey.internal.action.ChangePasswordAction;
 import com.survey.internal.action.CheckPermissionAnswerSurveyAction;
+import com.survey.internal.action.CopySurveyAction;
+import com.survey.internal.action.DeleteSurveyAction;
 import com.survey.internal.action.DepositAction;
+import com.survey.internal.action.DisableSurveyAction;
 import com.survey.internal.action.InternalSurveyBaseAction;
 import com.survey.internal.action.LoginAction;
 import com.survey.internal.action.NewSurveyAction;
@@ -69,11 +72,13 @@ public class SurveyProcessConstant {
 		mvActionMapping.put("payment", new PaymentAction());
 		// 4
 		mvActionMapping.put("retrievesurvey", new RetrieveSurveyAction());
-
+		mvActionMapping.put("copysurvey", new CopySurveyAction());
 		mvActionMapping.put("newsurvey", new NewSurveyAction());
 		mvActionMapping.put("updatesurvey", new UpdateSurveyDataAction());
 		mvActionMapping.put("pushlish", new PushlishSurveyAction());
 		mvActionMapping.put("checkanswerpermission", new CheckPermissionAnswerSurveyAction());
+		mvActionMapping.put("disablesurvey", new DisableSurveyAction());
+		mvActionMapping.put("deletesurvey", new DeleteSurveyAction());
 
 	}
 

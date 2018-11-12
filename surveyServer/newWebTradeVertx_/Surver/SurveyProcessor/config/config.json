@@ -39,8 +39,8 @@
 		"address": "vertx.mail",
 		"hostname": "smtp.gmail.com",
 		"port": 465,
-		"username": "thanhsu604@gmail.com",
-		"password": "62016303ts"
+		"username": "contact.go.survey@gmail.com"",
+		"password": "12wqasxz"
 	},
 	"PaypalConfig":{
 		"PaypalClientID":"AbbCG7NNwfl16JP3wZ0N6DxMB6_8B8K208LtMieymitsJI_npiNwv0yWorTX_7AgZBg95rBTIjRzKgxp",
