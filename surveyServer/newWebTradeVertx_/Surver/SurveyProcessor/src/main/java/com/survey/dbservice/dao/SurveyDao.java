@@ -245,7 +245,7 @@ public class SurveyDao extends SurveyBaseDao {
 			if (handler.succeeded() & handler.result() != null) {
 				if (isStop) {
 					JsonObject close = new JsonObject();
-					close.put(FieldName.STATUS, "C");
+					close.put(FieldName.STATE, "C");
 					close.put(FieldName.REMARK, remark);
 					this.updateSurveyData(surveyID, close);
 					// Send remain money to ethe Server
@@ -332,6 +332,7 @@ public class SurveyDao extends SurveyBaseDao {
 			if (handler.succeeded() && handler.result() != null) {
 				JsonObject tmp = handler.result();
 				if (tmp.getBoolean(FieldName.ISTEMP)) {
+					tmp.remove(FieldName._ID);
 					tmp.put(FieldName.ISTEMP, false);
 					tmp.put(FieldName.USERNAME, username);
 					tmp.put(FieldName.STATE, "A");
@@ -348,15 +349,35 @@ public class SurveyDao extends SurveyBaseDao {
 		});
 		return newSurveyID;
 	}
-	
-	public Future<Void> deleteSurvey(String username, String surveyID, String remark){
+
+	public void restoreDisableSurvey(String surveyID, String username) {
+		this.queryDocument(new JsonObject().put(FieldName._ID, surveyID).put(FieldName.USERNAME, username), handler -> {
+			if (handler.succeeded() & handler.result() != null) {
+				// check State if state == C do enable
+				if (handler.result().get(0).getString(FieldName.STATE).equals("C")) {
+					this.updateDocument(new JsonObject().put(FieldName._ID, surveyID),
+							new JsonObject().put(FieldName.STATE, "A"), new UpdateOptions(), handler2 -> {
+								this.retrieveSurvey(new JsonObject().put(FieldName._ID, surveyID), h -> {
+									this.CompleteGenerateResponse(CodeMapping.C0000.toString(), "", h.result().get(0));
+								});
+							});
+				} else {
+					this.CompleteGenerateResponse(CodeMapping.S0001.toString(), CodeMapping.S0001.value(),
+							handler.result().get(0));
+				}
+			}
+		});
+	}
+
+	public Future<Void> deleteSurvey(String username, String surveyID, String remark) {
 		Future<Void> deleteResult = Future.future();
 		JsonObject del = new JsonObject();
-		del.put(FieldName.STATUS, "D");
+		del.put(FieldName.STATE, "D");
 		del.put(FieldName.DELETEREMARK, remark);
-		this.updateDocument(new JsonObject().put(FieldName.USERNAME, username).put(FieldName._ID, surveyID), del, new UpdateOptions(), handler->{
-			deleteResult.complete();
-		});
+		this.updateDocument(new JsonObject().put(FieldName.USERNAME, username).put(FieldName._ID, surveyID), del,
+				new UpdateOptions(), handler -> {
+					deleteResult.complete();
+				});
 		return deleteResult;
-	} 
+	}
 }

@@ -39,7 +39,7 @@
 		"address": "vertx.mail",
 		"hostname": "smtp.gmail.com",
 		"port": 465,
-		"username": "contact.go.survey@gmail.com"",
+		"username": "contact.go.survey@gmail.com",
 		"password": "12wqasxz"
 	},
 	"PaypalConfig":{

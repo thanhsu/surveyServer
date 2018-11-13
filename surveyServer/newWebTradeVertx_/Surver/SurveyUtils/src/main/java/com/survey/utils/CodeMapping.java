@@ -38,6 +38,7 @@ public enum CodeMapping {
 	S7777("Initial Fun greater than account balance"),
 	S8888("Survey Closed or Deleted"),
 	S9999("Pushlish reject. Because Survey was pushlished"),
+	S0001("Survey can not restore"),
 	
 	D1111("Deposit Not Found"),
 	
