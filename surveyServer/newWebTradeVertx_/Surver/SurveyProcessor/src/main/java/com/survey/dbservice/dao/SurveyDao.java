@@ -299,6 +299,12 @@ public class SurveyDao extends SurveyBaseDao {
 						if (result.getJsonObject(i).getString(FieldName.USERNAME).equals(username)) {
 							result.getJsonObject(i).put(FieldName.ENABLEEDIT, true);
 							result.getJsonObject(i).put(FieldName.ENABLESUBMIT, false);
+							if(result.getJsonObject(i).getJsonArray(FieldName.QUESTIONDATA)!=null) {
+								result.getJsonObject(i).put(FieldName.TOTALQUESTION, result.getJsonObject(i).getJsonArray(FieldName.QUESTIONDATA).size());
+							}else {
+								result.getJsonObject(i).put(FieldName.TOTALQUESTION,0);
+							}
+							result.getJsonObject(i).remove(FieldName.QUESTIONDATA);
 						}
 						result.getJsonObject(i).put("totalresponse",
 								result.getJsonObject(i).getJsonArray("response").size());
@@ -374,7 +380,7 @@ public class SurveyDao extends SurveyBaseDao {
 		JsonObject del = new JsonObject();
 		del.put(FieldName.STATE, "D");
 		del.put(FieldName.DELETEREMARK, remark);
-		this.updateDocument(new JsonObject().put(FieldName.USERNAME, username).put(FieldName._ID, surveyID), del,
+		this.updateDocument(new JsonObject().put(FieldName.USERNAME, username).put(FieldName._ID, surveyID).put(FieldName.STATUS, new JsonObject().put("$ne", "N")), del,
 				new UpdateOptions(), handler -> {
 					deleteResult.complete();
 				});

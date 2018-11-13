@@ -88,4 +88,5 @@ public class FieldName {
 	public static final String TEMPSURVEYID = "tempsurveyid";
 	public static final String LISTSURVEYID = "listsurveyid";
 	public static final String DELETEREMARK = "deleteremark";
+	public static final String TOTALQUESTION = "totalquestion";
 }

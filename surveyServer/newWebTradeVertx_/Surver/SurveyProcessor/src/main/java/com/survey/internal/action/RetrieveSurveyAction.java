@@ -71,7 +71,7 @@ public class RetrieveSurveyAction extends InternalSurveyBaseAction {
 			count.complete(handler.result());
 		});
 		lvDao.retriveAndCountTotalResponseData(request.getString(FieldName.USERNAME), rs,
-				new JsonObject().put(FieldName.QUESTIONDATA, 0));
+				/*new JsonObject().put(FieldName.QUESTIONDATA, 0)*/null);
 		lvDao.getMvFutureResponse().setHandler(handler -> {
 			lvResult.complete(handler.result());
 		});
@@ -93,7 +93,7 @@ public class RetrieveSurveyAction extends InternalSurveyBaseAction {
 				});
 		lvDao.retriveAndCountTotalResponseData(request.getString(FieldName.USERNAME),
 				new JsonObject().put(FieldName.USERNAME, request.getString(FieldName.USERNAME)),
-				new JsonObject().put(FieldName.QUESTIONDATA, 0));
+				/*new JsonObject().put(FieldName.QUESTIONDATA, 0)*/null);
 		lvDao.getMvFutureResponse().setHandler(handler -> {
 			lvResult.complete(handler.result());
 
@@ -200,7 +200,7 @@ public class RetrieveSurveyAction extends InternalSurveyBaseAction {
 		} else {
 			lvSurveyDao.retriveAndCountTotalResponseData(
 					reqeuest.getString(FieldName.USERNAME) == null ? "" : reqeuest.getString(FieldName.USERNAME), query,
-					new JsonObject().put(FieldName.QUESTIONDATA, 0));
+							/*new JsonObject().put(FieldName.QUESTIONDATA, 0)*/null);
 			lvSurveyDao.getMvFutureResponse().setHandler(handler -> {
 				listData.complete(handler.result().getJsonArray(FieldName.DATA));
 			});
@@ -274,7 +274,7 @@ public class RetrieveSurveyAction extends InternalSurveyBaseAction {
 		SurveyDao lvDao = new SurveyDao();
 		lvDao.retriveAndCountTotalResponseData(request.getString(FieldName.USERNAME),
 				new JsonObject().put(FieldName.USERNAME, request.getString(FieldName.USERNAME)),
-				new JsonObject().put(FieldName.QUESTIONDATA, 0));
+				/*new JsonObject().put(FieldName.QUESTIONDATA, 0)*/null);
 		lvDao.getMvFutureResponse().setHandler(handler -> {
 			response.complete(handler.result());
 
