@@ -86,18 +86,23 @@ public class RetrieveSurveyAction extends InternalSurveyBaseAction {
 		Future<JsonObject> lvResult = Future.future();
 		Future<Long> count = Future.future();
 		CompositeFuture lvComp = CompositeFuture.all(lvResult, count);
+		JsonObject qr = new JsonObject().put(FieldName.USERNAME, request.getString(FieldName.USERNAME));
+		if (request.containsKey(FieldName.STATUS)) {
+			qr.put(FieldName.STATUS, request.getString(FieldName.STATUS));
+		}
+	
 		lvComp.setHandler(handler -> {
 			// lvResult.result().getJsonObject("data").put("total", count.result());
 			response.complete(lvResult.result().put("total", count.result()));
 		});
-
+		
+	
+		
 		SurveyDao lvDao = new SurveyDao();
-		lvDao.retriveCountTotalResponseData(
-				new JsonObject().put(FieldName.USERNAME, request.getString(FieldName.USERNAME))).setHandler(handler -> {
-					count.complete(handler.result());
-				});
-		lvDao.retriveAndCountTotalResponseData(request.getString(FieldName.USERNAME),
-				new JsonObject().put(FieldName.USERNAME, request.getString(FieldName.USERNAME)),
+		lvDao.retriveCountTotalResponseData(qr).setHandler(handler -> {
+			count.complete(handler.result());
+		});
+		lvDao.retriveAndCountTotalResponseData(request.getString(FieldName.USERNAME), qr,
 				/* new JsonObject().put(FieldName.QUESTIONDATA, 0) */null);
 		lvDao.getMvFutureResponse().setHandler(handler -> {
 			lvResult.complete(handler.result());
@@ -154,11 +159,11 @@ public class RetrieveSurveyAction extends InternalSurveyBaseAction {
 		if (category != null) {
 			query.put(FieldName.LISTCATEGORYID, category);
 		}
-		
-		if(searchValue.containsKey(FieldName.ISTEMP)){
+
+		if (searchValue.containsKey(FieldName.ISTEMP)) {
 			query.put(FieldName.ISTEMP, searchValue.getBoolean(FieldName.ISTEMP));
-		}else {
-			query.put(FieldName.ISTEMP,false);
+		} else {
+			query.put(FieldName.ISTEMP, false);
 		}
 		if (createdate != null) {
 			query.put(FieldName.PUSHLISHDATE, createdate);
