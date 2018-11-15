@@ -291,6 +291,10 @@ public class SurveyDao extends SurveyBaseDao {
 		pipeline.add(new JsonObject().put("$lookup", new JsonObject().put("from", SurveyPushlishDao.collectionname)
 				.put("localField", "_id").put("foreignField", FieldName.SURVEYID).put("as", "pushlish")));
 
+
+		pipeline.add(new JsonObject().put("$lookup", new JsonObject().put("from", SurveyCategoryDao.SurveyCategoryCollection)
+				.put("localField", FieldName.CATEGORY).put("foreignField", "categoryID").put("as", "categorydetail")));
+		
 		command.put("aggregate", this.getCollectionName());
 		command.put("cursor", new JsonObject().put("batchSize", 1000));
 		command.put("pipeline", pipeline);
@@ -302,13 +306,14 @@ public class SurveyDao extends SurveyBaseDao {
 						if (result.getJsonObject(i).getString(FieldName.USERNAME).equals(username)) {
 							result.getJsonObject(i).put(FieldName.ENABLEEDIT, true);
 							result.getJsonObject(i).put(FieldName.ENABLESUBMIT, false);
-							if(result.getJsonObject(i).getJsonArray(FieldName.QUESTIONDATA)!=null) {
-								result.getJsonObject(i).put(FieldName.TOTALQUESTION, result.getJsonObject(i).getJsonArray(FieldName.QUESTIONDATA).size());
-							}else {
-								result.getJsonObject(i).put(FieldName.TOTALQUESTION,0);
-							}
-							result.getJsonObject(i).remove(FieldName.QUESTIONDATA);
+							
 						}
+						if(result.getJsonObject(i).getJsonArray(FieldName.QUESTIONDATA)!=null) {
+							result.getJsonObject(i).put(FieldName.TOTALQUESTION, result.getJsonObject(i).getJsonArray(FieldName.QUESTIONDATA).size());
+						}else {
+							result.getJsonObject(i).put(FieldName.TOTALQUESTION,0);
+						}
+						result.getJsonObject(i).remove(FieldName.QUESTIONDATA);
 						result.getJsonObject(i).put("totalresponse",
 								result.getJsonObject(i).getJsonArray("response").size());
 						result.getJsonObject(i).remove("response");

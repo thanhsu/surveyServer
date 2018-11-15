@@ -237,7 +237,7 @@ public class RetrieveSurveyAction extends InternalSurveyBaseAction {
 						lvSurveyDao2.retriveAndCountTotalResponseData(
 								reqeuest.getString(FieldName.USERNAME) == null ? ""
 										: reqeuest.getString(FieldName.USERNAME),
-								query2, new JsonObject().put(FieldName.QUESTIONDATA, 0));
+								query2, /* new JsonObject().put(FieldName.QUESTIONDATA, 0) */null);
 						lvSurveyDao2.getMvFutureResponse().setHandler(handler -> {
 							listData2.complete(handler.result().getJsonArray(FieldName.DATA));
 						});
