@@ -35,7 +35,7 @@ public class RetrieveSurveyAction extends InternalSurveyBaseAction {
 		case SurveyRequestName.RETRIEVE_SUBMIT:
 			this.retrieveSubmittedSurvey(getMessageBody());
 			break;
-			
+
 		case SurveyRequestName.RETRIEVE_FAVOURITE:
 			this.retrieveFavourite(getMessageBody());
 			break;
@@ -63,7 +63,7 @@ public class RetrieveSurveyAction extends InternalSurveyBaseAction {
 
 	public void retrievepublic(JsonObject request) {
 		JsonObject rs = new JsonObject();
-		rs.put(FieldName.STATUS, "N").put(FieldName.STATE, "A");
+		rs.put(FieldName.STATUS, "N").put(FieldName.STATE, "A").put(FieldName.ISTEMP, false);
 		SurveyDao lvDao = new SurveyDao();
 		Future<JsonObject> lvResult = Future.future();
 		Future<Long> count = Future.future();
@@ -154,7 +154,12 @@ public class RetrieveSurveyAction extends InternalSurveyBaseAction {
 		if (category != null) {
 			query.put(FieldName.LISTCATEGORYID, category);
 		}
-
+		
+		if(searchValue.containsKey(FieldName.ISTEMP)){
+			query.put(FieldName.ISTEMP, searchValue.getBoolean(FieldName.ISTEMP));
+		}else {
+			query.put(FieldName.ISTEMP,false);
+		}
 		if (createdate != null) {
 			query.put(FieldName.PUSHLISHDATE, createdate);
 		}
