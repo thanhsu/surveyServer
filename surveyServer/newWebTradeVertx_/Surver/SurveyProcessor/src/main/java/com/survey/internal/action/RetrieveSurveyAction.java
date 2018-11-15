@@ -94,7 +94,7 @@ public class RetrieveSurveyAction extends InternalSurveyBaseAction {
 		if (request.containsKey(FieldName.STATUS)) {
 			qr.put(FieldName.STATUS, request.getString(FieldName.STATUS));
 		}
-
+		qr.put(FieldName.STATE, "A");
 		lvComp.setHandler(handler -> {
 			// lvResult.result().getJsonObject("data").put("total", count.result());
 			response.complete(lvResult.result().put("total", count.result()));
