@@ -5,6 +5,7 @@ import com.survey.constant.EventBusDiscoveryConst;
 import com.survey.utils.Log;
 import com.survey.utils.controller.MicroServiceVerticle;
 import io.vertx.core.Context;
+import io.vertx.core.Future;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 
@@ -16,9 +17,9 @@ public class PushServer extends MicroServiceVerticle {
 	}
 
 	@Override
-	public void start() throws Exception {
-		super.start();
-
+	public void start(Future<Void> startFuture) throws Exception {
+		// TODO Auto-generated method stub
+		super.start(startFuture);
 		vertx.eventBus().<JsonObject>consumer(EventBusDiscoveryConst.SURVEYPUSHSERVERDISCOVEY.value(), message -> {
 			JsonObject body = message.body();
 			message.reply(new JsonObject().put("success", AtmosphereAPI.getInstance().pushTopicWatchList("survey",
@@ -35,4 +36,5 @@ public class PushServer extends MicroServiceVerticle {
 					}
 				});
 	}
+
 }

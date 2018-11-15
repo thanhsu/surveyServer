@@ -68,7 +68,7 @@ public class AtmosphereAPI {
 	}
 
 	public AtmosphereAPI setSharedData(SharedData pSharedData) {
-		AtmosphereAPI.mvSharedData = pSharedData;
+		mvSharedData = pSharedData;
 		return this;
 	}
 
@@ -139,7 +139,7 @@ public class AtmosphereAPI {
 	public boolean pushTopicWatchList(final String module, final String action, final String session, Object o) {
 		HashMap<String, String> data = new HashMap<>();
 		data.put(CONTRACT_SESSION, session);
-		data.put(CONTRACT_ACTION, TOPIC_WATCHLIST);
+		data.put(CONTRACT_ACTION, action);
 		data.put(CONTRACT_MODULE, module);
 		String lvBid = contract(data);
 		this.mvMetaBroadcaster.broadcastTo(lvBid, o);

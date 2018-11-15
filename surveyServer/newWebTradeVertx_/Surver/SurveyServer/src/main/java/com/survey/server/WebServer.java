@@ -115,6 +115,16 @@ public class WebServer extends MicroServiceVerticle {
 		router.route("/api/resetpassword/:step").handler(this::handlerResetPassword);
 		router.route("/api/admin/confirm").handler(this::handlerAdminConfirm);
 		
+		router.get("/test/:message").handler(rtx->{
+			rtx.response().end("OK");
+			mvEventBus.send(EventBusDiscoveryConst.SURVEYPUSHSERVERDISCOVEY.value(), 
+					new JsonObject().put("action", "notification").put("session", "thanhsu604@gmail.com").put("data", new JsonObject().put("surveyId","123").put("message", rtx.pathParam("message"))),h->{
+						if(h.succeeded()) {
+							System.out.println("Success");
+						}
+					});
+		});
+		
 		router.route("/m").handler(RoutingContext -> {
 			Session session = RoutingContext.session();
 			if(!session.data().isEmpty()) {

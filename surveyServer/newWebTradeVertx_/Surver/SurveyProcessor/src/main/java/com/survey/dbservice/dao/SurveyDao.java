@@ -17,7 +17,7 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.ext.mongo.UpdateOptions;
 
 public class SurveyDao extends SurveyBaseDao {
-	private static final String SurveyCollectionName = "survey_datas";
+	public static final String SurveyCollectionName = "survey_datas";
 
 	public SurveyDao() {
 		setCollectionName(SurveyCollectionName);
@@ -64,6 +64,9 @@ public class SurveyDao extends SurveyBaseDao {
 		}
 		if (settingID != null) {
 			tmpSurvey.put(FieldName.SETTING, settingID);
+			if(settingID.getBoolean(FieldName.FAVOURITE_ENABLE)==null) {
+				settingID.put(FieldName.FAVOURITE_ENABLE, false);
+			}
 		}
 		if (theme != null) {
 			tmpSurvey.put(FieldName.THEME, theme);
@@ -346,7 +349,16 @@ public class SurveyDao extends SurveyBaseDao {
 					this.saveDocumentReturnID(tmp).setHandler(newSv -> {
 						newSurveyID.complete(newSv.result());
 					});
-				} else {
+				} else if(tmp.getJsonObject(FieldName.SETTING).getBoolean(FieldName.FAVOURITE_ENABLE)==null?false:tmp.getJsonObject(FieldName.SETTING).getBoolean(FieldName.FAVOURITE_ENABLE)){
+					tmp.remove(FieldName._ID);
+					tmp.put(FieldName.ISTEMP, false);
+					tmp.put(FieldName.USERNAME, username);
+					tmp.put(FieldName.STATE, "A");
+					tmp.put(FieldName.STATUS, "L");
+					this.saveDocumentReturnID(tmp).setHandler(newSv -> {
+						newSurveyID.complete(newSv.result());
+					});
+				}else{
 					newSurveyID.fail("Source Survey is not Template");
 				}
 			} else {

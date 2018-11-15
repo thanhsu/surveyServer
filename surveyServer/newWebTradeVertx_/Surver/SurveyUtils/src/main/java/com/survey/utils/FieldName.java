@@ -89,4 +89,6 @@ public class FieldName {
 	public static final String LISTSURVEYID = "listsurveyid";
 	public static final String DELETEREMARK = "deleteremark";
 	public static final String TOTALQUESTION = "totalquestion";
+	public static final String FAVOURITE_ENABLE = "favourite_enable";
+	public static final String SURVEYDATA = "surveydata";
 }

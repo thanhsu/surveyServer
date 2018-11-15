@@ -23,5 +23,7 @@ public class ServiceInit extends AbstractVerticle {
 		VertxServiceCenter.getInstance().init(vertx, config().getString("discoveryname"),
 				config().getString("discoveryaddress"));
 		vertx.deployVerticle(WebServer.class.getName(), new DeploymentOptions().setConfig(config()));
+		
+		vertx.deployVerticle(PushServer.class.getName(), new DeploymentOptions().setConfig(config()));
 	}
 }

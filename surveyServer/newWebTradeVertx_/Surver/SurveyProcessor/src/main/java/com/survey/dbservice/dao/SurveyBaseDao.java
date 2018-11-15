@@ -11,6 +11,7 @@ import io.vertx.core.Handler;
 import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
+import io.vertx.ext.mongo.MongoClientDeleteResult;
 import io.vertx.ext.mongo.UpdateOptions;
 
 public class SurveyBaseDao {
@@ -40,6 +41,10 @@ public class SurveyBaseDao {
 
 	public void queryDocument(JsonObject query, Handler<AsyncResult<List<JsonObject>>> handler) {
 		BaseDaoConnection.getInstance().getMongoClient().find(CollectionName, query, handler);
+	}
+
+	public void delteDocument(JsonObject query, Handler<AsyncResult<MongoClientDeleteResult>> handler) {
+		BaseDaoConnection.getInstance().getMongoClient().removeDocument(CollectionName, query, handler);
 	}
 	
 //	public void runCommand() {

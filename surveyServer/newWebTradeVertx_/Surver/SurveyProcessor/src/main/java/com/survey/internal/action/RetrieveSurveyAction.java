@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import com.survey.constant.SurveyRequestName;
+import com.survey.dbservice.dao.FavouriteSurveyDao;
 import com.survey.dbservice.dao.SurveyDao;
 import com.survey.dbservice.dao.SurveyPushlishDao;
 import com.survey.dbservice.dao.SurveySubmitDao;
@@ -33,6 +34,10 @@ public class RetrieveSurveyAction extends InternalSurveyBaseAction {
 			break;
 		case SurveyRequestName.RETRIEVE_SUBMIT:
 			this.retrieveSubmittedSurvey(getMessageBody());
+			break;
+			
+		case SurveyRequestName.RETRIEVE_FAVOURITE:
+			this.retrieveFavourite(getMessageBody());
 			break;
 
 		case "test": {
@@ -71,7 +76,7 @@ public class RetrieveSurveyAction extends InternalSurveyBaseAction {
 			count.complete(handler.result());
 		});
 		lvDao.retriveAndCountTotalResponseData(request.getString(FieldName.USERNAME), rs,
-				/*new JsonObject().put(FieldName.QUESTIONDATA, 0)*/null);
+				/* new JsonObject().put(FieldName.QUESTIONDATA, 0) */null);
 		lvDao.getMvFutureResponse().setHandler(handler -> {
 			lvResult.complete(handler.result());
 		});
@@ -93,7 +98,7 @@ public class RetrieveSurveyAction extends InternalSurveyBaseAction {
 				});
 		lvDao.retriveAndCountTotalResponseData(request.getString(FieldName.USERNAME),
 				new JsonObject().put(FieldName.USERNAME, request.getString(FieldName.USERNAME)),
-				/*new JsonObject().put(FieldName.QUESTIONDATA, 0)*/null);
+				/* new JsonObject().put(FieldName.QUESTIONDATA, 0) */null);
 		lvDao.getMvFutureResponse().setHandler(handler -> {
 			lvResult.complete(handler.result());
 
@@ -200,7 +205,7 @@ public class RetrieveSurveyAction extends InternalSurveyBaseAction {
 		} else {
 			lvSurveyDao.retriveAndCountTotalResponseData(
 					reqeuest.getString(FieldName.USERNAME) == null ? "" : reqeuest.getString(FieldName.USERNAME), query,
-							/*new JsonObject().put(FieldName.QUESTIONDATA, 0)*/null);
+					/* new JsonObject().put(FieldName.QUESTIONDATA, 0) */null);
 			lvSurveyDao.getMvFutureResponse().setHandler(handler -> {
 				listData.complete(handler.result().getJsonArray(FieldName.DATA));
 			});
@@ -256,6 +261,15 @@ public class RetrieveSurveyAction extends InternalSurveyBaseAction {
 		 */
 	}
 
+	private void retrieveFavourite(JsonObject body) {
+		FavouriteSurveyDao lvDao = new FavouriteSurveyDao();
+		String username = body.getString(FieldName.USERNAME);
+		lvDao.retrieveAllFavourite(username);
+		lvDao.getMvFutureResponse().setHandler(handler -> {
+			response.complete(handler.result());
+		});
+	}
+
 	public void updateSurvey(JsonObject data) {
 		/*
 		 * String lvSurveyID = data.getString(FieldName.SURVEYID); JsonObject setting =
@@ -274,7 +288,7 @@ public class RetrieveSurveyAction extends InternalSurveyBaseAction {
 		SurveyDao lvDao = new SurveyDao();
 		lvDao.retriveAndCountTotalResponseData(request.getString(FieldName.USERNAME),
 				new JsonObject().put(FieldName.USERNAME, request.getString(FieldName.USERNAME)),
-				/*new JsonObject().put(FieldName.QUESTIONDATA, 0)*/null);
+				/* new JsonObject().put(FieldName.QUESTIONDATA, 0) */null);
 		lvDao.getMvFutureResponse().setHandler(handler -> {
 			response.complete(handler.result());
 

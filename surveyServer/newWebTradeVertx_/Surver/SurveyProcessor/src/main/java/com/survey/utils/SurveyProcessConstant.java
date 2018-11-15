@@ -6,6 +6,7 @@ import com.survey.confirm.actions.BaseConfirmAction;
 import com.survey.confirm.actions.CreateUser;
 import com.survey.internal.action.AccountBalanceProxyAction;
 import com.survey.internal.action.ActiveUserAction;
+import com.survey.internal.action.AddFavouriteSurveyAction;
 import com.survey.internal.action.CancelCashAction;
 import com.survey.internal.action.CashEnquiryAction;
 import com.survey.internal.action.ChangePasswordAction;
@@ -20,6 +21,7 @@ import com.survey.internal.action.NewSurveyAction;
 import com.survey.internal.action.PaymentAction;
 import com.survey.internal.action.PushlishSurveyAction;
 import com.survey.internal.action.RegisterAction;
+import com.survey.internal.action.RemoveFavouriteSurveyAction;
 import com.survey.internal.action.ResetPasswordAction;
 import com.survey.internal.action.RetrieveCashMethodAction;
 import com.survey.internal.action.RetrieveConfigAction;
@@ -79,7 +81,10 @@ public class SurveyProcessConstant {
 		mvActionMapping.put("checkanswerpermission", new CheckPermissionAnswerSurveyAction());
 		mvActionMapping.put("disablesurvey", new DisableSurveyAction());
 		mvActionMapping.put("deletesurvey", new DeleteSurveyAction());
-
+		mvActionMapping.put("addfavouritesurvey", new AddFavouriteSurveyAction());
+		mvActionMapping.put("removefavouritesurvey",new RemoveFavouriteSurveyAction());
+		//5
+		
 	}
 
 	public InternalSurveyBaseAction getInternalAction(String p) {

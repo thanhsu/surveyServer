@@ -5,6 +5,8 @@ import org.atmosphere.config.service.*;
 import org.atmosphere.config.service.DeliverTo.DELIVER_TO;
 import org.atmosphere.cpr.*;
 import org.atmosphere.interceptor.*;
+
+import com.hazelcast.com.eclipsesource.json.Json;
 import com.hazelcast.com.eclipsesource.json.JsonObject;
 import com.survey.constant.AtmosphereAPI;
 import com.survey.constant.PushResponseJSONBean;
@@ -60,7 +62,7 @@ public class PushManager {
         Log.print("Subcribe Topic Failed: " + handler.cause().getMessage());
       }
     });
-    return lvResBean;
+    return io.vertx.core.json.Json.encode(lvResBean);
   }
 
   @Message(encoders = {JacksonEncoder.class}, decoders = {ProtocolDecoder.class})
