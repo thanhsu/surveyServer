@@ -56,6 +56,10 @@ public class RetrieveSurveyAction extends InternalSurveyBaseAction {
 			this.updateSurvey(getMessageBody());
 			break;
 
+		case SurveyRequestName.RETRIEVE_CLOSE:
+			this.retrieveClose(getMessageBody());
+			break;
+
 		default:
 			break;
 		}
@@ -90,14 +94,12 @@ public class RetrieveSurveyAction extends InternalSurveyBaseAction {
 		if (request.containsKey(FieldName.STATUS)) {
 			qr.put(FieldName.STATUS, request.getString(FieldName.STATUS));
 		}
-	
+
 		lvComp.setHandler(handler -> {
 			// lvResult.result().getJsonObject("data").put("total", count.result());
 			response.complete(lvResult.result().put("total", count.result()));
 		});
-		
-	
-		
+
 		SurveyDao lvDao = new SurveyDao();
 		lvDao.retriveCountTotalResponseData(qr).setHandler(handler -> {
 			count.complete(handler.result());
@@ -291,6 +293,27 @@ public class RetrieveSurveyAction extends InternalSurveyBaseAction {
 		 * SurveyDao lvSurveyDao = new SurveyDao(); lvSurveyDao.UpdateSurvey(lvSurveyID,
 		 * question, setting, rule, themeData); response =
 		 * lvSurveyDao.getMvFutureResponse();
+		 */
+	}
+
+	private void retrieveClose(JsonObject data) {
+		SurveyDao lvSurveyDao2 = new SurveyDao();
+		Future<JsonArray> handler = Future.future();
+		lvSurveyDao2.queryDocumentRunCmd(
+				new JsonObject().put(FieldName.USERNAME, data.getString(FieldName.USERNAME)).put(FieldName.STATE, "C"),
+				new JsonObject().put(FieldName.QUESTIONDATA, 0), new JsonObject().put(FieldName.INPUTTIME, -1),
+				handler);
+		lvSurveyDao2.getMvFutureResponse().setHandler(handler3 -> {
+			response.complete(handler3.result());
+		});
+		/*
+		 * lvSurveyDao2.queryDocument( new JsonObject().put(FieldName.USERNAME,
+		 * data.getString(FieldName.USERNAME)).put(FieldName.STATE, "C"), handler2 -> {
+		 * if (handler.succeeded()) {
+		 * this.CompleteGenerateResponse(CodeMapping.C0000.toString(), "",
+		 * handler2.result(), response); } else {
+		 * this.CompleteGenerateResponse(CodeMapping.C1111.toString(),
+		 * handler2.cause().getMessage(), null, response); } });
 		 */
 	}
 

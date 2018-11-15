@@ -3,6 +3,7 @@ package com.survey.dbservice.dao;
 import java.util.List;
 
 import com.mongodb.client.model.Aggregates;
+import com.survey.utils.CodeMapping;
 import com.survey.utils.FieldName;
 
 import io.vertx.core.AsyncResult;
@@ -43,19 +44,53 @@ public class SurveyBaseDao {
 		BaseDaoConnection.getInstance().getMongoClient().find(CollectionName, query, handler);
 	}
 
+	public void queryDocumentRunCmd(JsonObject query, JsonObject project, JsonObject sort, Future<JsonArray> handler) {
+		JsonObject command = new JsonObject();
+		JsonArray pipeline = new JsonArray();
+		pipeline.add(new JsonObject().put("$match", query));
+		if (project != null) {
+			pipeline.add(new JsonObject().put("$project", project));
+		}
+		pipeline.add(new JsonObject().put("$sort", sort));
+
+		command.put("aggregate", this.getCollectionName());
+		command.put("cursor", new JsonObject().put("batchSize", 1000));
+		command.put("pipeline", pipeline);
+
+		BaseDaoConnection.getInstance().getMongoClient().runCommand("aggregate", command, resultHandler -> {
+			if (resultHandler.succeeded()) {
+				JsonArray result = resultHandler.result().getJsonObject("cursor").getJsonArray("firstBatch");
+				if (result != null) {
+
+					this.CompleteGenerateResponse(CodeMapping.C0000.toString(), CodeMapping.S1111.value(), result);
+				} else {
+					this.CompleteGenerateResponse(CodeMapping.C1111.toString(), CodeMapping.S1111.value(), null);
+
+				}
+				handler.complete(result);
+			} else {
+				this.CompleteGenerateResponse(CodeMapping.C1111.toString(), CodeMapping.S1111.value(),
+						resultHandler.cause().getMessage());
+				handler.fail(resultHandler.cause().getMessage());
+			}
+
+		});
+
+	}
+
 	public void delteDocument(JsonObject query, Handler<AsyncResult<MongoClientDeleteResult>> handler) {
 		BaseDaoConnection.getInstance().getMongoClient().removeDocument(CollectionName, query, handler);
 	}
-	
-//	public void runCommand() {
-//		JsonArray lvJsonArr= new JsonArray();
-//		JsonObject command = new JsonObject()
-//				  .put("aggregate", this.CollectionName)
-//				  .put("pipeline",lvJsonArr);
-//		BaseDaoConnection.getInstance().getMongoClient().
-//		runCommand(commandName, command, resultHandler)
-//		
-//	}
+
+	// public void runCommand() {
+	// JsonArray lvJsonArr= new JsonArray();
+	// JsonObject command = new JsonObject()
+	// .put("aggregate", this.CollectionName)
+	// .put("pipeline",lvJsonArr);
+	// BaseDaoConnection.getInstance().getMongoClient().
+	// runCommand(commandName, command, resultHandler)
+	//
+	// }
 
 	public Future<JsonObject> findOneByID(String id) {
 		mvFutureResponse = Future.future();

@@ -11,4 +11,6 @@ public class SurveyRequestName {
 	public static final String UPDATE = "update";
 	public static final String ACTIVE = "active";
 	public static final String DETAIL = "detail";
+	public static final String RETRIEVE_CLOSE = "retrieveclose";
+	
 }

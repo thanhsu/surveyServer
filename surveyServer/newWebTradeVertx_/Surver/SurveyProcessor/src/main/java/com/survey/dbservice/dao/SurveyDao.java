@@ -18,6 +18,7 @@ import io.vertx.ext.mongo.UpdateOptions;
 
 public class SurveyDao extends SurveyBaseDao {
 	public static final String SurveyCollectionName = "survey_datas";
+	public static final String SurveyCollectionNameBK = "survey_datas_bk";
 
 	public SurveyDao() {
 		setCollectionName(SurveyCollectionName);
@@ -64,7 +65,7 @@ public class SurveyDao extends SurveyBaseDao {
 		}
 		if (settingID != null) {
 			tmpSurvey.put(FieldName.SETTING, settingID);
-			if(settingID.getBoolean(FieldName.FAVOURITE_ENABLE)==null) {
+			if (settingID.getBoolean(FieldName.FAVOURITE_ENABLE) == null) {
 				settingID.put(FieldName.FAVOURITE_ENABLE, false);
 			}
 		}
@@ -245,7 +246,7 @@ public class SurveyDao extends SurveyBaseDao {
 
 	public void closesurvey(String username, String userID, String surveyID, boolean isStop, String remark) {
 		this.queryDocument(new JsonObject().put(FieldName._ID, surveyID).put(FieldName.USERNAME, username), handler -> {
-			if (handler.succeeded() & handler.result() != null) {
+			if (handler.succeeded() && handler.result() != null&&!handler.result().isEmpty()) {
 				if (isStop) {
 					JsonObject close = new JsonObject();
 					close.put(FieldName.STATE, "C");
@@ -291,10 +292,11 @@ public class SurveyDao extends SurveyBaseDao {
 		pipeline.add(new JsonObject().put("$lookup", new JsonObject().put("from", SurveyPushlishDao.collectionname)
 				.put("localField", "_id").put("foreignField", FieldName.SURVEYID).put("as", "pushlish")));
 
+		pipeline.add(new JsonObject().put("$lookup",
+				new JsonObject().put("from", SurveyCategoryDao.SurveyCategoryCollection)
+						.put("localField", FieldName.CATEGORY).put("foreignField", "categoryID")
+						.put("as", "categorydetail")));
 
-		pipeline.add(new JsonObject().put("$lookup", new JsonObject().put("from", SurveyCategoryDao.SurveyCategoryCollection)
-				.put("localField", FieldName.CATEGORY).put("foreignField", "categoryID").put("as", "categorydetail")));
-		
 		command.put("aggregate", this.getCollectionName());
 		command.put("cursor", new JsonObject().put("batchSize", 1000));
 		command.put("pipeline", pipeline);
@@ -306,12 +308,13 @@ public class SurveyDao extends SurveyBaseDao {
 						if (result.getJsonObject(i).getString(FieldName.USERNAME).equals(username)) {
 							result.getJsonObject(i).put(FieldName.ENABLEEDIT, true);
 							result.getJsonObject(i).put(FieldName.ENABLESUBMIT, false);
-							
+
 						}
-						if(result.getJsonObject(i).getJsonArray(FieldName.QUESTIONDATA)!=null) {
-							result.getJsonObject(i).put(FieldName.TOTALQUESTION, result.getJsonObject(i).getJsonArray(FieldName.QUESTIONDATA).size());
-						}else {
-							result.getJsonObject(i).put(FieldName.TOTALQUESTION,0);
+						if (result.getJsonObject(i).getJsonArray(FieldName.QUESTIONDATA) != null) {
+							result.getJsonObject(i).put(FieldName.TOTALQUESTION,
+									result.getJsonObject(i).getJsonArray(FieldName.QUESTIONDATA).size());
+						} else {
+							result.getJsonObject(i).put(FieldName.TOTALQUESTION, 0);
 						}
 						result.getJsonObject(i).remove(FieldName.QUESTIONDATA);
 						result.getJsonObject(i).put("totalresponse",
@@ -354,7 +357,8 @@ public class SurveyDao extends SurveyBaseDao {
 					this.saveDocumentReturnID(tmp).setHandler(newSv -> {
 						newSurveyID.complete(newSv.result());
 					});
-				} else if(tmp.getJsonObject(FieldName.SETTING).getBoolean(FieldName.FAVOURITE_ENABLE)==null?false:tmp.getJsonObject(FieldName.SETTING).getBoolean(FieldName.FAVOURITE_ENABLE)){
+				} else if (tmp.getJsonObject(FieldName.SETTING).getBoolean(FieldName.FAVOURITE_ENABLE) == null ? false
+						: tmp.getJsonObject(FieldName.SETTING).getBoolean(FieldName.FAVOURITE_ENABLE)) {
 					tmp.remove(FieldName._ID);
 					tmp.put(FieldName.ISTEMP, false);
 					tmp.put(FieldName.USERNAME, username);
@@ -363,7 +367,7 @@ public class SurveyDao extends SurveyBaseDao {
 					this.saveDocumentReturnID(tmp).setHandler(newSv -> {
 						newSurveyID.complete(newSv.result());
 					});
-				}else{
+				} else {
 					newSurveyID.fail("Source Survey is not Template");
 				}
 			} else {
@@ -394,12 +398,28 @@ public class SurveyDao extends SurveyBaseDao {
 
 	public Future<Void> deleteSurvey(String username, String surveyID, String remark) {
 		Future<Void> deleteResult = Future.future();
-		JsonObject del = new JsonObject();
+		/*JsonObject del = new JsonObject();
 		del.put(FieldName.STATE, "D");
-		del.put(FieldName.DELETEREMARK, remark);
-		this.updateDocument(new JsonObject().put(FieldName.USERNAME, username).put(FieldName._ID, surveyID).put(FieldName.STATUS, new JsonObject().put("$ne", "N")), del,
-				new UpdateOptions(), handler -> {
-					deleteResult.complete();
+		del.put(FieldName.DELETEREMARK, remark);*/
+		this.queryDocument(new JsonObject().put(FieldName.USERNAME, username).put(FieldName._ID, surveyID)
+				.put(FieldName.STATUS, new JsonObject().put("$ne", "N")), handler -> {
+					if (handler.succeeded() & handler.result() != null) {
+						if (handler.result().size() > 0) {
+							JsonObject tmp = handler.result().get(0);
+							tmp.put(FieldName.STATE, "D");
+							this.delteDocument(new JsonObject().put(FieldName._ID, surveyID), handler2 -> {
+								BaseDaoConnection.getInstance().getMongoClient().save(SurveyCollectionNameBK, tmp, handler4 -> {
+									if (handler4.succeeded()) {
+										deleteResult.complete();
+									} else {
+										deleteResult.fail(handler4.cause());
+									}
+								});
+							});
+						}
+					} else {
+						deleteResult.fail(handler.cause().getMessage());
+					}
 				});
 		return deleteResult;
 	}
