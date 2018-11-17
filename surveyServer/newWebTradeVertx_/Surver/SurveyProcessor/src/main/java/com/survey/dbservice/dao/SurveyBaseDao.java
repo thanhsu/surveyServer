@@ -62,14 +62,14 @@ public class SurveyBaseDao {
 				JsonArray result = resultHandler.result().getJsonObject("cursor").getJsonArray("firstBatch");
 				if (result != null) {
 
-					this.CompleteGenerateResponse(CodeMapping.C0000.toString(), CodeMapping.S1111.value(), result);
+					this.CompleteGenerateResponse(CodeMapping.C0000.toString(), CodeMapping.C0000.value(), result);
 				} else {
-					this.CompleteGenerateResponse(CodeMapping.C1111.toString(), CodeMapping.S1111.value(), null);
+					this.CompleteGenerateResponse(CodeMapping.C1111.toString(), CodeMapping.C1111.value(), null);
 
 				}
 				handler.complete(result);
 			} else {
-				this.CompleteGenerateResponse(CodeMapping.C1111.toString(), CodeMapping.S1111.value(),
+				this.CompleteGenerateResponse(CodeMapping.C1111.toString(), CodeMapping.C1111.value(),
 						resultHandler.cause().getMessage());
 				handler.fail(resultHandler.cause().getMessage());
 			}

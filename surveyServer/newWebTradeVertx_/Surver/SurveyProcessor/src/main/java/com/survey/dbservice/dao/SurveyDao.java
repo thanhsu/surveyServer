@@ -246,7 +246,7 @@ public class SurveyDao extends SurveyBaseDao {
 
 	public void closesurvey(String username, String userID, String surveyID, boolean isStop, String remark) {
 		this.queryDocument(new JsonObject().put(FieldName._ID, surveyID).put(FieldName.USERNAME, username), handler -> {
-			if (handler.succeeded() && handler.result() != null&&!handler.result().isEmpty()) {
+			if (handler.succeeded() && handler.result() != null && !handler.result().isEmpty()) {
 				if (isStop) {
 					JsonObject close = new JsonObject();
 					close.put(FieldName.STATE, "C");
@@ -333,6 +333,63 @@ public class SurveyDao extends SurveyBaseDao {
 		});
 	}
 
+	public void retriveAndCountTotalResponseData(String username, JsonObject query, JsonObject project,
+			boolean detail) {
+		JsonObject command = new JsonObject();
+		JsonArray pipeline = new JsonArray();
+		pipeline.add(new JsonObject().put("$match", query));
+		if (project != null) {
+			pipeline.add(new JsonObject().put("$project", project));
+		}
+		pipeline.add(new JsonObject().put("$sort", new JsonObject().put(FieldName.INPUTTIME, -1)));
+		pipeline.add(new JsonObject().put("$lookup", new JsonObject().put("from", "survey_response")
+				.put("localField", "_id").put("foreignField", FieldName.SURVEYID).put("as", "response")));
+		pipeline.add(new JsonObject().put("$lookup", new JsonObject().put("from", SurveyPushlishDao.collectionname)
+				.put("localField", "_id").put("foreignField", FieldName.SURVEYID).put("as", "pushlish")));
+
+		pipeline.add(new JsonObject().put("$lookup",
+				new JsonObject().put("from", SurveyCategoryDao.SurveyCategoryCollection)
+						.put("localField", FieldName.CATEGORY).put("foreignField", "categoryID")
+						.put("as", "categorydetail")));
+
+		command.put("aggregate", this.getCollectionName());
+		command.put("cursor", new JsonObject().put("batchSize", 1000));
+		command.put("pipeline", pipeline);
+		BaseDaoConnection.getInstance().getMongoClient().runCommand("aggregate", command, resultHandler -> {
+			if (resultHandler.succeeded()) {
+				JsonArray result = resultHandler.result().getJsonObject("cursor").getJsonArray("firstBatch");
+				if (result != null) {
+					for (int i = 0; i < result.size(); i++) {
+						if (result.getJsonObject(i).getString(FieldName.USERNAME).equals(username)) {
+							result.getJsonObject(i).put(FieldName.ENABLEEDIT, true);
+							result.getJsonObject(i).put(FieldName.ENABLESUBMIT, false);
+
+						}
+						if (result.getJsonObject(i).getJsonArray(FieldName.QUESTIONDATA) != null) {
+							result.getJsonObject(i).put(FieldName.TOTALQUESTION,
+									result.getJsonObject(i).getJsonArray(FieldName.QUESTIONDATA).size());
+						} else {
+							result.getJsonObject(i).put(FieldName.TOTALQUESTION, 0);
+						}
+						if (!detail) {
+							result.getJsonObject(i).remove(FieldName.QUESTIONDATA);
+						}
+						result.getJsonObject(i).put("totalresponse",
+								result.getJsonObject(i).getJsonArray("response").size());
+						result.getJsonObject(i).remove("response");
+					}
+					this.CompleteGenerateResponse(CodeMapping.C0000.toString(), CodeMapping.C0000.value(), result);
+				} else {
+					this.CompleteGenerateResponse(CodeMapping.S1111.toString(), CodeMapping.S1111.value(), null);
+				}
+			} else {
+				this.CompleteGenerateResponse(CodeMapping.S1111.toString(), CodeMapping.S1111.value(),
+						resultHandler.cause().getMessage());
+			}
+
+		});
+	}
+
 	public Future<Long> retriveCountTotalResponseData(JsonObject query) {
 		JsonArray pipeline = new JsonArray();
 		Future<Long> lvResult = Future.future();
@@ -398,9 +455,10 @@ public class SurveyDao extends SurveyBaseDao {
 
 	public Future<Void> deleteSurvey(String username, String surveyID, String remark) {
 		Future<Void> deleteResult = Future.future();
-		/*JsonObject del = new JsonObject();
-		del.put(FieldName.STATE, "D");
-		del.put(FieldName.DELETEREMARK, remark);*/
+		/*
+		 * JsonObject del = new JsonObject(); del.put(FieldName.STATE, "D");
+		 * del.put(FieldName.DELETEREMARK, remark);
+		 */
 		this.queryDocument(new JsonObject().put(FieldName.USERNAME, username).put(FieldName._ID, surveyID)
 				.put(FieldName.STATUS, new JsonObject().put("$ne", "N")), handler -> {
 					if (handler.succeeded() & handler.result() != null) {
@@ -408,13 +466,14 @@ public class SurveyDao extends SurveyBaseDao {
 							JsonObject tmp = handler.result().get(0);
 							tmp.put(FieldName.STATE, "D");
 							this.delteDocument(new JsonObject().put(FieldName._ID, surveyID), handler2 -> {
-								BaseDaoConnection.getInstance().getMongoClient().save(SurveyCollectionNameBK, tmp, handler4 -> {
-									if (handler4.succeeded()) {
-										deleteResult.complete();
-									} else {
-										deleteResult.fail(handler4.cause());
-									}
-								});
+								BaseDaoConnection.getInstance().getMongoClient().save(SurveyCollectionNameBK, tmp,
+										handler4 -> {
+											if (handler4.succeeded()) {
+												deleteResult.complete();
+											} else {
+												deleteResult.fail(handler4.cause());
+											}
+										});
 							});
 						}
 					} else {

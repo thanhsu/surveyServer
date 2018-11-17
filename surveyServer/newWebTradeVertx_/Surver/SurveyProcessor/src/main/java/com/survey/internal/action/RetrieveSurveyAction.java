@@ -134,7 +134,8 @@ public class RetrieveSurveyAction extends InternalSurveyBaseAction {
 		rs.put(FieldName._ID, request.getString(FieldName.SURVEYID));
 		SurveyDao lvSurveyDao = new SurveyDao();
 		lvSurveyDao.retriveAndCountTotalResponseData(
-				request.getString(FieldName.USERNAME) == null ? "" : request.getString(FieldName.USERNAME), rs, null);
+				request.getString(FieldName.USERNAME) == null ? "" : request.getString(FieldName.USERNAME), rs, null,
+				true);
 		lvSurveyDao.getMvFutureResponse().setHandler(handler -> {
 			response.complete(handler.result());
 		});
