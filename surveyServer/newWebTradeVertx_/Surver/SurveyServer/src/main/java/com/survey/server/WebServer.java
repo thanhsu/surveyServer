@@ -73,21 +73,21 @@ public class WebServer extends MicroServiceVerticle {
 		long lvSessionTimeout = config().getLong("HttpSessionTimeout");
 		HttpServerOptions httpOption = new HttpServerOptions();
 		Router router = Router.router(this.vertx);
-		
-		Set<String> allowedHeaders = new HashSet<>();
-	    allowedHeaders.add("Access-Control-Allow-Origin");
-	    allowedHeaders.add("origin");
-	    allowedHeaders.add("Content-Type");
-	    allowedHeaders.add("accept");
 
-	    Set<HttpMethod> allowedMethods = new HashSet<>();
-	    allowedMethods.add(HttpMethod.GET);
-	    allowedMethods.add(HttpMethod.POST);
-	    allowedMethods.add(HttpMethod.OPTIONS);
-	    allowedMethods.add(HttpMethod.DELETE);
-	    allowedMethods.add(HttpMethod.PATCH);
-	    allowedMethods.add(HttpMethod.PUT);
-	    
+		Set<String> allowedHeaders = new HashSet<>();
+		allowedHeaders.add("Access-Control-Allow-Origin");
+		allowedHeaders.add("origin");
+		allowedHeaders.add("Content-Type");
+		allowedHeaders.add("accept");
+
+		Set<HttpMethod> allowedMethods = new HashSet<>();
+		allowedMethods.add(HttpMethod.GET);
+		allowedMethods.add(HttpMethod.POST);
+		allowedMethods.add(HttpMethod.OPTIONS);
+		allowedMethods.add(HttpMethod.DELETE);
+		allowedMethods.add(HttpMethod.PATCH);
+		allowedMethods.add(HttpMethod.PUT);
+
 		mvLocalSessionStored = LocalSessionStore.create(this.vertx);
 		router.route().handler(BodyHandler.create()).handler(CookieHandler.create())
 				.handler(SessionHandler.create(mvLocalSessionStored).setSessionTimeout(lvSessionTimeout))
@@ -108,63 +108,64 @@ public class WebServer extends MicroServiceVerticle {
 		});
 		router.route("/api/register").handler(this::handlerRegister);
 		router.route("/api/login").handler(this::handlerLogin);
+		router.route("/loginbygoogle").handler(rtx -> {
+			System.out.println("have login be google: " + rtx.getBodyAsString());
+		});
 
 		router.route("/api/survey/:action").handler(this::handlerSurveyAction);
 		router.get("/api/activeuser").handler(this::handlerActiveAccount);
 		router.post("/api/cash/:method/:action").handler(this::handlerCashAction);
 		router.route("/api/resetpassword/:step").handler(this::handlerResetPassword);
 		router.route("/api/admin/confirm").handler(this::handlerAdminConfirm);
-		
-		router.get("/test/:message").handler(rtx->{
+
+		router.get("/test/:message").handler(rtx -> {
 			rtx.response().end("OK");
-			mvEventBus.send(EventBusDiscoveryConst.SURVEYPUSHSERVERDISCOVEY.value(), 
-					new JsonObject().put("action", "notification").put("session", "thanhsu604@gmail.com").put("data", new JsonObject().put("surveyId","123").put("message", rtx.pathParam("message"))),h->{
-						if(h.succeeded()) {
+			mvEventBus.send(EventBusDiscoveryConst.SURVEYPUSHPRIVATESERVERDISCOVEY.value(),
+					new JsonObject().put("action", "notification").put("session", "thanhsu604@gmail.com").put("data",
+							new JsonObject().put("surveyId", "123").put("message", rtx.pathParam("message"))),
+					h -> {
+						if (h.succeeded()) {
 							System.out.println("Success");
 						}
 					});
 		});
-		
+
 		router.route("/m").handler(RoutingContext -> {
 			Session session = RoutingContext.session();
-			if(!session.data().isEmpty()) {
+			if (!session.data().isEmpty()) {
 				RoutingContext.response().sendFile("./webroot/index.html");
-			}
-			else {
+			} else {
 				redirectTo(RoutingContext, "/login");
 			}
 		});
 		router.route("/m/:s").handler(RoutingContext -> {
 			Session session = RoutingContext.session();
-			if(!session.data().isEmpty()) {
+			if (!session.data().isEmpty()) {
 				RoutingContext.response().sendFile("./webroot/index.html");
-			}
-			else {
+			} else {
 				redirectTo(RoutingContext, "/login");
 			}
 		});
-		
+
 		router.route("/").handler(RoutingContext -> {
 			Session session = RoutingContext.session();
-			if(!session.data().isEmpty()) {
+			if (!session.data().isEmpty()) {
 				redirectTo(RoutingContext, "/m");
-			}
-			else {
+			} else {
 				RoutingContext.response().sendFile("./webroot/home.html");
 			}
 		});
-		
+
 		router.route().handler(RoutingContext -> {
 			if (this.mvStaticHandler == null) {
 				this.mvStaticHandler = StaticHandler.create("webroot");
 				this.mvStaticHandler.setCachingEnabled(false);
 				this.mvStaticHandler.setIndexPage("home.html").handle(RoutingContext);
-			} 
-			else {
+			} else {
 				this.mvStaticHandler.handle(RoutingContext);
 			}
 		});
-		
+
 		if (config().getBoolean("enabledSSL")) {
 			httpOption.setSsl(true).setKeyStoreOptions(new JksOptions().setPassword(config().getString("SSLPassword"))
 					.setPath(config().getString("SSLKey")));
@@ -186,7 +187,10 @@ public class WebServer extends MicroServiceVerticle {
 				System.out.println("******************Init WTrade Services Listening*******************");
 				System.out.println("******************Init WTrade Services Port: " + lvPort + " *************");
 			} else {
+				System.out.println("Cause: "+res.cause().getMessage());
 				System.out.println("******************Init WTrade Services Start Failed*******************");
+				vertx.close();
+				System.exit(-1);
 			}
 		});
 
@@ -229,7 +233,7 @@ public class WebServer extends MicroServiceVerticle {
 		// Check Message
 		JsonObject messageBody = pvRtx.getBodyAsJson();
 		messageBody.put("action", pvRtx.pathParam("action"));
-		
+
 		discovery.getRecord(
 				new JsonObject().put("name", EventBusDiscoveryConst.SURVEYINTERNALPROCESSORTDISCOVERY.toString()),
 				resultHandler -> {
@@ -478,8 +482,8 @@ public class WebServer extends MicroServiceVerticle {
 					resultHandler -> {
 						if (resultHandler.succeeded() && resultHandler.result() != null) {
 							Record record = resultHandler.result();
-							VertxServiceCenter.getEventbus().<JsonObject>send(record.getLocation().getString("endpoint"),
-									message, res -> {
+							VertxServiceCenter.getEventbus()
+									.<JsonObject>send(record.getLocation().getString("endpoint"), message, res -> {
 										if (res.succeeded()) {
 											if (res.result().body().getString(FieldName.CODE)
 													.equals(CodeMapping.C0000.toString())) {
@@ -503,13 +507,13 @@ public class WebServer extends MicroServiceVerticle {
 
 		}
 	}
-	
+
 	private void redirectTo(RoutingContext rtx, String url) {
-		String host = new String( rtx.request().host().toString() );
+		String host = new String(rtx.request().host().toString());
 		Boolean isSSL = rtx.request().isSSL();
-		
-		String uri = (isSSL ? "https": "http") + "://" + host + url;
-		String html = new String("<script>window.location = \""+ uri +"\"</script>");
+
+		String uri = (isSSL ? "https" : "http") + "://" + host + url;
+		String html = new String("<script>window.location = \"" + uri + "\"</script>");
 		Buffer buffer = Buffer.buffer(html);
 		rtx.response().setChunked(true).putHeader("Content-Type", "text/html").setStatusCode(200).write(buffer).end();
 	}

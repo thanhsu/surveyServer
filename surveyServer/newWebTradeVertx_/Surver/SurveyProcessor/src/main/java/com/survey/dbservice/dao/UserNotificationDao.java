@@ -1,9 +1,10 @@
 package com.survey.dbservice.dao;
 
 import java.util.Date;
+
+import com.survey.constant.UserNotificationEnum;
 import com.survey.utils.CodeMapping;
 import com.survey.utils.FieldName;
-import com.survey.utils.UserNotificationEnum;
 
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;

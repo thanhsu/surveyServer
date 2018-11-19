@@ -1,32 +1,36 @@
 package com.survey.internal.action;
 
-import com.survey.constant.EventBusDiscoveryConst;
 import com.survey.constant.HttpParameter;
+import com.survey.dbservice.dao.UserDao;
 import com.survey.dbservices.action.UserLogin;
 import com.survey.utils.CodeMapping;
 import com.survey.utils.FieldName;
-import com.survey.utils.MessageDefault;
-import com.survey.utils.VertxServiceCenter;
 
-import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
-import io.vertx.ext.web.RoutingContext;
-import io.vertx.servicediscovery.Record;
 
 public class LoginAction extends InternalSurveyBaseAction {
 
 	public LoginAction() {
 	}
 
-	public LoginAction(RoutingContext rtx) {
-		super(rtx);
-	}
-
 	@Override
 	public void doProccess() {
 		// response = Future.future();
+		String methodLogin = getMessageBody().getString(FieldName.METHOD);
+		if (methodLogin == null) {
+			defaultLogin();
+		} else if (methodLogin.equals("google")) {
+			loginByGoogle();
+		} else if (methodLogin.equals("facebook")) {
+			loginByFacebook();
+		} else {
+			defaultLogin();
+		}
+	}
+
+	private void defaultLogin() {
 		loginID = getMessageBody().getString(HttpParameter.LOGINID);
-		String lvPass = getMessageBody().getString(HttpParameter.PASSWORD);
+		// String lvPass = getMessageBody().getString(HttpParameter.PASSWORD);
 		// Check Message Login
 		UserLogin lvLogin = new UserLogin();
 		lvLogin.doProcess(getMessageBody());
@@ -43,32 +47,31 @@ public class LoginAction extends InternalSurveyBaseAction {
 				response.fail(handler.cause());
 			}
 		});
-		//
-		// VertxServiceCenter.getInstance().getDiscovery().getRecord(
-		// new JsonObject().put("name",
-		// EventBusDiscoveryConst.SURVEYDBDISCOVERY.toString()), resultHandler -> {
-		// if (resultHandler.succeeded() && resultHandler.result() != null) {
-		// Record record = resultHandler.result();
-		// VertxServiceCenter.getEventbus().<JsonObject>send(record.getLocation().getString("endpoint"),
-		// getMessageBody(), res -> {
-		// if (res.succeeded()) {
-		// JsonObject msg = res.result().body();
-		// if (msg.getString(FieldName.CODE).equals(CodeMapping.C0000)) {
-		// response.complete(msg);
-		// } else {
-		// response.complete(msg);
-		// }
-		// } else {
-		// response.fail(res.cause());
-		// }
-		// response.completer();
-		// });
-		// } else {
-		// response.fail(resultHandler.cause());
-		//
-		// response.completer();
-		// }
-		// });
+	}
+
+	private void loginByGoogle() {
+		// set username = google email and email = google email
+		// get user token and check from user table
+		String userToken = getMessageBody().getString(FieldName.CLIENT_TOKEN);
+
+		UserDao lvUserDao = new UserDao();
+		lvUserDao.loginByGoogle(userToken);
+		lvUserDao.getMvFutureResponse().setHandler(handler -> {
+			if (handler.succeeded()) {
+				JsonObject msg = handler.result();
+				if (msg.getString(FieldName.CODE).equals(CodeMapping.C0000)) {
+					response.complete(msg);
+				} else {
+					response.complete(msg);
+				}
+			} else {
+				response.fail(handler.cause());
+			}
+		});
+	}
+
+	private void loginByFacebook() {
+
 	}
 
 }

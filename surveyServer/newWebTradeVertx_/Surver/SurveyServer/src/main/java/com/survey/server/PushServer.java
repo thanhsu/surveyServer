@@ -2,6 +2,7 @@ package com.survey.server;
 
 import com.survey.constant.AtmosphereAPI;
 import com.survey.constant.EventBusDiscoveryConst;
+import com.survey.utils.FieldName;
 import com.survey.utils.Log;
 import com.survey.utils.controller.MicroServiceVerticle;
 import io.vertx.core.Context;
@@ -18,20 +19,36 @@ public class PushServer extends MicroServiceVerticle {
 
 	@Override
 	public void start(Future<Void> startFuture) throws Exception {
-		// TODO Auto-generated method stub
 		super.start(startFuture);
-		vertx.eventBus().<JsonObject>consumer(EventBusDiscoveryConst.SURVEYPUSHSERVERDISCOVEY.value(), message -> {
-			JsonObject body = message.body();
-			message.reply(new JsonObject().put("success", AtmosphereAPI.getInstance().pushTopicWatchList("survey",
-					body.getString("action"), body.getString("session"), body)));
-		});
+		vertx.eventBus().<JsonObject>consumer(EventBusDiscoveryConst.SURVEYPUSHPUBLICSERVERDISCOVEY.value(),
+				message -> {
+					JsonObject body = message.body();
+					message.reply(new JsonObject().put("success",
+							AtmosphereAPI.getInstance().pushTopicNotification("survey", "notification", "all", body)));
+				});
 
-		this.publishEventBusService(EventBusDiscoveryConst.SURVEYPUSHSERVERDISCOVEY.name(),
-				EventBusDiscoveryConst.SURVEYPUSHSERVERDISCOVEY.value(), completionHandler -> {
+		this.publishEventBusService(EventBusDiscoveryConst.SURVEYPUSHPUBLICSERVERDISCOVEY.name(),
+				EventBusDiscoveryConst.SURVEYPUSHPUBLICSERVERDISCOVEY.value(), completionHandler -> {
 					if (completionHandler.succeeded()) {
-						Log.print("Pushlish SURVEYPUSHSERVERDISCOVEY success!");
+						Log.print("Pushlish SURVEYPUSHPRIVATESERVERDISCOVEY success!");
 					} else {
-						Log.print("Pushlish SURVEYPUSHSERVERDISCOVEY fail! cause: "
+						Log.print("Pushlish SURVEYPUSHPRIVATESERVERDISCOVEY fail! cause: "
+								+ completionHandler.cause().getMessage());
+					}
+				});
+		vertx.eventBus().<JsonObject>consumer(EventBusDiscoveryConst.SURVEYPUSHPRIVATESERVERDISCOVEY.value(),
+				message -> {
+					JsonObject body = message.body();
+					message.reply(new JsonObject().put("success", AtmosphereAPI.getInstance().pushTopicToUser("survey",
+							body.getString("action"), body.getString("session"), body.getJsonObject(FieldName.DATA))));
+				});
+
+		this.publishEventBusService(EventBusDiscoveryConst.SURVEYPUSHPRIVATESERVERDISCOVEY.name(),
+				EventBusDiscoveryConst.SURVEYPUSHPRIVATESERVERDISCOVEY.value(), completionHandler -> {
+					if (completionHandler.succeeded()) {
+						Log.print("Pushlish SURVEYPUSHPRIVATESERVERDISCOVEY success!");
+					} else {
+						Log.print("Pushlish SURVEYPUSHPRIVATESERVERDISCOVEY fail! cause: "
 								+ completionHandler.cause().getMessage());
 					}
 				});

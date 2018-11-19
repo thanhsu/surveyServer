@@ -5,8 +5,11 @@ import java.util.Date;
 import java.util.List;
 
 import com.survey.constant.EventBusDiscoveryConst;
+import com.survey.constant.UserNotificationEnum;
+import com.survey.notification.actions.SurveyStatusUpdate;
 import com.survey.utils.CodeMapping;
 import com.survey.utils.FieldName;
+import com.survey.utils.PushMessageBean;
 import com.survey.utils.VertxServiceCenter;
 
 import io.vertx.core.AsyncResult;
@@ -34,7 +37,7 @@ public class SurveyDao extends SurveyBaseDao {
 		tmpSurvey.put(FieldName.TITLE, title);
 		tmpSurvey.put(FieldName.ISTEMP, false);
 		tmpSurvey.put(FieldName.DESCRIPTION, description);
-		tmpSurvey.put(FieldName.CATEGORY, categoryID);
+		tmpSurvey.put(FieldName.LISTCATEGORYID, categoryID);
 		tmpSurvey.put(FieldName.STATE, "A");
 		tmpSurvey.put(FieldName.STATUS, "L");
 		tmpSurvey.put(FieldName.INPUTTIME, new Date().getTime());
@@ -200,6 +203,19 @@ public class SurveyDao extends SurveyBaseDao {
 		this.CompleteGenerateResponse(CodeMapping.C0000.toString(), CodeMapping.C0000.value(), surveyData);
 	}
 
+	public Future<JsonObject> retrieveSurveyStatus(String surveyID) {
+		Future<JsonObject> lvResult = Future.future();
+		Future<JsonArray> lvTmp = Future.future(h -> {
+			if (h.succeeded()) {
+				lvResult.complete(h.result().getJsonObject(0));
+			}
+		});
+		this.queryDocumentRunCmd(new JsonObject().put(FieldName._ID, surveyID),
+				new JsonObject().put(FieldName.QUESTIONDATA, 0).put(FieldName.LISTCATEGORYID, 0), new JsonObject(),
+				lvTmp);
+		return lvResult;
+	}
+
 	public void pushlishSurvey(String surveyID, String username, double limitResp, float pointPerOne, float initialFund,
 			boolean noti, float limitFund) {
 		this.queryDocument(new JsonObject().put(FieldName._ID, surveyID), handler -> {
@@ -247,11 +263,13 @@ public class SurveyDao extends SurveyBaseDao {
 	public void closesurvey(String username, String userID, String surveyID, boolean isStop, String remark) {
 		this.queryDocument(new JsonObject().put(FieldName._ID, surveyID).put(FieldName.USERNAME, username), handler -> {
 			if (handler.succeeded() && handler.result() != null && !handler.result().isEmpty()) {
+				JsonObject lvSurveyNewStatus = new JsonObject();
+
 				if (isStop) {
-					JsonObject close = new JsonObject();
-					close.put(FieldName.STATE, "C");
-					close.put(FieldName.REMARK, remark);
-					this.updateSurveyData(surveyID, close);
+
+					lvSurveyNewStatus.put(FieldName.STATE, "C");
+					lvSurveyNewStatus.put(FieldName.REMARK, remark);
+					this.updateSurveyData(surveyID, lvSurveyNewStatus);
 					// Send remain money to ethe Server
 					Future<JsonObject> response = Future.future();
 					VertxServiceCenter.getInstance().sendNewMessage(
@@ -267,11 +285,13 @@ public class SurveyDao extends SurveyBaseDao {
 								handler1.result());
 					});
 				} else {
-					JsonObject pause = new JsonObject();
-					pause.put(FieldName.STATE, "S");
-					pause.put(FieldName.REMARK, remark);
-					this.updateSurveyData(surveyID, pause);
+
+					lvSurveyNewStatus.put(FieldName.STATE, "S");
+					lvSurveyNewStatus.put(FieldName.REMARK, remark);
+					this.updateSurveyData(surveyID, lvSurveyNewStatus);
 				}
+				// Send notification
+
 			} else {
 				this.CompleteGenerateResponse(CodeMapping.S1111.toString(), "Survey not found or permission deny",
 						null);
@@ -481,5 +501,11 @@ public class SurveyDao extends SurveyBaseDao {
 					}
 				});
 		return deleteResult;
+	}
+
+	private void sendNotification(String surveyID) {
+		SurveyStatusUpdate lvStatusUpdate = new SurveyStatusUpdate();
+		lvStatusUpdate.setSurveyID(surveyID);
+		lvStatusUpdate.generate();
 	}
 }

@@ -1,14 +1,20 @@
 package com.survey.dbservice.dao;
 
+import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.sql.Date;
 import java.sql.Timestamp;
 
+import com.survey.constant.EventBusDiscoveryConst;
 import com.survey.otp.OTPManagerException;
 import com.survey.utils.CodeMapping;
 import com.survey.utils.Encrypt;
 import com.survey.utils.FieldName;
+import com.survey.utils.GoogleUserBean;
+import com.survey.utils.SurveyGoogleApiUtils;
 import com.survey.utils.SurveyToken;
 import com.survey.utils.Utils;
+import com.survey.utils.VertxServiceCenter;
 
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
@@ -31,7 +37,7 @@ public class UserDao extends SurveyBaseDao {
 					this.CompleteGenerateResponse(CodeMapping.U1111.toString(), CodeMapping.U1111.value(), null);
 				} else {
 					JsonObject userData = handler.result().get(0);
-					if (userData.getString(FieldName.STATUS).equals("L")) {
+					if (userData.getString(FieldName.STATUS).equals("D")) {
 						this.CompleteGenerateResponse(CodeMapping.U3333.toString(), CodeMapping.U3333.value(), null);
 						return;
 					}
@@ -51,6 +57,79 @@ public class UserDao extends SurveyBaseDao {
 			}
 		});
 		return mvFutureResponse;
+	}
+
+	public void loginByGoogle(String userToken) {
+		this.queryDocument(new JsonObject().put(FieldName.GOOGLETOKEN, userToken), handler -> {
+			if (handler.succeeded() && handler.result() != null) {
+				if (!handler.result().isEmpty()) {
+					JsonObject userData = handler.result().get(0);
+					userData.remove(FieldName.PASSWORD);
+					userData.remove(FieldName.PIN);
+					this.CompleteGenerateResponse(CodeMapping.C0000.toString(), "Login is success", userData);
+					loginSuccess(userData.getString("_id"));
+				} else {
+					// Create User
+					createUserByGoogleID(userToken);
+				}
+			} else {
+				// Create User
+				createUserByGoogleID(userToken);
+			}
+		});
+	}
+
+	private void createUserByGoogleID(String token) {
+		try {
+			GoogleUserBean lvBean = SurveyGoogleApiUtils.getInstance().retrieveUserInfo(token);
+			getClientIDbyEmail(lvBean.getEmail()).setHandler(r -> {
+				if (r.succeeded() & r.result() != null) {
+					if (r.result().getString(FieldName.CODE).equals(CodeMapping.U0000.toString())) {
+						this.CompleteGenerateResponse(CodeMapping.R3333.toString(), CodeMapping.R3333.value(), null);
+					} else {
+						JsonObject query = new JsonObject().put(FieldName.USERNAME, lvBean.getEmail())
+								.put(FieldName.GOOGLETOKEN, token).put(FieldName.AVATAR, lvBean.getAvatar());
+						query.put(FieldName.PASSWORD, "").put(FieldName.FULLNAME, lvBean.getFullname())
+								.put(FieldName.EMAIL, lvBean.getEmail()).put(FieldName.STATUS, "L")
+								.put(FieldName.TOKEN, token);
+						this.saveDocumentReturnID(query).setHandler(handler->{
+							this.doLogin(lvBean.getEmail(), "");
+							Future<JsonObject> lvProxyResult = Future.future();
+							JsonObject rq = new JsonObject().put(FieldName.ACTION, "createaccount")
+									.put(FieldName.USERNAME, lvBean.getEmail()).put(FieldName.EMAIL,lvBean.getEmail());
+							VertxServiceCenter.getInstance().sendNewMessage(
+									EventBusDiscoveryConst.ETHEREUMPROXYDISCOVERY.name(), rq, lvProxyResult);
+							lvProxyResult.setHandler(x -> {
+								ProxyLogDao lvDao = new ProxyLogDao();
+								lvDao.storeNewRequest("createaccount", rq, lvProxyResult.result());
+							});
+						});
+
+					}
+				} else {
+					JsonObject query = new JsonObject().put(FieldName.USERNAME, lvBean.getEmail())
+							.put(FieldName.GOOGLETOKEN, token).put(FieldName.AVATAR, lvBean.getAvatar());
+					query.put(FieldName.PASSWORD, "").put(FieldName.FULLNAME, lvBean.getFullname())
+							.put(FieldName.EMAIL, lvBean.getEmail()).put(FieldName.STATUS, "L")
+							.put(FieldName.TOKEN, token);
+					this.saveDocumentReturnID(query).setHandler(handler->{
+						this.doLogin(lvBean.getEmail(), "");
+						Future<JsonObject> lvProxyResult = Future.future();
+						JsonObject rq = new JsonObject().put(FieldName.ACTION, "createaccount")
+								.put(FieldName.USERNAME, lvBean.getEmail()).put(FieldName.EMAIL, lvBean.getEmail());
+						VertxServiceCenter.getInstance().sendNewMessage(
+								EventBusDiscoveryConst.ETHEREUMPROXYDISCOVERY.name(), rq, lvProxyResult);
+						lvProxyResult.setHandler(x -> {
+							ProxyLogDao lvDao = new ProxyLogDao();
+							lvDao.storeNewRequest("createaccount", rq, lvProxyResult.result());
+						});
+					});
+				}
+			});
+		} catch (GeneralSecurityException | IOException e) {
+			this.CompleteGenerateResponse(CodeMapping.U2222.toString(), CodeMapping.U2222.value(), null);
+		}
+
 	}
 
 	public void doRegister(String username, String password, String email, String fullname) {

@@ -136,33 +136,19 @@ public class AtmosphereAPI {
 	// }
 	// }
 	// Will Broadcast to ALL
-	public boolean pushTopicWatchList(final String module, final String action, final String session, Object o) {
+	public boolean pushTopicToUser(final String module, final String action, final String session, Object o) {
 		HashMap<String, String> data = new HashMap<>();
 		data.put(CONTRACT_SESSION, session);
 		data.put(CONTRACT_ACTION, action);
 		data.put(CONTRACT_MODULE, module);
 		String lvBid = contract(data);
 		this.mvMetaBroadcaster.broadcastTo(lvBid, o);
-		return true;
-		// Broadcaster lvBroadcaster = lookupBroadcaster(lvBid, false);
-		// if (lvBroadcaster == null) {
-		// Log.println("[ITradeAtmosphere] Action " + action + " not found in list stock
-		// . Removed",
-		// Log.ACCESS_LOG);
-		// return false;
-		// } else {
-		// return broadcast(lvBroadcaster, o, action);
-		// }
-	}
-
-	public boolean pushTopicWinvestor(final String module, final String action, final String session, Object o) {
-		HashMap<String, String> data = new HashMap<>();
-		data.put(CONTRACT_SESSION, session);
-		data.put(CONTRACT_ACTION, action);
-		data.put(CONTRACT_MODULE, module);
-		String lvBid = contract(data);
-		this.mvMetaBroadcaster.broadcastTo(lvBid, o);
-		return true;
+		Broadcaster lvBroadcaster = lookupBroadcaster(lvBid, false);
+		if (lvBroadcaster == null) {
+			return false;
+		} else {
+			return broadcast(lvBroadcaster, o, action);
+		}
 		// Broadcaster lvBroadcaster = lookupBroadcaster(lvBid, false);
 		// if (lvBroadcaster == null) {
 		// Log.println("[ITradeAtmosphere] Action " + action + " not found in list stock
@@ -197,20 +183,10 @@ public class AtmosphereAPI {
 	public boolean pushTopicNotification(final String module, final String action, final String session, Object o) {
 		HashMap<String, String> data = new HashMap<>();
 		data.put(CONTRACT_SESSION, session);
-		data.put(CONTRACT_ACTION, TOPIC_NOTIFICATION);
+		data.put(CONTRACT_ACTION, "data");
 		data.put(CONTRACT_MODULE, module);
 		String lvBid = contract(data);
-
-		// Broadcaster lvBroadcaster = lookupBroadcaster(lvBid, false);
-		// if (lvBroadcaster == null) {
-		// Log.println("[ITradeAtmosphere] Action " + action + " not found in list stock
-		// . Removed",
-		// Log.ACCESS_LOG);
-		// return false;
-		// } else {
-		// return broadcast(lvBroadcaster, o, action);
-		// }
-		// lookupBroadcaster(lvBid, false).broadcast(o);
+		
 		this.mvMetaBroadcaster.broadcastTo(lvBid, o);
 		return true;
 
@@ -220,7 +196,7 @@ public class AtmosphereAPI {
 	 * Push for watch List topic: watchlist
 	 */
 	public boolean pushFnoWatchlist(final String module, final String action, Object o) {
-		return pushTopicWatchList(module, action, SESSION_FNO, o);
+		return pushTopicToUser(module, action, SESSION_FNO, o);
 	}
 
 	// TODO must checking if connection
