@@ -369,7 +369,7 @@ public class SurveyDao extends SurveyBaseDao {
 
 		pipeline.add(new JsonObject().put("$lookup",
 				new JsonObject().put("from", SurveyCategoryDao.SurveyCategoryCollection)
-						.put("localField", FieldName.CATEGORY).put("foreignField", "categoryID")
+						.put("localField", FieldName.LISTCATEGORYID).put("foreignField", "categoryID")
 						.put("as", "categorydetail")));
 
 		command.put("aggregate", this.getCollectionName());
