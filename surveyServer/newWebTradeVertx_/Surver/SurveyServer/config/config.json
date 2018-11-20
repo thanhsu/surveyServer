@@ -1,4 +1,5 @@
 {
+	"DebugMode":true,
 	"discoveryaddress": "wtradediscovery",
 	"discoveryname": "myname",
 	"log.path": "./logs/survey",

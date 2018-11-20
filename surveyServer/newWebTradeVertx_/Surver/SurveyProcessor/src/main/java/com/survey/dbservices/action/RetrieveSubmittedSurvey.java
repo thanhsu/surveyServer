@@ -4,7 +4,7 @@ import com.survey.utils.FieldName;
 
 import io.vertx.core.json.JsonObject;
 
-public class RetrieveSubmittedSurvey extends BaseDbServiceAction {
+public class RetrieveSubmittedSurvey extends BaseAdminServiceAction {
 
 	@Override
 	public void doProcess(JsonObject body) {

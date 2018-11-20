@@ -5,7 +5,7 @@ import com.survey.dbservice.dao.UtilsDao;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
 
-public class RetrieveConfigAction extends BaseDbServiceAction {
+public class RetrieveConfigAction extends BaseAdminServiceAction {
 	@Override
 	public void doProcess(JsonObject body) {
 		UtilsDao lvUtils = new UtilsDao();

@@ -5,7 +5,7 @@ import com.survey.utils.FieldName;
 
 import io.vertx.core.json.JsonObject;
 
-public class UserLogin extends BaseDbServiceAction {
+public class UserLogin extends BaseAdminServiceAction {
 	
 
 	@Override

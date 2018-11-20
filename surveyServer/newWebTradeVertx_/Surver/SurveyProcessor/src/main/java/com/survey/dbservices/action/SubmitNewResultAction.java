@@ -4,7 +4,7 @@ import com.survey.dbservice.dao.SurveyDao;
 
 import io.vertx.core.json.JsonObject;
 
-public class SubmitNewResultAction extends BaseDbServiceAction {
+public class SubmitNewResultAction extends BaseAdminServiceAction {
 
 	@Override
 	public void doProcess(JsonObject body) {

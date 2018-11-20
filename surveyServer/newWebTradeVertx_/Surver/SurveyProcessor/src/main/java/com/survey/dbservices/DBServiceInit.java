@@ -5,7 +5,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Hashtable;
 
 import com.survey.dbservice.dao.BaseDaoConnection;
-import com.survey.dbservices.action.BaseDbServiceAction;
+import com.survey.dbservices.action.BaseAdminServiceAction;
 import com.survey.utils.Log;
 
 import io.vertx.core.AbstractVerticle;
@@ -16,7 +16,7 @@ import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonArray;
 
 public class DBServiceInit extends AbstractVerticle {
-	public static Hashtable<String, BaseDbServiceAction> mvActionAuthMapping = new Hashtable<>();
+	public static Hashtable<String, BaseAdminServiceAction> mvActionAuthMapping = new Hashtable<>();
 
 	@Override
 	public void init(Vertx vertx, Context context) {
@@ -43,7 +43,7 @@ public class DBServiceInit extends AbstractVerticle {
 					String actionmap = action.toString();
 					Class<?> lvActionClass = Class.forName(actionmap.split("-")[1]);
 					Constructor<?> lvConstructor = lvActionClass.getConstructor();
-					BaseDbServiceAction lvAuthAction = (BaseDbServiceAction) lvConstructor.newInstance();
+					BaseAdminServiceAction lvAuthAction = (BaseAdminServiceAction) lvConstructor.newInstance();
 					mvActionAuthMapping.put(actionmap.split("-")[0], lvAuthAction);
 				} catch (ClassNotFoundException | NoSuchMethodException | SecurityException | InstantiationException
 						| IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
@@ -66,11 +66,11 @@ public class DBServiceInit extends AbstractVerticle {
 		});
 	}
 
-	public static Hashtable<String, BaseDbServiceAction> getMvActionAuthMapping() {
+	public static Hashtable<String, BaseAdminServiceAction> getMvActionAuthMapping() {
 		return mvActionAuthMapping;
 	}
 
-	public static void setMvActionAuthMapping(Hashtable<String, BaseDbServiceAction> mvActionAuthMapping) {
+	public static void setMvActionAuthMapping(Hashtable<String, BaseAdminServiceAction> mvActionAuthMapping) {
 		DBServiceInit.mvActionAuthMapping = mvActionAuthMapping;
 	}
 }

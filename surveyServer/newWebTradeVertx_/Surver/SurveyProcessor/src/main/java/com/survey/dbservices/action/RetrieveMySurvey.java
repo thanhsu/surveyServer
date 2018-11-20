@@ -6,7 +6,7 @@ import com.survey.utils.FieldName;
 
 import io.vertx.core.json.JsonObject;
 
-public class RetrieveMySurvey extends BaseDbServiceAction {
+public class RetrieveMySurvey extends BaseAdminServiceAction {
 	@Override
 	public void doProcess(JsonObject body) {
 		String lvUsername = body.getString(FieldName.USERNAME);

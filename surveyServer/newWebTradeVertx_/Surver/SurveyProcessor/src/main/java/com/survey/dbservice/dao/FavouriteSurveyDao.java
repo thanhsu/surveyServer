@@ -52,31 +52,32 @@ public class FavouriteSurveyDao extends SurveyBaseDao {
 
 	public Future<Void> retrieveAllFavourite(String username) {
 		Future<Void> lvResult = Future.future();
-		/*this.queryDocument(new JsonObject().put(FieldName.USERNAME, username), handler -> {
-			if (handler.succeeded()) {
-				this.CompleteGenerateResponse(CodeMapping.S0000.toString(), "", handler.result());
-			} else {
-				this.CompleteGenerateResponse(CodeMapping.S1111.toString(), handler.cause().getMessage(), null);
-			}
-		});*/
-		
+		/*
+		 * this.queryDocument(new JsonObject().put(FieldName.USERNAME, username),
+		 * handler -> { if (handler.succeeded()) {
+		 * this.CompleteGenerateResponse(CodeMapping.S0000.toString(), "",
+		 * handler.result()); } else {
+		 * this.CompleteGenerateResponse(CodeMapping.S1111.toString(),
+		 * handler.cause().getMessage(), null); } });
+		 */
+
 		JsonObject command = new JsonObject();
 		JsonArray pipeline = new JsonArray();
 		pipeline.add(new JsonObject().put("$match", new JsonObject().put(FieldName.USERNAME, username)));
-	
-		
+
 		pipeline.add(new JsonObject().put("$lookup", new JsonObject().put("from", SurveyDao.SurveyCollectionName)
-				.put("localField", "_id").put("foreignField", FieldName.SURVEYID).put("as", "surveydata")));
-		
+				.put("localField", FieldName.SURVEYID).put("foreignField", FieldName._ID).put("as", "surveydata")));
+
 		command.put("aggregate", this.getCollectionName());
 		command.put("cursor", new JsonObject().put("batchSize", 1000));
 		command.put("pipeline", pipeline);
 		BaseDaoConnection.getInstance().getMongoClient().runCommand("aggregate", command, resultHandler -> {
 			if (resultHandler.succeeded()) {
 				JsonArray result = resultHandler.result().getJsonObject("cursor").getJsonArray("firstBatch");
-				if(result!=null) {
-					for(int i =0; i < result.size();i++) {
-						result.getJsonObject(i).getJsonObject("surveydata").remove(FieldName.QUESTIONDATA);
+				if (result != null) {
+					for (int i = 0; i < result.size(); i++) {
+						result.getJsonObject(i).getJsonArray("surveydata").getJsonObject(0)
+								.remove(FieldName.QUESTIONDATA);
 					}
 				}
 				this.CompleteGenerateResponse(CodeMapping.S0000.toString(), "", result);

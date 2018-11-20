@@ -1,7 +1,7 @@
 package com.survey.dbservices;
 
 import com.survey.constant.EventBusDiscoveryConst;
-import com.survey.dbservices.action.BaseDbServiceAction;
+import com.survey.dbservices.action.BaseAdminServiceAction;
 import com.survey.utils.MessageDefault;
 import com.survey.utils.controller.MicroServiceVerticle;
 
@@ -27,7 +27,7 @@ public class DBService extends MicroServiceVerticle {
 			JsonObject lvBody = handler.body();
 			String action = lvBody.getString("action");
 			if (action != null) {
-				BaseDbServiceAction lvAction = DBServiceInit.getMvActionAuthMapping().get(action);
+				BaseAdminServiceAction lvAction = DBServiceInit.getMvActionAuthMapping().get(action);
 				try {
 					lvAction.doProcess(lvBody);
 					lvAction.doResponse(handler);

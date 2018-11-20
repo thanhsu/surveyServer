@@ -5,7 +5,7 @@ import com.survey.utils.FieldName;
 
 import io.vertx.core.json.JsonObject;
 
-public class ChangePassword extends BaseDbServiceAction {
+public class ChangePassword extends BaseAdminServiceAction {
 
 	@Override
 	public void doProcess(JsonObject body) {

@@ -6,7 +6,7 @@ import io.vertx.core.Future;
 import io.vertx.core.eventbus.Message;
 import io.vertx.core.json.JsonObject;
 
-public abstract class BaseDbServiceAction {
+public abstract class BaseAdminServiceAction {
 	protected Future<JsonObject> mvResponse = Future.future();
 
 	public abstract void doProcess(JsonObject body);

@@ -57,6 +57,7 @@ public class WebServer extends MicroServiceVerticle {
 	private HashMap<String, String> BANKGATEWAYDISCOVERY = new HashMap<>();
 	private JsonObject mvWebConfig = new JsonObject();
 	private Buffer Webroot = null;
+	private boolean isDebug = false;
 
 	@Override
 	public void init(Vertx vertx, Context context) {
@@ -67,6 +68,7 @@ public class WebServer extends MicroServiceVerticle {
 			LISTCASHMETHODSUBPORT.add(lst[0]);
 			BANKGATEWAYDISCOVERY.put(lst[0], lst[1]);
 		});
+		isDebug = config().getBoolean("DebugMode") == null ? false : config().getBoolean("DebugMode");
 	}
 
 	@Override
@@ -118,6 +120,8 @@ public class WebServer extends MicroServiceVerticle {
 		router.route("/api/resetpassword/:step").handler(this::handlerResetPassword);
 		router.route("/api/admin/confirm").handler(this::handlerAdminConfirm);
 
+		router.route("/api/image/:action").handler(this::handlerSurveyImage);
+
 		router.get("/test/:message").handler(rtx -> {
 			rtx.response().end("OK");
 			mvEventBus.send(EventBusDiscoveryConst.SURVEYPUSHPRIVATESERVERDISCOVEY.value(),
@@ -149,11 +153,15 @@ public class WebServer extends MicroServiceVerticle {
 				redirectTo(pRoutingContext, "/login");
 				return;
 			}
-			if (!session.data().isEmpty()) {
-				// pRoutingContext.response().sendFile("./webroot/index.html");
-				responseHomeIndex(pRoutingContext);
-			} else {
+			/*
+			 * if (session.data().isEmpty()) { //
+			 * pRoutingContext.response().sendFile("./webroot/index.html");
+			 * redirectTo(pRoutingContext, "/login"); } else
+			 */
+			if (session.get(FieldName.USERNAME) != null) {
 				redirectTo(pRoutingContext, "/login");
+			} else {
+				responseHomeIndex(pRoutingContext);
 			}
 		});
 
@@ -198,11 +206,11 @@ public class WebServer extends MicroServiceVerticle {
 
 		this.mvHttpServer.requestHandler(router::accept).listen(lvPort, res -> {
 			if (res.succeeded()) {
-				System.out.println("******************Init WTrade Services Listening*******************");
-				System.out.println("******************Init WTrade Services Port: " + lvPort + " *************");
+				System.out.println("******************Init survey Services Listening*******************");
+				System.out.println("******************Init survey Services Port: " + lvPort + " *************");
 			} else {
 				System.out.println("Cause: " + res.cause().getMessage());
-				System.out.println("******************Init WTrade Services Start Failed*******************");
+				System.out.println("******************Init survey Services Start Failed*******************");
 				vertx.close();
 				System.exit(-1);
 			}
@@ -244,7 +252,33 @@ public class WebServer extends MicroServiceVerticle {
 	}
 
 	private void handlerSurveyAction(RoutingContext pvRtx) {
+		if (isDebug) {
+			JsonObject messageBody = pvRtx.getBodyAsJson();
+			messageBody.put("action", pvRtx.pathParam("action"));
+			discovery.getRecord(
+					new JsonObject().put("name", EventBusDiscoveryConst.SURVEYINTERNALPROCESSORTDISCOVERY.toString()),
+					resultHandler -> {
+						if (resultHandler.succeeded() && resultHandler.result() != null) {
+							Record record = resultHandler.result();
+							mvEventBus.<JsonObject>send(record.getLocation().getString("endpoint"), messageBody,
+									res -> {
+										if (res.succeeded()) {
+											JsonObject resp = res.result().body();
+											doResponseNoRenewCookie(pvRtx, Json.encodePrettily(resp));
+										} else {
+											doResponse(pvRtx, MessageDefault.RequestFailed(CodeMapping.C1111.toString(),
+													res.cause().getMessage()));
+										}
+									});
+
+						} else {
+							doResponse(pvRtx, MessageDefault.RequestFailed(resultHandler.cause().getMessage()));
+						}
+					});
+			return;
+		}
 		// check auth
+
 		if (pvRtx.session() == null) {
 			sendCheckAuthFail(pvRtx);
 			return;
@@ -280,6 +314,30 @@ public class WebServer extends MicroServiceVerticle {
 					}
 				});
 
+	}
+
+	public void handlerSurveyImage(RoutingContext rtx) {
+		JsonObject messageBody = rtx.getBodyAsJson();
+		messageBody.put("action", rtx.pathParam("action") + "image");
+
+		discovery.getRecord(
+				new JsonObject().put("name", EventBusDiscoveryConst.SURVEYINTERNALPROCESSORTDISCOVERY.toString()),
+				resultHandler -> {
+					if (resultHandler.succeeded() && resultHandler.result() != null) {
+						Record record = resultHandler.result();
+						mvEventBus.<JsonObject>send(record.getLocation().getString("endpoint"), messageBody, res -> {
+							if (res.succeeded()) {
+								JsonObject resp = res.result().body();
+								doResponseNoRenewCookie(rtx, Json.encodePrettily(resp));
+							} else {
+								doResponse(rtx, MessageDefault.RequestFailed(CodeMapping.C1111.toString(),
+										res.cause().getMessage()));
+							}
+						});
+					} else {
+						doResponse(rtx, MessageDefault.RequestFailed(resultHandler.cause().getMessage()));
+					}
+				});
 	}
 
 	public static void doResponse(RoutingContext rtx, JsonObject returnObj) {
@@ -541,11 +599,11 @@ public class WebServer extends MicroServiceVerticle {
 		Buffer buffer = Buffer.buffer(html);
 		rtx.response().setChunked(true).putHeader("Content-Type", "text/html").setStatusCode(200).write(buffer).end();
 	}
-	
-	private void sendCheckAuthFail(RoutingContext rtx){
+
+	private void sendCheckAuthFail(RoutingContext rtx) {
 		doResponseNoRenewCookie(rtx, Json.encode(MessageDefault.SessionTimeOut()));
 	}
-	
+
 	private void responseHomeIndex(RoutingContext rtx) {
 		JsonObject tmp = new JsonObject().put("config", mvWebConfig);
 		tmp.put("logindata", (JsonObject) rtx.session().get("logindata"));

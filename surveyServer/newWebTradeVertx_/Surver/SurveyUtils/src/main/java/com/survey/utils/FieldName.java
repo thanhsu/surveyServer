@@ -93,7 +93,8 @@ public class FieldName {
 	public static final String SURVEYDATA = "surveydata";
 	public static final String TYPE = "type";
 	public static final String LISTNOTIFICATION = "listnotification";
-	public static final String GOOGLETOKEN ="google_token";
-	public static final String CLIENT_TOKEN="client_token";
-	public static final String AVATAR="avatar";
+	public static final String GOOGLETOKEN = "google_token";
+	public static final String CLIENT_TOKEN = "client_token";
+	public static final String AVATAR = "avatar";
+	public static final String IMAGEID = "imageid";
 }
