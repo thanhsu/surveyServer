@@ -7,6 +7,7 @@ import com.survey.confirm.actions.CreateUser;
 import com.survey.internal.action.AccountBalanceProxyAction;
 import com.survey.internal.action.ActiveUserAction;
 import com.survey.internal.action.AddFavouriteSurveyAction;
+import com.survey.internal.action.AnswerSurveyAction;
 import com.survey.internal.action.CancelCashAction;
 import com.survey.internal.action.CashEnquiryAction;
 import com.survey.internal.action.ChangePasswordAction;
@@ -80,6 +81,7 @@ public class SurveyProcessConstant {
 		mvActionMapping.put("updatesurvey", new UpdateSurveyDataAction());
 		mvActionMapping.put("pushlish", new PushlishSurveyAction());
 		mvActionMapping.put("checkanswerpermission", new CheckPermissionAnswerSurveyAction());
+		mvActionMapping.put("answer", new AnswerSurveyAction());
 		mvActionMapping.put("disablesurvey", new DisableSurveyAction());
 		mvActionMapping.put("deletesurvey", new DeleteSurveyAction());
 		mvActionMapping.put("restoresurvey", new RestoreSurveyAction());
