@@ -14,7 +14,7 @@
 	"log.Reply": "N",
 	"log.SMTPMessageInterval": "300000",
 	"log.SMTPHost": "mail.tx-tech.com",
-	"HttpPort": 80,
+	"HttpPort": 443,
 	"HttpSessionTimeout": 6000000,
 	"enabledSSL": true,
 	"SSLPassword":"wibble",
