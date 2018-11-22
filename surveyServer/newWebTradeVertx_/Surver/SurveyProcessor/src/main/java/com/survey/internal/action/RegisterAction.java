@@ -28,7 +28,7 @@ public class RegisterAction extends InternalSurveyBaseAction {
 							.sendEmail(getMessageBody().getString(FieldName.EMAIL), "Register-ISurvey", "",
 									"Register success. Access your account by link: "
 											+ generateactivelink(getMessageBody().getString(FieldName.USERNAME),
-													msg.getString(FieldName.TOKEN)))) {
+													msg.getJsonObject(FieldName.DATA).getString(FieldName.TOKEN)))) {
 						// Sent Mail
 					}
 				} else {
@@ -42,7 +42,7 @@ public class RegisterAction extends InternalSurveyBaseAction {
 	}
 
 	private String generateactivelink(String username, String token) {
-		String lvTemp = ProcessorInit.mvConfig.getString("SurveyHost") + "/activeuser?username=" + username;
+		String lvTemp = ProcessorInit.mvConfig.getString("SurveyHost") + "/api/activeuser?username=" + username;
 		try {
 			lvTemp =lvTemp+ "&token=" + token;
 			JsonObject tmp = new JsonObject().put(FieldName.USERNAME, username).put(FieldName.TOKEN, token);

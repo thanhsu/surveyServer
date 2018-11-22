@@ -97,4 +97,5 @@ public class FieldName {
 	public static final String CLIENT_TOKEN = "client_token";
 	public static final String AVATAR = "avatar";
 	public static final String IMAGEID = "imageid";
+	public static final String PUSHLISHREJECTCAUSE = "pushlishrejectcause";
 }

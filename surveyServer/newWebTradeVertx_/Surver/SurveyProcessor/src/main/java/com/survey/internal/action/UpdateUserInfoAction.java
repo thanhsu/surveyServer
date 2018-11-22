@@ -11,13 +11,15 @@ public class UpdateUserInfoAction extends InternalSurveyBaseAction {
 
 	@Override
 	public void doProccess() {
-		String userID = getMessageBody().getString(FieldName.USERID);
+		//String userID = getMessageBody().getString(FieldName.USERID);
+		String username = getMessageBody().getString(FieldName.USERNAME);
 		JsonObject newUserInfoData = getMessageBody().getJsonObject(FieldName.DATA);
 		UserDao lvDao = new UserDao();
-		lvDao.updateDocument(new JsonObject().put(FieldName._ID, userID), newUserInfoData, new UpdateOptions(false),
+
+		lvDao.updateDocument(new JsonObject().put(FieldName.USERNAME, username), newUserInfoData, new UpdateOptions(false),
 				handler -> {
 					if (handler.succeeded()) {
-						lvDao.doGetUserInfo(userID);
+						lvDao.doGetUserInfobyUserName(username);
 						lvDao.getMvFutureResponse().setHandler(handler1 -> {
 							response.complete(handler1.result());
 						});

@@ -290,6 +290,8 @@ public class WebServer extends MicroServiceVerticle {
 		if (!pvRtx.session().get(FieldName.USERNAME).equals(messageBody.getString(FieldName.USERNAME))) {
 			sendCheckAuthFail(pvRtx);
 			return;
+		}else{
+			messageBody.put(FieldName.USERID, pvRtx.session().get(FieldName.USERNAME).equals(messageBody.getString(FieldName._ID)));
 		}
 		// Check Message
 		messageBody.put("action", pvRtx.pathParam("action"));
@@ -496,7 +498,11 @@ public class WebServer extends MicroServiceVerticle {
 		final JsonObject lvMessage = new JsonObject();
 		if (rtx.request().method().equals(HttpMethod.POST)) {
 			lvMessage.mergeIn(rtx.getBodyAsJson());
+		} else if (step.equals("2")) {
+			
+			return;
 		}
+
 		lvMessage.put(FieldName.STEP, step);
 		lvMessage.put(FieldName.ACTION, "resetpassword");
 		rtx.queryParams().forEach(action -> {
@@ -510,18 +516,12 @@ public class WebServer extends MicroServiceVerticle {
 						VertxServiceCenter.getEventbus().<JsonObject>send(record.getLocation().getString("endpoint"),
 								lvMessage, res -> {
 									if (res.succeeded()) {
-										if (res.result().body().getString(FieldName.CODE)
-												.equals(CodeMapping.C0000.toString())) {
-											rtx.response().end("Confirm success");
-										} else {
-											rtx.response().end("Confirm Failed");
-										}
+										doResponse(rtx, res.result().body());
 									} else {
-										rtx.response().end("Confirm Failed");
-										/*
-										 * doResponse(rtx,
-										 * MessageDefault.RequestFailed(resultHandler.cause().getMessage()));
-										 */
+
+										doResponse(rtx,
+												MessageDefault.RequestFailed(resultHandler.cause().getMessage()));
+
 									}
 								});
 					} else {
@@ -542,6 +542,7 @@ public class WebServer extends MicroServiceVerticle {
 						mvEventBus.<JsonObject>send(record.getLocation().getString("endpoint"), messageBody, res -> {
 							if (res.succeeded()) {
 								JsonObject resp = res.result().body();
+								resp.remove(FieldName.DATA);
 								doResponseNoRenewCookie(rtx, Json.encodePrettily(resp));
 							} else {
 								doResponse(rtx, MessageDefault.RequestFailed(CodeMapping.C1111.toString(),
@@ -608,7 +609,7 @@ public class WebServer extends MicroServiceVerticle {
 		JsonObject tmp = new JsonObject().put("config", mvWebConfig);
 		tmp.put("logindata", (JsonObject) rtx.session().get("logindata"));
 
-		vertx.fileSystem().readFile("./webroot/index.html", handler -> {
+		vertx.fileSystem().readFile("./webroot/home.html", handler -> {
 			if (handler.succeeded() && handler.result() != null) {
 				if (mvWebConfig.isEmpty()) {
 					initConfig();

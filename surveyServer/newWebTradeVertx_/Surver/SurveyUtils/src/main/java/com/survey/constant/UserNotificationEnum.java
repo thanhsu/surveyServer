@@ -2,6 +2,7 @@ package com.survey.constant;
 
 public enum UserNotificationEnum {
 	SURVEYSTATE("Survey state updated"),
+	SURVEYPUSHLISH("Survey pushlish"),
 	ACCOUNT("Account Ssatus update"),
 	ACCOUNTCASH("Account cash balance update"),
 	UNKNOWN("Unknownw");

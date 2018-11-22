@@ -1,20 +1,649 @@
-<html>
+<html lang="en">
 <head>
-  <meta name="google-signin-client_id" content="235104055100-ucqogsakjknke4h9vvnfk9ig44cm0lio.apps.googleusercontent.com">
- <script src="https://apis.google.com/js/platform.js" async defer></script>
-</head>
-<!-- [START body] -->
-<body>
-`
-  <script>
-    function onSuccess(googleUser) {
-    	  console.log('Signed i');
-      console.log('Signed in assssss: ' + googleUser.getBasicProfile().getName());
-    }
-  </script>
-  <div class="g-signin2" data-onsuccess="onSuccess"></div>
- 
-</body>
-<!-- [END body] -->
-</html>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Survey Go! Hỏi nhiều hơn, biết nhiều hơn, làm nhiều hơn - Nền tảng kháo sát trực tuyến </title>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.js"></script>
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+    <link rel="icon" href="/assets/image/logo.png" type="image/png" />
+    <script src="/assets/js/index.js"></script>
+    <link rel="stylesheet" href="/assets/css/style.css" />
+
+</head>
+<body>
+    <nav class="go-nav go-container">
+        <div class="go-container">
+            <button class="hamburger hamburger--collapse" type="button" id="responsive-nav-button">
+                <span class="hamburger-box">
+                    <span class="hamburger-inner"></span>
+                </span>
+            </button>
+            <div class="logo-brand">
+                <a href="/" class="logo">
+                    <img class="logo-image" src="/assets/image/logo.png"/>
+                    <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+                        width="141.73px" height="45.35px" viewBox="0 0 141.73 45.35" style="enable-background:new 0 0 141.73 45.35;"
+                        xml:space="preserve">
+                        <linearGradient id="SVGID_1_" gradientUnits="userSpaceOnUse" x1="57.4521" y1="27.9111" x2="50.4584" y2="10.6979" gradientTransform="matrix(0.9858 -0.168 0.168 0.9858 -0.248 14.729)">
+                        <stop  offset="0" style="stop-color:#F4806E"/>
+                        <stop  offset="0.4147" style="stop-color:#F34A5C"/>
+                        <stop  offset="1" style="stop-color:#F11A2C"/>
+                    </linearGradient>
+                    <path style="fill:url(#SVGID_1_);" d="M64.831,12.498c-1.043-0.727-2.504-0.462-3.262,0.59l-7.494,10.399
+                        c-0.051,0.07-0.097,0.144-0.139,0.216c-0.039,0.049-0.079,0.096-0.115,0.147l-3.158,4.459c-0.203,0.287-0.575,0.351-0.861,0.147
+                        l-4.519-3.206c-1.032-0.731-2.462-0.488-3.193,0.544c-0.731,1.034-0.49,2.466,0.542,3.201l6.669,4.749
+                        c1.152,0.817,2.743,0.546,3.56-0.607l4.699-6.635c0.033-0.047,0.063-0.095,0.092-0.144c0.07-0.075,0.139-0.154,0.201-0.24
+                        l7.494-10.398C66.104,14.667,65.874,13.224,64.831,12.498z"/>
+                    <text transform="matrix(1 0 0 1 3.1387 35.2158)" style="font-size:27;">Sur</text>
+                    <text transform="matrix(1 0 0 1 60.1387 35.2158)" style="font-size:27;">ey</text>
+                    <text transform="matrix(1 0 0 1 120.6221 35.2158)" style="font-size:27;">o</text>
+                    <g>
+                        
+                            <linearGradient id="SVGID_2_" gradientUnits="userSpaceOnUse" x1="-47.2256" y1="193.8779" x2="-47.1287" y2="193.7983" gradientTransform="matrix(104.4583 -104.4583 140.5062 140.5062 -22194.25 -32139.7188)">
+                            <stop  offset="0" style="stop-color:#3F81BA"/>
+                            <stop  offset="1" style="stop-color:#2DAECF"/>
+                        </linearGradient>
+                        <polygon style="fill:url(#SVGID_2_);" points="115.416,30.63 111.889,30.632 111.889,30.632 	"/>
+                        
+                            <linearGradient id="SVGID_3_" gradientUnits="userSpaceOnUse" x1="-47.2529" y1="193.8252" x2="-47.1549" y2="193.7447" gradientTransform="matrix(104.4583 -104.4583 140.5062 140.5062 -22194.25 -32139.7188)">
+                            <stop  offset="0" style="stop-color:#3F81BA"/>
+                            <stop  offset="1" style="stop-color:#2DAECF"/>
+                        </linearGradient>
+                        <path style="fill:url(#SVGID_3_);" d="M102.803,30.013l0.01-20.994c0-0.146,0.055-0.272,0.135-0.376
+                            c-0.08,0.104-0.135,0.229-0.135,0.376L102.803,30.013z"/>
+                        
+                            <linearGradient id="SVGID_4_" gradientUnits="userSpaceOnUse" x1="-47.2549" y1="193.8223" x2="-47.1568" y2="193.7417" gradientTransform="matrix(104.4583 -104.4583 140.5062 140.5062 -22194.25 -32139.7188)">
+                            <stop  offset="0" style="stop-color:#3F81BA"/>
+                            <stop  offset="1" style="stop-color:#2DAECF"/>
+                        </linearGradient>
+                        <path style="fill:url(#SVGID_4_);" d="M103.054,30.502c-0.023-0.018-0.052-0.027-0.073-0.048
+                            C103.002,30.475,103.03,30.484,103.054,30.502z"/>
+                        
+                            <linearGradient id="SVGID_5_" gradientUnits="userSpaceOnUse" x1="-47.2344" y1="193.8477" x2="-47.1363" y2="193.7671" gradientTransform="matrix(104.4583 -104.4583 140.5062 140.5062 -22194.25 -32139.7188)">
+                            <stop  offset="0" style="stop-color:#3F81BA"/>
+                            <stop  offset="1" style="stop-color:#2DAECF"/>
+                        </linearGradient>
+                        <path style="fill:url(#SVGID_5_);" d="M103.187,8.448c0.074-0.031,0.157-0.047,0.245-0.047l8.355-0.004L103.432,8.4
+                            C103.344,8.4,103.261,8.417,103.187,8.448z"/>
+                        
+                            <linearGradient id="SVGID_6_" gradientUnits="userSpaceOnUse" x1="-47.2129" y1="193.873" x2="-47.1148" y2="193.7925" gradientTransform="matrix(104.4583 -104.4583 140.5062 140.5062 -22194.25 -32139.7188)">
+                            <stop  offset="0" style="stop-color:#3F81BA"/>
+                            <stop  offset="1" style="stop-color:#2DAECF"/>
+                        </linearGradient>
+                        <path style="fill:url(#SVGID_6_);" d="M114.08,6.104c0.001-1.108-0.785-2.031-1.829-2.245
+                            C113.295,4.073,114.081,4.997,114.08,6.104z"/>
+                        
+                            <linearGradient id="SVGID_7_" gradientUnits="userSpaceOnUse" x1="-47.2578" y1="193.8262" x2="-47.2578" y2="193.8261" gradientTransform="matrix(104.4583 -104.4583 140.5062 140.5062 -22194.25 -32139.7188)">
+                            <stop  offset="0" style="stop-color:#3F81BA"/>
+                            <stop  offset="1" style="stop-color:#2DAECF"/>
+                        </linearGradient>
+                        <path style="fill:url(#SVGID_7_);" d="M103.178,30.584c0.035,0.015,0.079,0.015,0.119,0.022
+                            C103.257,30.599,103.213,30.599,103.178,30.584z"/>
+                        
+                            <linearGradient id="SVGID_8_" gradientUnits="userSpaceOnUse" x1="-47.2085" y1="193.8994" x2="-47.1104" y2="193.8188" gradientTransform="matrix(104.4583 -104.4583 140.5062 140.5062 -22194.25 -32139.7188)">
+                            <stop  offset="0" style="stop-color:#3F81BA"/>
+                            <stop  offset="1" style="stop-color:#2DAECF"/>
+                        </linearGradient>
+                        <path style="fill:url(#SVGID_8_);" d="M120.62,26.317l0.002-4.664c0-1.266-1.025-2.292-2.292-2.291
+                            c-1.265,0.001-2.292,1.026-2.293,2.293l-0.002,8.356c0,0.351-0.269,0.618-0.619,0.618c0.814-0.06,2.296-0.011,3.524-0.88
+                            C119.853,29.103,120.411,27.958,120.62,26.317z"/>
+                        
+                            <linearGradient id="SVGID_9_" gradientUnits="userSpaceOnUse" x1="-47.2554" y1="193.8223" x2="-47.1573" y2="193.7417" gradientTransform="matrix(104.4583 -104.4583 140.5062 140.5062 -22194.25 -32139.7188)">
+                            <stop  offset="0" style="stop-color:#3F81BA"/>
+                            <stop  offset="1" style="stop-color:#2DAECF"/>
+                        </linearGradient>
+                        <path style="fill:url(#SVGID_9_);" d="M102.851,30.258c0.005,0.014,0.017,0.022,0.023,0.035
+                            C102.867,30.28,102.855,30.271,102.851,30.258z"/>
+                        
+                            <linearGradient id="SVGID_10_" gradientUnits="userSpaceOnUse" x1="-47.2568" y1="193.8262" x2="-47.257" y2="193.8252" gradientTransform="matrix(104.4583 -104.4583 140.5062 140.5062 -22194.25 -32139.7188)">
+                            <stop  offset="0" style="stop-color:#26ADCE"/>
+                            <stop  offset="0.3786" style="stop-color:#2288BC"/>
+                            <stop  offset="1" style="stop-color:#1E5AA6"/>
+                        </linearGradient>
+                        <path style="fill:url(#SVGID_10_);" d="M102.803,30.013c0,0.088,0.018,0.171,0.048,0.245
+                            C102.82,30.184,102.803,30.101,102.803,30.013z"/>
+                        
+                            <linearGradient id="SVGID_11_" gradientUnits="userSpaceOnUse" x1="-47.2402" y1="193.9453" x2="-47.2734" y2="193.7147" gradientTransform="matrix(104.4583 -104.4583 140.5062 140.5062 -22194.25 -32139.7188)">
+                            <stop  offset="0" style="stop-color:#26ADCE"/>
+                            <stop  offset="0.3786" style="stop-color:#2288BC"/>
+                            <stop  offset="1" style="stop-color:#1E5AA6"/>
+                        </linearGradient>
+                        <path style="fill:url(#SVGID_11_);" d="M102.98,30.454c-0.045-0.046-0.078-0.103-0.106-0.161
+                            C102.902,30.352,102.936,30.408,102.98,30.454z"/>
+                        
+                            <linearGradient id="SVGID_12_" gradientUnits="userSpaceOnUse" x1="-47.2402" y1="193.9453" x2="-47.2734" y2="193.7147" gradientTransform="matrix(104.4583 -104.4583 140.5062 140.5062 -22194.25 -32139.7188)">
+                            <stop  offset="0" style="stop-color:#26ADCE"/>
+                            <stop  offset="0.3786" style="stop-color:#2288BC"/>
+                            <stop  offset="1" style="stop-color:#1E5AA6"/>
+                        </linearGradient>
+                        <path style="fill:url(#SVGID_12_);" d="M103.054,30.502c0.04,0.029,0.077,0.063,0.124,0.082
+                            C103.131,30.564,103.094,30.531,103.054,30.502z"/>
+                        
+                            <linearGradient id="SVGID_13_" gradientUnits="userSpaceOnUse" x1="-47.2393" y1="193.9453" x2="-47.2724" y2="193.7147" gradientTransform="matrix(104.4583 -104.4583 140.5062 140.5062 -22194.25 -32139.7188)">
+                            <stop  offset="0" style="stop-color:#26ADCE"/>
+                            <stop  offset="0.3786" style="stop-color:#2288BC"/>
+                            <stop  offset="1" style="stop-color:#1E5AA6"/>
+                        </linearGradient>
+                        <path style="fill:url(#SVGID_13_);" d="M103.422,30.631c-0.045,0-0.084-0.016-0.125-0.024
+                            C103.338,30.615,103.377,30.631,103.422,30.631L103.422,30.631z"/>
+                        
+                            <linearGradient id="SVGID_14_" gradientUnits="userSpaceOnUse" x1="-47.1519" y1="193.749" x2="-47.152" y2="193.7481" gradientTransform="matrix(104.4583 -104.4583 140.5062 140.5062 -22194.25 -32139.7188)">
+                            <stop  offset="0" style="stop-color:#26ADCE"/>
+                            <stop  offset="0.3786" style="stop-color:#2288BC"/>
+                            <stop  offset="1" style="stop-color:#1E5AA6"/>
+                        </linearGradient>
+                        <path style="fill:url(#SVGID_14_);" d="M102.947,8.643c0.063-0.083,0.14-0.155,0.239-0.195
+                            C103.087,8.488,103.01,8.56,102.947,8.643z"/>
+                        
+                            <linearGradient id="SVGID_15_" gradientUnits="userSpaceOnUse" x1="-47.1914" y1="193.9385" x2="-47.2246" y2="193.7079" gradientTransform="matrix(104.4583 -104.4583 140.5062 140.5062 -22194.25 -32139.7188)">
+                            <stop  offset="0" style="stop-color:#26ADCE"/>
+                            <stop  offset="0.3786" style="stop-color:#2288BC"/>
+                            <stop  offset="1" style="stop-color:#1E5AA6"/>
+                        </linearGradient>
+                        <path style="fill:url(#SVGID_15_);" d="M100.767,3.817c-1.413,0-2.555,1.143-2.556,2.556L98.2,32.661l0.011-26.288
+                            C98.212,4.96,99.354,3.818,100.767,3.817z"/>
+                        
+                            <linearGradient id="SVGID_16_" gradientUnits="userSpaceOnUse" x1="-47.2163" y1="193.8906" x2="-47.1182" y2="193.81" gradientTransform="matrix(104.4583 -104.4583 140.5062 140.5062 -22194.25 -32139.7188)">
+                            <stop  offset="0" style="stop-color:#3F81BA"/>
+                            <stop  offset="1" style="stop-color:#2DAECF"/>
+                        </linearGradient>
+                        <path style="fill:url(#SVGID_16_);" d="M118.94,29.75c-1.229,0.869-2.71,0.82-3.524,0.88l-3.527,0.002v4.584l6.154-0.003
+                            c1.407-0.001,2.556-1.138,2.574-2.538c0-0.794,0.001-1.522,0.001-2.193l0.002-4.164C120.411,27.958,119.853,29.103,118.94,29.75z"
+                            />
+                        
+                            <linearGradient id="SVGID_17_" gradientUnits="userSpaceOnUse" x1="-47.2412" y1="193.8389" x2="-47.1431" y2="193.7583" gradientTransform="matrix(104.4583 -104.4583 140.5062 140.5062 -22194.25 -32139.7188)">
+                            <stop  offset="0" style="stop-color:#3F81BA"/>
+                            <stop  offset="1" style="stop-color:#2DAECF"/>
+                        </linearGradient>
+                        <path style="fill:url(#SVGID_17_);" d="M103.422,30.631L103.422,30.631c-0.045,0-0.084-0.016-0.125-0.024
+                            c-0.04-0.008-0.084-0.008-0.119-0.022c-0.047-0.02-0.084-0.053-0.124-0.082c-0.023-0.018-0.052-0.027-0.073-0.048
+                            c-0.045-0.046-0.078-0.103-0.106-0.161c-0.007-0.013-0.019-0.021-0.023-0.035c-0.03-0.074-0.048-0.157-0.048-0.245l0.01-20.994
+                            c0-0.146,0.055-0.272,0.135-0.376c0.063-0.083,0.14-0.155,0.239-0.195c0.074-0.031,0.157-0.047,0.245-0.047l8.355-0.004
+                            c1.266,0,2.293-1.027,2.293-2.292c0.001-1.107-0.785-2.031-1.829-2.245c-0.149-0.03-0.304-0.046-0.462-0.046l-11.022,0.004
+                            c-1.413,0.001-2.555,1.143-2.556,2.556L98.2,32.661c-0.001,1.414,1.14,2.555,2.554,2.555l11.635-0.004v-4.584L103.422,30.631z"/>
+                        <linearGradient id="SVGID_18_" gradientUnits="userSpaceOnUse" x1="112.5947" y1="51.7207" x2="104.8343" y2="-2.2281">
+                            <stop  offset="0" style="stop-color:#26ADCE"/>
+                            <stop  offset="0.3786" style="stop-color:#2288BC"/>
+                            <stop  offset="1" style="stop-color:#1E5AA6"/>
+                        </linearGradient>
+                        <path style="fill:url(#SVGID_18_);" d="M118.94,29.75c-1.229,0.869-2.71,0.82-3.524,0.88l-3.027,0.002v-0.004l-8.967,0.003l0,0
+                            c-0.045,0-0.084-0.016-0.125-0.024c-0.04-0.008-0.084-0.008-0.119-0.022c-0.047-0.02-0.084-0.053-0.124-0.082
+                            c-0.023-0.018-0.052-0.027-0.073-0.048c-0.045-0.046-0.078-0.103-0.106-0.161c-0.007-0.013-0.019-0.021-0.023-0.035
+                            c-0.03-0.074-0.048-0.157-0.048-0.245l0.01-20.994c0-0.146,0.055-0.272,0.135-0.376c0.063-0.083,0.14-0.155,0.239-0.195
+                            c0.074-0.031,0.157-0.047,0.245-0.047l8.355-0.004c1.266,0,2.293-1.027,2.293-2.292c0.001-1.107-0.785-2.031-1.829-2.245
+                            c-0.149-0.03-0.304-0.046-0.462-0.046l-11.022,0.004c-1.413,0.001-2.555,1.143-2.556,2.556L98.2,32.661
+                            c-0.001,1.414,1.14,2.555,2.554,2.555l11.135-0.004v0.004l6.154-0.003c1.407-0.001,2.556-1.138,2.574-2.538
+                            c0-0.794,0.001-1.522,0.001-2.193l0.002-4.164C120.411,27.958,119.853,29.103,118.94,29.75z"/>
+                    </g>
+                    </svg>
+    
+                </a>
+            </div>
+            <ul class="main-menu">
+                <li class="menu-item">
+                    <a href="explore">Khám phá</a>
+                </li>
+                <li class="menu-item has-sub" onclick="onNavMenuClick(this)">
+                    Giải pháp
+                    <div class="sub-menu solution-menu">
+                        <div class="solution-container">
+                            <ul>
+                                <li><a href="#">
+                                    <h2>Ý kiến người dùng</h2>
+                                    <p>Tham dò đánh giá, nhận xét của khách hàng về một sản phẩm nhất định</p>
+                                </a></li>
+                                <li><a href="#">
+                                    <h2>Sự hài lòng của nhân viên</h2>
+                                    <p>Xậy dựng nguồn nhân lực mạnh mẽ với dữ liệu hỗ trợ nhân nhiên</p>
+                                </a></li>
+                                <li><a href="#">
+                                    <h2>Nghiên cứu thị trường</h2>
+                                    <p>Xác định chiến lược kinh doanh với dữ liệu hỗ trợ thị trường</p>
+                                </a></li>
+                            </ul>
+                            <ul>
+                                <li><a href="#">
+                                    <h2>Trải nghiệm của người dùng</h2>
+                                    <p>Thu hút và cải thiện trải nghiệm của khách hàng thông quá các phản hồi</p>
+                                </a></li>
+                                <li><a href="#">
+                                    <h2>Sự tín nhiệm của người dùng</h2>
+                                    <p>Đưa ra các phân tích, dự đoán nhằm giữ chân khách hàng thân thiết</p>
+                                </a></li>
+                                <li><a href="#">
+                                    <h2>Quảng bá sản phẩm</h2>
+                                    <p>Tạo thăm dò, khảo sát kèm theo quảng bá hình ảnh, nội dung sản phẩm và các chương trình liên quan</p>
+                                </a></li>
+                            </ul>
+                        </div>
+                        <div class="explore-more">
+                            <a href="#">
+                                <span>Khám phá các loại khảo sát khác</span>
+                                <img src="/res/arrow-right.svg" />
+                            </a>
+                        </div>
+                    </div>
+                </li>
+                <li class="menu-item has-sub" onclick="onNavMenuClick(this)">
+                    Thông tin
+                    <div class="sub-menu info-menu">
+                        <ul>
+                            <li><a href="#">
+                                <h2>Trợ giúp</h2>
+                                <p>Hướng dẫn sử dụng hệ thống một cách hiệu quả</p>
+                            </a></li>
+                            <li><a href="#">
+                                <h2>FAQ</h2>
+                                <p>Các câu hỏi thường gặp</p>
+                            </a></li>
+                            <li><a href="#">
+                                <h2>Phản hồi & Góp ý</h2>
+                                <p>Phản hồi và góp ý nâng cao chất lượng dịch vụ</p>
+                            </a></li>
+                        </ul>
+                    </div>
+                </li>
+            </ul>
+            <ul class="account-manager">
+                <li class="login">
+                    <a href="login">Đăng nhập</a>
+                </li>
+                <li class="register">
+                    <a href="register">Đăng kí</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+    <div class="reponsive-menu-list" id="responsive-nav-list">
+        <div class="wrapper">
+            <div class="item"><h1 class="title"><a href="explore">Khám phá</a></h1></div>
+
+            <div class="item"><h1 class="title">Giải pháp</h1></div>
+            <ul>
+                <li><a href="#">
+                    <h2>Ý kiến người dùng</h2>
+                    <p>Tham dò đánh giá, nhận xét của khách hàng về một sản phẩm nhất định</p>
+                </a></li>
+                <li><a href="#">
+                    <h2>Sự hài lòng của nhân viên</h2>
+                    <p>Xậy dựng nguồn nhân lực mạnh mẽ với dữ liệu hỗ trợ nhân nhiên</p>
+                </a></li>
+                <li><a href="#">
+                    <h2>Nghiên cứu thị trường</h2>
+                    <p>Xác định chiến lược kinh doanh với dữ liệu hỗ trợ thị trường</p>
+                </a></li>
+                <li><a href="#">
+                    <h2>Trải nghiệm của người dùng</h2>
+                    <p>Thu hút và cải thiện trải nghiệm của khách hàng thông quá các phản hồi</p>
+                </a></li>
+                <li><a href="#">
+                    <h2>Sự tín nhiệm của người dùng</h2>
+                    <p>Đưa ra các phân tích, dự đoán nhằm giữ chân khách hàng thân thiết</p>
+                </a></li>
+                <li><a href="#">
+                    <h2>Quảng bá sản phẩm</h2>
+                    <p>Tạo thăm dò, khảo sát kèm theo quảng bá hình ảnh, nội dung sản phẩm và các chương trình liên quan</p>
+                </a></li>
+            </ul>
+
+            <div class="item"><h1 class="title">Thông tin</h1></div>
+            <ul>
+                <li><a href="#">
+                    <h2>Trợ giúp</h2>
+                    <p>Hướng dẫn sử dụng hệ thống một cách hiệu quả</p>
+                </a></li>
+                <li><a href="#">
+                    <h2>FAQ</h2>
+                    <p>Các câu hỏi thường gặp</p>
+                </a></li>
+                <li><a href="#">
+                    <h2>Phản hồi & Góp ý</h2>
+                    <p>Phản hồi và góp ý nâng cao chất lượng dịch vụ</p>
+                </a></li>
+            </ul>
+
+            <div class="button-group">
+                <div class="login">
+                    <a href="login">Đăng nhập</a>
+                </div>
+                <div class="register">
+                    <a href="register">Đăng kí</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <header class="go-header">
+        <div class="background-overlay" style="background-image: url(http://react.pixelstrap.com/tovo/static/media/1.50daee30.png)"></div>
+        <div class="header-container">
+            <h1 class="header-title" data-aos="zoom-in">Hỏi nhiều hơn, biết nhiều hơn, làm nhiều hơn.</h1>
+            <h2 class="header-sub-title" data-aos="fade-up" data-aos-easing="ease" data-aos-delay="400">
+                Hãy bắt đầu khám phá xem khách hàng của bạn quan tâm điều gì, và họ cần gì.
+            </h2>
+            <div data-aos="fade-up" data-aos-easing="ease" data-aos-delay="800" class="header-group-button">
+                <a href="login" class="go-btn header-signin">
+                    Bắt đầu ngay
+                </a>
+                <a href="register" class="go-btn header-signup">
+                    Đăng kí nếu bạn là người mới
+                </a>
+            </div>
+        </div>
+    </header>
+    <section id="about">
+        <img style="position: absolute; top: 50px; right: 250px;" class="moveleftbounce"
+            src="http://react.pixelstrap.com/tovo/assets/images/main-banner1.png" alt="banner1">
+        <img style="position: absolute; top: 450px; left: 10px;" class="moveleftbounce"
+            src="http://react.pixelstrap.com/tovo/assets/images/main-banner3.png" alt="banner1">
+
+        <div class="go-container">
+            <div class="about-info" data-aos="fade-up" data-aos-easing="ease">
+                <h1 class="title">Giới thiệu về <h1 class="title go-brand">Survey go</h1></h1>
+                <div class="about-info-detail"><h1 class="go-brand">Survey go</h1> là hệ sinh thái giúp doanh nghiệp, tổ chức của bạn hiểu rõ hơn về khách hàng của mình bằng các đưa ra các câu hỏi dưới dạng một cuộc khảo sát nhỏ, từ đó bạn sẽ đưa ra chính sách, phương pháp nhằm thu hút các khách hàng tiềm năng, cũng như giữ chân các khách hàng thân thiết nhờ vào công cụ phân tích chuyên nghiệp của <h1 class="go-brand">Survey go</h1></div>
+            </div>
+            <div class="about-image">
+                <div class="circle-image"></div>
+            </div>
+        </div>
+
+        </div>
+    </section>
+    <section id="feature">
+        <img style="position: absolute; top: 800px; right: 50px;" class="movebounce"
+            src="http://react.pixelstrap.com/tovo/assets/images/main-banner1.png" 
+            alt="banner1">
+
+        <img style="position: absolute; top: 1100px; right: 100px;" class="movebounce slow"
+            src="http://react.pixelstrap.com/tovo/assets/images/team1.png" 
+            alt="banner1">
+
+        <img style="position: absolute; top: 1800px; left: 100px;" class="moveleftbounce fast"
+            src="http://react.pixelstrap.com/tovo/assets/images/team1.png" 
+            alt="banner1">
+
+        <img style="position: absolute; top: 2800px; right: 50px;" class="movebounce"
+            src="http://react.pixelstrap.com/tovo/assets/images/team3.png" 
+            alt="banner1">
+
+        <img style="position: absolute; top: 2600px; right: 130px;" class="movebounce slow"
+            src="http://react.pixelstrap.com/tovo/assets/images/team1.png" 
+            alt="banner1">
+
+        <h1>Với Survey go...</h1>
+        <div class="go-container featurebox design-and-share">
+            <div class="left" data-aos="zoom-in">
+                <div class="content">
+                    <h1>Thiết kế và chia sẻ chuyên nghiệp</h1>
+                    <ul>
+                        <li class="content-item">
+                            <div class="infobox">
+                                <h1>Thiết kế chuyên nghiệp, tuỳ chỉnh thương hiệu</h1>
+                                <p>
+                                    Tạo chủ đề tùy chỉnh, thêm biểu tượng cho riêng bạn, chọn phông chữ và tạo trang cảm ơn tùy chỉnh
+                                </p>
+                            </div>
+                        </li>
+                        <li class="content-item">
+                            <div class="infobox">
+                                <h1>15+ câu hỏi khác nhau</h1>
+                                <p>
+                                    Từ quy mô, đến nhiều lựa chọn, đến chức năng NPS tích hợp, hãy đặt câu hỏi bạn muốn.
+                                </p>
+                            </div>
+                        </li>
+                        <li class="content-item">
+                            <div class="infobox">
+                                <h1>Tiếp cận với nguồn khách hàng tiềm năng</h1>
+                                <p>
+                                    Với điểm thưởng bạn đặt để dành tặng cho người thực hiện thành công khảo sát, giờ đây bạn có thể thu thập được nhiều lời phản hồi khác nhau, đa dạng và khổng lồ.
+                                </p>
+                            </div>
+                        </li>
+                        <li class="content-item">
+                            <div class="infobox">
+                                <h1>Chia sẻ khảo sát qua web, email, xã hội và nhiều hơn nữa</h1>
+                                <p>
+                                    Chia sẻ, quảng bá khảo sát cũng như sản phẩm của bạn thông qua các kênh mạng xã hội giờ đây không thể đơn giản và dễ dàng hơn
+                                </p>
+                            </div>
+                        </li>
+                        <li class="content-item">
+                            <div class="infobox">
+                                <h1>Tích hợp Khảo sát của bạn và các Website có sẵn</h1>
+                                <p>
+                                    Thật dễ dàng khi tích hợp Khảo sát của bạn vào Website mua sắm, bán hàng trực tuyến thông qua bộ API của chúng tôi.
+                                </p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="right" data-aos="zoom-in">
+                <div class="infoimg">
+                    <img class="infoimg" src="https://cdn.smassets.net/assets/anonweb/anonweb/204.0.115/assets/homepage/features-rebrand/autoscroll_row.gif" alt="1">
+                </div>
+            </div>
+        </div>
+        <div class="go-container featurebox data-protector">
+            <div class="left" data-aos="zoom-in">
+                <div class="infoimg">
+                    <img class="infoimg" src="https://cdn.smassets.net/assets/anonweb/anonweb/204.0.115/assets/homepage/features-rebrand/audience_row.gif" alt="1">
+                </div>
+            </div>
+            <div class="right" data-aos="zoom-in">
+                <div class="content">
+                    <h1>Bảo vệ dữ liệu</h1>
+                    <ul>
+                        <li class="content-item">
+                            <div class="infobox">
+                                <h1>Sử dụng công nghê Blockchain</h1>
+                                <p>
+                                    Chúng tôi sử dụng công nghệ Blockchain như là hệ thống lưu trữ dữ liệu, do đó dữ liệu của bạn sẽ đảm bảo tính nhất quán, không thể làm giả cũng như không thể sửa đổi hay xoá bỏ.
+                                </p>
+                            </div>
+                        </li>
+                        <li class="content-item">
+                            <div class="infobox">
+                                <h1>Hệ thống lưu trữ dữ liệu phân tán</h1>
+                                <p>
+                                    Chúng tôi sử dụng hệ thống lưu trữ ở nhiều nơi khác nhau nhằm đảm bảo dữ liệu của bạn sẽ không bao giờ bị mất hay thất lạc.
+                                </p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="go-container featurebox data-analyzer">
+            <div class="left" data-aos="zoom-in">
+                <div class="content">
+                    <h1>Phân tích dữ liệu chuyên sâu</h1>
+                    <ul>
+                        <li class="content-item">
+                            <div class="infobox">
+                                <h1>Cập nhật dữ liệu Realtime</h1>
+                                <p>
+                                    Bạn sẽ nhận được kết quả gần như tức thì khi có một ai đó đã thực hiện xong khảo sát, bạn cũng có thể lựa chọn chức năng gửi thông báo qua Email nếu như bạn không trực tuyến.
+                                </p>
+                            </div>
+                        </li>
+                        <li class="content-item">
+                            <div class="infobox">
+                                <h1>Hệ thống đánh giá khác nhau trên từng loại câu hỏi</h1>
+                                <p>
+                                    Tuỳ vào loại câu hỏi sẽ có các đánh giá khác nhau cũng như biểu đồ khác nhau.
+                                </p>
+                            </div>
+                        </li>
+                        <li class="content-item">
+                            <div class="infobox">
+                                <h1>Lọc thông minh</h1>
+                                <p>
+                                    Lọc kết quả theo thời gian, kết quả của từng câu hỏi.
+                                </p>
+                            </div>
+                        </li>
+                        <li class="content-item">
+                            <div class="infobox">
+                                <h1>Xuất báo cáo với nhiều dạng dữ liệu khác nhau</h1>
+                                <p>
+                                    Nhận dữ liệu của bạn ở định dạng CSV, Excel hoặc PDF để dễ dàng chia sẻ và báo cáo.
+                                </p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="right" data-aos="zoom-in">
+                <div class="infoimg">
+                    <img class="infoimg" src="https://cdn.smassets.net/assets/anonweb/anonweb/204.0.115/assets/homepage/features-rebrand/autoscroll_row.gif" alt="1">
+                </div>
+            </div>
+        </div>
+        <div class="go-container featurebox earn-point">
+            <div class="left" data-aos="zoom-in">
+                <div class="infoimg">
+                    <img src="https://cdn.smassets.net/assets/anonweb/anonweb/204.0.115/assets/homepage/features-rebrand/collab_row.gif" alt="1" />
+                </div>
+            </div>
+            <div class="right" data-aos="zoom-in">
+                <div class="content">
+                    <h1>Tích luỹ điểm thưởng và quy đổi</h1>
+                    <ul>
+                        <li class="content-item">
+                            <div class="infobox">
+                                <h1>Hệ thống quản lý điểm thưởng</h1>
+                                <p>
+                                    Bằng việc áp dụng công nghệ Blockchain, chúng tôi tạo ra một thống tiền ảo riêng, và chúng tôi gọi đó là điểm thưởng (EPoint).
+                                </p>
+                            </div>
+                        </li>
+                        <li class="content-item">
+                            <div class="infobox">
+                                <h1>Tích luỹ điểm thưởng</h1>
+                                <p>
+                                    Bạn hãy thực hiện các cuộc khảo sát trong mục Khám phá để tích luỹ thêm EPoint.
+                                </p>
+                            </div>
+                        </li>
+                        <li class="content-item">
+                            <div class="infobox">
+                                <h1>Gửi và nhận điểm thưởng</h1>
+                                <p>
+                                    Mọi người dùng trong hệ thống đều có thể gửi và nhận EPoint lẫn nhau.
+                                </p>
+                            </div>
+                        </li>
+                        <li class="content-item">
+                            <div class="infobox">
+                                <h1>Quy đổi giá trị thật</h1>
+                                <p>
+                                    Chúng tôi có quy định số EPoint cần thiết để quy đổi ra tiền mặt, do đó, bạn hoàn toàn có thể quy đổi ra tiền mặt khi đã tích luỹ đủ EPoint
+                                </p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+
+            </div>
+        </div>
+        <div class="go-container featurebox suport-team-group">
+            <div class="left" data-aos="zoom-in">
+                <div class="content">
+                    <h1>Hỗ trợ cho mọi dự án, nhóm hoặc tổ chức</h1>
+                    <ul>
+                        <li class="content-item">
+                            <div class="infobox">
+                                <h1>Chia sẻ giữa các thành viên</h1>
+                                <p>
+                                    Bạn có thể dữ dàng thiết lập Khảo sát ở chế độ Riêng tư và chỉ có những người trong nhóm của bạn có thể tiếp cận đến.
+                                </p>
+                            </div>
+                        </li>
+                        <li class="content-item">
+                            <div class="infobox">
+                                <h1>Chia sẻ dữ liệu</h1>
+                                <p>
+                                    Các thành viên trong nhóm đều có thể nhận thông báo mới khi có phản hồi mới thông qua Email.
+                                </p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="right" data-aos="zoom-in">
+                <div class="infoimg">
+                    <img src="https://cdn.smassets.net/assets/anonweb/anonweb/204.0.115/assets/homepage/features-rebrand/collab_row.gif" alt="1" />
+                </div>
+            </div>
+        </div>
+        <h1>Và nhiều điều khác đang chờ bạn khám phá</h1>
+    </section>
+    <!-- <section id="survey-stats" class="survey-stats">
+        <div class="go-container">
+            <h1>Hiện nay chúng tôi đã thực hiện thành công <span>120,000</span> chiến dịch khảo khảo sát, bạn còn chần chờ gì nữa mà không khá phá và thực hiện chúng nào!</h1>
+            <a href="explore" class="go-btn go-explore">Khám phá ngay.</a>
+        </div>
+    </section> -->
+    <section id="packages" class="packages">
+        <div class="for-reporter">
+            <h1>Dành cho người tạo khảo sát</h1>
+            <p>Có được một nền tảng có thể phát triển và thay đổi cùng với nhu cầu khảo sát của bạn theo thời gian. Hãy cùng với chúng tôi để tìm hiểu thêm về các tính năng cụ thể.</p>
+            <a class="go-btn white-bg white-solid">Xem chi tiết</a>
+        </div>
+        <div class="for-responser">
+            <h1>Dành cho người thực hiện khảo sát</h1>
+            <p>Có một nền tảng kiếm thêm thu nhập trực tiếp từ việc thực hiện khảo sát, tích luỹ điểm thưởng, chuyển điểm hoặc quy đổi thành tiền mặt.</p>
+            <a class="go-btn white-bg white-solid">Tìm hiểu thêm</a>
+        </div>
+    </section>
+    <section id="do-survey" class="do-survey">
+        <div class="go-container">
+            <h1>Bạn đang có thời gian rảnh, hãy tham gia thực hiện khảo sát để tích luỹ điểm thưởng nào!</h1>
+            <a href="kham-pha" class="go-btn go-to-survey">Thực hiện khảo sát ngay.</a>
+        </div>
+    </section>
+    <footer id="footer" class="go-footer">
+        <div>
+            <ul>
+                <li><h1>Cộng đồng</h1></li>
+                <li><a href="#">Facebook</a></li>
+                <li><a href="#">Zalo</a></li>
+                <li><a href="#">Messenger</a></li>
+            </ul>
+            <ul>
+                <li><h1>Về chúng tôi</h1></li>
+                <li><a href="#">Nhóm phát triển</a></li>
+                <li><a href="#">Tuyển dụng</a></li>
+                <li><a href="#">FAQ</a></li>
+                <li><a href="#">Trợ giúp</a></li>
+                <li><a href="#">Phản hồi & góp ý</a></li>
+            </ul>
+            <ul>
+                <li><h1>Chính sách</h1></li>
+                <li><a href="#">Điều khoản sử dụng</a></li>
+                <li><a href="#">Chính sách bảo mật</a></li>
+                <li><a href="#">Chính sách sử dụng Cookies</a></li>
+            </ul>
+        </div>
+        <div>
+            <ul>
+                <li><h1>Ngôn ngữ</h1></li>
+                <li><a href="#">Tiếng Việt</a></li>
+            </ul>
+        </div>
+        <div class="copy-right">
+            <img src="/assets/image/logo.png"/>
+            Bản quyền thuộc về SurveyGo © 2018
+        </div>
+    </footer>
+</body>
+<script>
+    AOS.init({
+        easing: 'ease-out-back',
+        duration: 1000
+    });
+</script>
+</html>

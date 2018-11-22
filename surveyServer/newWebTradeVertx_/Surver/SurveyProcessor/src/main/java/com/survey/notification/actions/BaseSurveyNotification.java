@@ -9,7 +9,7 @@ import io.vertx.core.json.JsonObject;
 
 public abstract class BaseSurveyNotification implements ISurveyNotification {
 	private String username;
-	private PushMessageBean message;
+	protected PushMessageBean message;
 	private UserNotificationDao mvUserNotificationDao;
 	private boolean isPublic = false;
 	private boolean isPrivate = false;

@@ -27,7 +27,7 @@
 		"userinfo-com.survey.dbservices.action.UserInfoAction",
 		"retrieveconfig-com.survey.dbservices.action.RetrieveConfigAction"
 	],
-	"SurveyHost":"http://localhost:5050",
+	"SurveyHost":"https://server.igo-survey.xyz",
 	
 	
 	

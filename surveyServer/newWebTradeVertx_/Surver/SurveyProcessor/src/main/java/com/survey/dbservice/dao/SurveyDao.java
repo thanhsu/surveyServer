@@ -88,7 +88,7 @@ public class SurveyDao extends SurveyBaseDao {
 	}
 
 	public void updateSurveyData(String _id, JsonObject newData) {
-		this.updateDocument(new JsonObject().put(FieldName._ID, _id), newData, null, handler -> {
+		this.updateDocument(new JsonObject().put(FieldName._ID, _id), newData, new UpdateOptions(false), handler -> {
 			if (handler.succeeded()) {
 				this.retrieveSurvey(new JsonObject().put(FieldName._ID, _id), h -> {
 					this.CompleteGenerateResponse(CodeMapping.C0000.toString(), "Updated", h.result().get(0));
@@ -503,9 +503,11 @@ public class SurveyDao extends SurveyBaseDao {
 		return deleteResult;
 	}
 
-	private void sendNotification(String surveyID) {
+	private void sendNotification(String surveyID, boolean isProvate, boolean isPublic) {
 		SurveyStatusUpdate lvStatusUpdate = new SurveyStatusUpdate();
 		lvStatusUpdate.setSurveyID(surveyID);
+		lvStatusUpdate.setPrivate(isProvate);
+		lvStatusUpdate.setPublic(isPublic);
 		lvStatusUpdate.generate();
 	}
 }

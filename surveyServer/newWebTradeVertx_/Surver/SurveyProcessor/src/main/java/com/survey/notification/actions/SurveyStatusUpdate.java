@@ -25,8 +25,6 @@ public class SurveyStatusUpdate extends BaseSurveyNotification {
 				this.setUsername(handler.result().getString(FieldName.USERNAME));
 				handler.result().remove(FieldName.USERNAME);
 				lvTmp.setType(UserNotificationEnum.SURVEYSTATE);
-				this.setPrivate(false);
-				this.setPublic(true);
 				this.doSend();
 			}
 		});
