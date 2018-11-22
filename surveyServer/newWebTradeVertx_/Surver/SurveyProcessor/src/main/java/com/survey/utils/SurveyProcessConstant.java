@@ -30,6 +30,7 @@ import com.survey.internal.action.RetrieveConfigAction;
 import com.survey.internal.action.RetrievePointValueAction;
 import com.survey.internal.action.RetrieveSurveyAction;
 import com.survey.internal.action.RetrieveUserinfoAction;
+import com.survey.internal.action.Testing;
 import com.survey.internal.action.UpdateSurveyDataAction;
 import com.survey.internal.action.UpdateUserInfoAction;
 import com.survey.internal.action.WithdrawAction;
@@ -51,9 +52,11 @@ public class SurveyProcessConstant {
 
 	public void init() {
 		confirmActionMapping.put("create_account", new CreateUser());
+		
 	}
 
 	private void initActionMapping() {
+		mvActionMapping.put("testing", new Testing());
 		mvActionMapping.put("login", new LoginAction());
 		mvActionMapping.put("register", new RegisterAction());
 		mvActionMapping.put("activeaccount", new ActiveUserAction());

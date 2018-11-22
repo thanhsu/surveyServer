@@ -51,8 +51,9 @@ public class SurveyBaseDao {
 		if (project != null) {
 			pipeline.add(new JsonObject().put("$project", project));
 		}
-		pipeline.add(new JsonObject().put("$sort", sort));
-
+		if (!sort.isEmpty()) {
+			pipeline.add(new JsonObject().put("$sort", sort));
+		}
 		command.put("aggregate", this.getCollectionName());
 		command.put("cursor", new JsonObject().put("batchSize", 1000));
 		command.put("pipeline", pipeline);

@@ -92,11 +92,11 @@ public class UserDao extends SurveyBaseDao {
 						query.put(FieldName.PASSWORD, "").put(FieldName.FULLNAME, lvBean.getFullname())
 								.put(FieldName.EMAIL, lvBean.getEmail()).put(FieldName.STATUS, "L")
 								.put(FieldName.TOKEN, token);
-						this.saveDocumentReturnID(query).setHandler(handler->{
+						this.saveDocumentReturnID(query).setHandler(handler -> {
 							this.doLogin(lvBean.getEmail(), "");
 							Future<JsonObject> lvProxyResult = Future.future();
 							JsonObject rq = new JsonObject().put(FieldName.ACTION, "createaccount")
-									.put(FieldName.USERNAME, lvBean.getEmail()).put(FieldName.EMAIL,lvBean.getEmail());
+									.put(FieldName.USERNAME, lvBean.getEmail()).put(FieldName.EMAIL, lvBean.getEmail());
 							VertxServiceCenter.getInstance().sendNewMessage(
 									EventBusDiscoveryConst.ETHEREUMPROXYDISCOVERY.name(), rq, lvProxyResult);
 							lvProxyResult.setHandler(x -> {
@@ -112,7 +112,7 @@ public class UserDao extends SurveyBaseDao {
 					query.put(FieldName.PASSWORD, "").put(FieldName.FULLNAME, lvBean.getFullname())
 							.put(FieldName.EMAIL, lvBean.getEmail()).put(FieldName.STATUS, "L")
 							.put(FieldName.TOKEN, token);
-					this.saveDocumentReturnID(query).setHandler(handler->{
+					this.saveDocumentReturnID(query).setHandler(handler -> {
 						this.doLogin(lvBean.getEmail(), "");
 						Future<JsonObject> lvProxyResult = Future.future();
 						JsonObject rq = new JsonObject().put(FieldName.ACTION, "createaccount")
@@ -333,7 +333,16 @@ public class UserDao extends SurveyBaseDao {
 					if (Encrypt.compare(oldPassword, userData.getString(FieldName.PASSWORD))) {
 						// check old password success
 						// Check new password
-						JsonObject newPasswordData = new JsonObject().put(FieldName.PASSWORD, newPassword);
+						String ecryptPassword = newPassword;
+
+						try {
+							ecryptPassword = Encrypt.encode(newPassword);
+
+						} catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
+							e.printStackTrace();
+						}
+
+						JsonObject newPasswordData = new JsonObject().put(FieldName.PASSWORD, ecryptPassword);
 						this.updateDocument(new JsonObject().put(FieldName._ID, userData.getString("_id")),
 								newPasswordData, null, changepasswordresult -> {
 									if (changepasswordresult.succeeded()) {

@@ -205,13 +205,14 @@ public class SurveyDao extends SurveyBaseDao {
 
 	public Future<JsonObject> retrieveSurveyStatus(String surveyID) {
 		Future<JsonObject> lvResult = Future.future();
-		Future<JsonArray> lvTmp = Future.future(h -> {
+		Future<JsonArray> lvTmp = Future.future();
+		lvTmp.setHandler(h -> {
 			if (h.succeeded()) {
 				lvResult.complete(h.result().getJsonObject(0));
 			}
 		});
 		this.queryDocumentRunCmd(new JsonObject().put(FieldName._ID, surveyID),
-				new JsonObject().put(FieldName.QUESTIONDATA, 0).put(FieldName.LISTCATEGORYID, 0), new JsonObject(),
+				new JsonObject().put(FieldName.QUESTIONDATA, 0).put(FieldName.LISTCATEGORYID, 0).put(FieldName.SETTING, 0), new JsonObject(),
 				lvTmp);
 		return lvResult;
 	}

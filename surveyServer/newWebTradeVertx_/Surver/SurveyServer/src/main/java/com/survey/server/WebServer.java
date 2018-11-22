@@ -499,7 +499,7 @@ public class WebServer extends MicroServiceVerticle {
 		if (rtx.request().method().equals(HttpMethod.POST)) {
 			lvMessage.mergeIn(rtx.getBodyAsJson());
 		} else if (step.equals("2")) {
-			
+			rtx.reroute("/confirmresetpassword.html");
 			return;
 		}
 
