@@ -16,7 +16,9 @@
 	"log.SMTPHost": "mail.tx-tech.com",
 	"HttpPort": 5050,
 	"HttpSessionTimeout": 6000000,
-	"enabledSSL": false,
+	"enabledSSL": true,
+	"SSLPassword":"wibble",
+	"SSLKey":"config/key/itradekeystore.jks",
 	"EmailServiceConfig": {
 		"address": "vertx.mail",
 		"hostname": "localhost",
