@@ -98,4 +98,5 @@ public class FieldName {
 	public static final String AVATAR = "avatar";
 	public static final String IMAGEID = "imageid";
 	public static final String PUSHLISHREJECTCAUSE = "pushlishrejectcause";
+	public static final String RESPONSE = "response";
 }

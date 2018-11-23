@@ -1,5 +1,7 @@
 package com.survey.dbservice.dao;
 
+import java.util.List;
+
 import com.survey.utils.CodeMapping;
 import com.survey.utils.FieldName;
 
@@ -25,6 +27,18 @@ public class SurveySubmitDao extends SurveyBaseDao {
 		this.queryDocument(new JsonObject().put(FieldName.SURVEYID, surveyID), handler -> {
 			this.CompleteGenerateResponse(CodeMapping.C0000.toString(), "", handler.result());
 		});
+	}
+
+	public Future<List<JsonObject>> retrieveAllSubmitted(String suurveyID) {
+		Future<List<JsonObject>> lvResp = Future.future();
+		this.queryDocument(new JsonObject().put(FieldName.SURVEYID, suurveyID), handler -> {
+			if (handler.succeeded()) {
+				lvResp.complete(handler.result());
+			} else {
+				lvResp.complete();
+			}
+		});
+		return lvResp;
 	}
 
 	public Future<Integer> countAllSubmitResult(String surveyID) {

@@ -29,6 +29,7 @@ import com.survey.internal.action.RetrieveCashMethodAction;
 import com.survey.internal.action.RetrieveConfigAction;
 import com.survey.internal.action.RetrievePointValueAction;
 import com.survey.internal.action.RetrieveSurveyAction;
+import com.survey.internal.action.RetrieveSurveyAnsweredAction;
 import com.survey.internal.action.RetrieveUserinfoAction;
 import com.survey.internal.action.Testing;
 import com.survey.internal.action.UpdateSurveyDataAction;
@@ -90,6 +91,7 @@ public class SurveyProcessConstant {
 		mvActionMapping.put("restoresurvey", new RestoreSurveyAction());
 		mvActionMapping.put("addfavouritesurvey", new AddFavouriteSurveyAction());
 		mvActionMapping.put("removefavouritesurvey",new RemoveFavouriteSurveyAction());
+		mvActionMapping.put("retrievesurveyresponse", new RetrieveSurveyAnsweredAction());
 		//5
 		
 	}

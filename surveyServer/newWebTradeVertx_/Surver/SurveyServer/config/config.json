@@ -16,7 +16,7 @@
 	"log.SMTPHost": "mail.tx-tech.com",
 	"HttpPort": 5050,
 	"HttpSessionTimeout": 6000000,
-	"enabledSSL": true,
+	"enabledSSL": false,
 	"SSLPassword":"wibble",
 	"SSLKey":"config/key/itradekeystore.jks",
 	"EmailServiceConfig": {
