@@ -36,7 +36,7 @@ public class FieldName {
 	public static final String ETHEREUMCONTRACT = "ethecontract";
 	public static final String STEP = "step";
 	public static final String TOKEN = "token";
-	public static final String ISPUBLIC = "public";
+	public static final String ISPUBLIC = "isPublic";
 	public static final String ENABLEEDIT = "enableedit";
 	public static final String ENABLESUBMIT = "enablesubmit";
 	public static final String SEARCH = "search";
@@ -53,9 +53,9 @@ public class FieldName {
 	public static final String THEMEID = "themeid";
 	public static final String THEME = "theme";
 
-	public static final String LISTALLOWUSER = "listuserallow";
+	public static final String LISTALLOWUSER = "allowUser";
 	public static final String ENDTIME = "endtime";
-	public static final String ALLOWMULTIRESPONSE = "allowmultiresponse";
+	public static final String ALLOWMULTIRESPONSE = "allowMultiResponse";
 	public static final String UPDATETIME = "updatetime";
 	public static final String MAXRESPONSE = "maxresponse";
 	public static final String POINT = "point";
@@ -99,4 +99,7 @@ public class FieldName {
 	public static final String IMAGEID = "imageid";
 	public static final String PUSHLISHREJECTCAUSE = "pushlishrejectcause";
 	public static final String RESPONSE = "response";
+	public static final String ENDLESS="endless";
+	public static final String ENDDATE="enddate";
+	public static final String STARTDATE="startDate";
 }

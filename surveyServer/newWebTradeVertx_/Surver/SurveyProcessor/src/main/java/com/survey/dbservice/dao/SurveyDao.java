@@ -1,6 +1,7 @@
 package com.survey.dbservice.dao;
 
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
@@ -18,6 +19,7 @@ import io.vertx.core.Handler;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.mongo.UpdateOptions;
+import sun.tools.tree.IfStatement;
 
 public class SurveyDao extends SurveyBaseDao {
 	public static final String SurveyCollectionName = "survey_datas";
@@ -119,8 +121,17 @@ public class SurveyDao extends SurveyBaseDao {
 				// lvUserDao.getMvFutureResponse().result().getJsonObject(FieldName.DATA);
 				// Check end Date
 				boolean checkdate = false;
-				checkdate = setting.getLong(FieldName.ENDTIME) == null ? false
-						: (new Timestamp(setting.getLong(FieldName.ENDTIME))).before(new Date());
+				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+				if (sdf.format(new Date()).compareTo(setting.getString(FieldName.STARTDATE)) < 0) {
+					checkdate = true;
+				} else {
+					if (!(setting.getBoolean(FieldName.ENDLESS) == null ? true
+							: setting.getBoolean(FieldName.ENDLESS))) {
+						if (sdf.format(new Date()).compareTo(setting.getString(FieldName.ENDDATE)) > 0) {
+							checkdate = true;
+						}
+					}
+				}
 				if (checkdate) {
 					// Expired
 					this.CompleteGenerateResponse(CodeMapping.S3333.toString(), CodeMapping.S3333.value(), null);
@@ -211,9 +222,9 @@ public class SurveyDao extends SurveyBaseDao {
 				lvResult.complete(h.result().getJsonObject(0));
 			}
 		});
-		this.queryDocumentRunCmd(new JsonObject().put(FieldName._ID, surveyID),
-				new JsonObject().put(FieldName.QUESTIONDATA, 0).put(FieldName.LISTCATEGORYID, 0).put(FieldName.SETTING, 0), new JsonObject(),
-				lvTmp);
+		this.queryDocumentRunCmd(new JsonObject().put(FieldName._ID, surveyID), new JsonObject()
+				.put(FieldName.QUESTIONDATA, 0).put(FieldName.LISTCATEGORYID, 0).put(FieldName.SETTING, 0),
+				new JsonObject(), lvTmp);
 		return lvResult;
 	}
 

@@ -3,11 +3,13 @@ package com.survey.internal.action;
 import java.io.UnsupportedEncodingException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.util.Date;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 
+import com.survey.ProcessorInit;
 import com.survey.constant.EventBusDiscoveryConst;
 import com.survey.dbservice.dao.ProxyLogDao;
 import com.survey.dbservice.dao.SurveySubmitDao;
@@ -30,7 +32,14 @@ public class AnswerSurveyAction extends InternalSurveyBaseAction {
 		JsonObject answerdata = getMessageBody().getJsonObject(FieldName.DATA);
 		String token = getMessageBody().getString(FieldName.TOKEN);
 		try {
-			if (surveyID.equals(RSAEncrypt.getIntance().decrypt(token))) {
+			String descryptToken = RSAEncrypt.getIntance().decrypt(token);
+			long timeout = new Date().getTime() - Long.parseLong(descryptToken.split("\\*")[1]);
+			if (timeout > ProcessorInit.mvConfig.getDouble("SurveyTokenTimeOut")) {
+				this.CompleteGenerateResponse(CodeMapping.C6666.toString(), "Permission deny invalid token", null,
+						response);
+				return;
+			}
+			if (surveyID.equals(descryptToken.split("\\*")[0])) {
 				SurveySubmitDao lvSurveySubmitDao = new SurveySubmitDao();
 				lvSurveySubmitDao.newSurveyResult(username, answerdata, surveyID).setHandler(id -> {
 					if (id.succeeded()) {
@@ -65,5 +74,6 @@ public class AnswerSurveyAction extends InternalSurveyBaseAction {
 
 		}
 	}
+
 
 }
