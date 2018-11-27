@@ -1,7 +1,7 @@
 package com.survey.confirm.actions;
 
 import com.survey.dbservice.dao.SurveyDao;
-import com.survey.notification.actions.SurveyPushlished;
+import com.survey.notification.actions.NotifiSurveyPushlished;
 import com.survey.utils.FieldName;
 
 import io.vertx.core.json.JsonObject;
@@ -23,11 +23,11 @@ public class PublishSurveyResult extends BaseConfirmAction {
 		SurveyDao  lvDao = new SurveyDao();
 		lvDao.updateSurveyData(surveyID,data );
 		if(success){
-			SurveyPushlished lvPushlished = new SurveyPushlished(surveyID);
+			NotifiSurveyPushlished lvPushlished = new NotifiSurveyPushlished(surveyID);
 
 			lvPushlished.generate();
 		}else {
-			SurveyPushlished lvPushlished = new SurveyPushlished(surveyID);
+			NotifiSurveyPushlished lvPushlished = new NotifiSurveyPushlished(surveyID);
 			lvPushlished.setPrivate(true);
 			lvPushlished.setPublic(false);
 			lvPushlished.generate();

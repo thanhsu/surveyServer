@@ -7,7 +7,7 @@ import java.util.List;
 
 import com.survey.constant.EventBusDiscoveryConst;
 import com.survey.constant.UserNotificationEnum;
-import com.survey.notification.actions.SurveyStatusUpdate;
+import com.survey.notification.actions.NotifiSurveyStatusUpdate;
 import com.survey.utils.CodeMapping;
 import com.survey.utils.FieldName;
 import com.survey.utils.PushMessageBean;
@@ -516,7 +516,7 @@ public class SurveyDao extends SurveyBaseDao {
 	}
 
 	private void sendNotification(String surveyID, boolean isProvate, boolean isPublic) {
-		SurveyStatusUpdate lvStatusUpdate = new SurveyStatusUpdate();
+		NotifiSurveyStatusUpdate lvStatusUpdate = new NotifiSurveyStatusUpdate();
 		lvStatusUpdate.setSurveyID(surveyID);
 		lvStatusUpdate.setPrivate(isProvate);
 		lvStatusUpdate.setPublic(isPublic);

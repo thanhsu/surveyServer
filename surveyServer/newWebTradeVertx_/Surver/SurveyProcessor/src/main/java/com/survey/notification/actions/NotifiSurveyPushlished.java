@@ -5,14 +5,14 @@ import com.survey.dbservice.dao.SurveyDao;
 import com.survey.utils.FieldName;
 import com.survey.utils.PushMessageBean;
 
-public class SurveyPushlished extends BaseSurveyNotification {
+public class NotifiSurveyPushlished extends BaseSurveyNotification {
 	private String surveyID;
 
-	public SurveyPushlished(String username, PushMessageBean pPushMessageBean) {
+	public NotifiSurveyPushlished(String username, PushMessageBean pPushMessageBean) {
 		super(username, pPushMessageBean);
 	}
 
-	public SurveyPushlished(String pSurveyID) {
+	public NotifiSurveyPushlished(String pSurveyID) {
 		this.setPublic(true);
 		this.setPrivate(true);
 		this.setSurveyID(pSurveyID);

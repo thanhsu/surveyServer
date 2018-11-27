@@ -5,30 +5,29 @@ import com.survey.dbservice.dao.SurveyDao;
 import com.survey.utils.FieldName;
 import com.survey.utils.PushMessageBean;
 
-public class NotifiSurveyStatusUpdate extends BaseSurveyNotification {
+public class NotifiNewSurveyResponse extends BaseSurveyNotification {
 	private String surveyID;
 
-	public NotifiSurveyStatusUpdate(String username, PushMessageBean pPushMessageBean) {
-		super(username, pPushMessageBean);
-	}
-
-	public NotifiSurveyStatusUpdate() {
+	public NotifiNewSurveyResponse(String pId) {
+		this.setSurveyID(surveyID);
 	}
 
 	@Override
 	public void generate() {
+		this.setPublic(false);
+		this.setPrivate(true);
 		SurveyDao lvSurveyDao = new SurveyDao();
 		lvSurveyDao.retrieveSurveyStatus(getSurveyID()).setHandler(handler -> {
 			if (handler.succeeded()) {
-				PushMessageBean lvTmp = new PushMessageBean();
-				lvTmp.setData(handler.result());
+				message = new PushMessageBean();
+				message.setData(handler.result());
 				this.setUsername(handler.result().getString(FieldName.USERNAME));
 				handler.result().remove(FieldName.USERNAME);
-				lvTmp.setType(UserNotificationEnum.SURVEYSTATE);
+				message.setType(UserNotificationEnum.SURVEYNEWRESPONSE);
+				message.setDescription(UserNotificationEnum.SURVEYNEWRESPONSE.getDescription());
 				this.doSend();
 			}
 		});
-
 	}
 
 	public String getSurveyID() {

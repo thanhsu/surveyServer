@@ -46,6 +46,8 @@ public class AnswerSurveyAction extends InternalSurveyBaseAction {
 						this.CompleteGenerateResponse(CodeMapping.C0000.toString(), CodeMapping.C0000.value(), null,
 								response);
 						Future<JsonObject> lv = Future.future();
+						//Send Push Messae
+						
 						VertxServiceCenter.getInstance().sendNewMessage(
 								EventBusDiscoveryConst.ETHEREUMPROXYDISCOVERY.name(), getMessageBody(), lv);
 						lv.setHandler(handler -> {

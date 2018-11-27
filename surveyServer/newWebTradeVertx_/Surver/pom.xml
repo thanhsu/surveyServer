@@ -174,5 +174,6 @@
 		<module>ServeyProcessor</module>
     <module>SurveyEtheProxyService</module>
     <module>PaypalGatewayService</module> -->
-	</modules>
+    <module>BaoKimGateWay</module>
+  </modules>
 </project>
