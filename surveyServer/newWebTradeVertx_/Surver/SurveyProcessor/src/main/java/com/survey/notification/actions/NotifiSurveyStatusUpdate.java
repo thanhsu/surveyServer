@@ -20,11 +20,10 @@ public class NotifiSurveyStatusUpdate extends BaseSurveyNotification {
 		SurveyDao lvSurveyDao = new SurveyDao();
 		lvSurveyDao.retrieveSurveyStatus(getSurveyID()).setHandler(handler -> {
 			if (handler.succeeded()) {
-				PushMessageBean lvTmp = new PushMessageBean();
-				lvTmp.setData(handler.result());
+				message.setData(handler.result());
 				this.setUsername(handler.result().getString(FieldName.USERNAME));
 				handler.result().remove(FieldName.USERNAME);
-				lvTmp.setType(UserNotificationEnum.SURVEYSTATE);
+				message.setType(UserNotificationEnum.SURVEYSTATE);
 				this.doSend();
 			}
 		});

@@ -24,6 +24,7 @@ public class VertxServiceCenter {
 	public static final String LoadSurveyData = "SHARED.SURVEYDATA";
 	public static final String RegisterSharedData = "SHARED.SURVEYREGISTER";
 	public static final String ResetPasswordSharedData = "SHARED.SURVEYRESETPASSWORD";
+	public static final String TempPasswordSharedData = "SHARED.SURVEYTEMPPASSWORD";
 
 	public static VertxServiceCenter getInstance() {
 		if (instance == null) {

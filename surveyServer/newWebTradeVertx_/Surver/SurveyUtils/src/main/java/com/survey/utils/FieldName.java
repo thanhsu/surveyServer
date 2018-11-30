@@ -47,6 +47,7 @@ public class FieldName {
 	public static final String MACADDRESS = "macaddress";
 	public static final String IPADDRESS = "ipaddress";
 	public static final String SETTLESTATUS = "settlestatus";
+	public static final String SETTLESTIME = "settlestime";
 	public static final String SETTINGID = "settingid";
 	public static final String SETTING = "setting";
 	public static final String RULE = "rule";
@@ -67,7 +68,7 @@ public class FieldName {
 	public static final String PRIVATETOKEN = "privatetoken";
 	public static final String TARGETPAYPALID = "targetpaypalid";
 	public static final String PAYPALIDTYPE = "paypalidtype";
-	public static final String TRANID = "trandid";
+	public static final String TRANID = "transid";
 	public static final String DISCOVERYKEY = "discoverykey";
 	public static final String DW = "DW";
 	public static final String TRANSACTIONDATA = "trandata";
@@ -99,7 +100,25 @@ public class FieldName {
 	public static final String IMAGEID = "imageid";
 	public static final String PUSHLISHREJECTCAUSE = "pushlishrejectcause";
 	public static final String RESPONSE = "response";
-	public static final String ENDLESS="endless";
-	public static final String ENDDATE="enddate";
-	public static final String STARTDATE="startDate";
+	public static final String ENDLESS = "endless";
+	public static final String ENDDATE = "enddate";
+	public static final String STARTDATE = "startDate";
+	public static final String TEMPPASSWORD = "temppassword";
+	public static final String EXPIREDTIME = "expiredtime";
+	public static final String NEEDCHANGEPASSWORD = "needchangepassword";
+	public static final String PUSHLISHID = "pushlishid";
+	public static final String USERBALANCE = "userBalance";
+	public static final String SURVEYBALANCE = "surveyBalance";
+	public static final String REFUNDPOINT = "refundPoint";
+	public static final String CONFIRMCODE = "confirmcode";
+	public static final String AGENT = "agent";
+	public static final String AGENTTYPE = "agenttype";
+	public static final String FROMUSER = "fromuser";
+	public static final String TOUSER = "touser";
+	public static final String FROMUSERBALANCE = "fromUserBalance";
+	public static final String TOUSERBALANCE = "toUserBalance";
+	public static final String FEE = "fee";
+	public static final String INITAMOUNT = "initamount";
+	public static final String TIMESTAMP = "timestamp";
+	public static final String ANSWERID="answerid";
 }

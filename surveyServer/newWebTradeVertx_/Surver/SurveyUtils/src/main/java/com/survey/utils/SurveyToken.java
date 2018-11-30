@@ -37,4 +37,9 @@ public class SurveyToken {
 		return token;
 		
 	}
+	
+	public String generateNewPassword() {
+		String newPassword =Utils.generateOTPSMSMessage(8)[1];
+		return newPassword;
+	}
 }

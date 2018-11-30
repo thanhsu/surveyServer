@@ -29,6 +29,9 @@ public class ResetPasswordAction extends InternalSurveyBaseAction {
 		case "2":
 			resetSecondStep();
 			break;
+		case "3":
+			sendNewPasswordToEmail();
+			break;
 		default:
 			break;
 		}
@@ -106,6 +109,21 @@ public class ResetPasswordAction extends InternalSurveyBaseAction {
 				});
 	}
 
+	private void storeResetPassordToken(String username, String password, Date expired) {
+		JsonObject tmp = new JsonObject().put("password", password).put("expired", expired.getTime());
+		VertxServiceCenter.getInstance().getSharedData().getClusterWideMap(VertxServiceCenter.TempPasswordSharedData,
+				resultHandler -> {
+					resultHandler.result().put(username, tmp, 600000, completionHandler -> {
+						if (completionHandler.succeeded()) {
+							Log.print("Caching register request success for username:  " + username, Log.ACCESS_LOG);
+						} else {
+							Log.print(
+									"Caching register request failed. Cause:" + completionHandler.cause().getMessage());
+						}
+					});
+				});
+	}
+
 	private Future<Boolean> checkToken(String lvToken, String username, Date now) {
 		Future<Boolean> lvResult = Future.future();
 		VertxServiceCenter.getInstance().getSharedData().getClusterWideMap(VertxServiceCenter.ResetPasswordSharedData,
@@ -163,6 +181,58 @@ public class ResetPasswordAction extends InternalSurveyBaseAction {
 						CodeMapping.U9999.value());
 				response.complete(messageResponse);
 			}
+
+		});
+	}
+
+	private void sendNewPasswordToEmail() {
+		String lvUsername = getMessageBody().getString(FieldName.USERNAME);
+		String lvEmail = getMessageBody().getString(FieldName.EMAIL);
+
+		UserDao lvDao = new UserDao();
+		lvDao.doGetUserInfobyUserName(lvUsername);
+		lvDao.getMvFutureResponse().setHandler(res -> {
+
+			if (res.succeeded()) {
+				JsonObject msg = res.result();
+				if (msg.getString(FieldName.CODE).equals(CodeMapping.U0000.toString())) {
+					// Check Email
+					String email = msg.getJsonObject(FieldName.DATA).getString(FieldName.EMAIL);
+					JsonObject reset1st = new JsonObject();
+					SimpleDateFormat sdf = new SimpleDateFormat("yyyy:MM:dd HH:MM:SS");
+					Date lvNow = new Date();
+					lvNow.setMinutes(lvNow.getMinutes() + 10);
+					String lvExprired = sdf.format(lvNow);
+					if (email.equals(lvEmail)) {
+						String newPassword = SurveyToken.getInstance().generateNewPassword();
+						// Send link to Email
+						if (SurveyMailCenter.getInstance().sendEmail(lvEmail, "ResetPassword-ISurvey", "",
+								"Reset password your account! New password for access to your account is " + newPassword
+										+ "\n Your password expired at: " + lvExprired)) {
+							reset1st.put(FieldName.CODE, CodeMapping.C0000.toString()).put(FieldName.MESSAGE,
+									"Check your email inbox");
+							// Store token
+						UserDao lvDao2 = new UserDao();
+						lvDao2.storeTempPassword(lvUsername, newPassword, lvNow);
+
+						} else {
+							reset1st.put(FieldName.CODE, CodeMapping.U8888.toString()).put(FieldName.MESSAGE,
+									CodeMapping.U8888.value());
+						}
+
+						response.complete(reset1st);
+					} else {
+						reset1st.put(FieldName.CODE, CodeMapping.U7777.toString()).put(FieldName.MESSAGE,
+								CodeMapping.U7777.value());
+					}
+
+				} else {
+					response.complete(msg);
+				}
+			} else {
+				response.fail(res.cause());
+			}
+			response.completer();
 
 		});
 	}

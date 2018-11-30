@@ -11,8 +11,11 @@ import javax.crypto.NoSuchPaddingException;
 
 import com.survey.ProcessorInit;
 import com.survey.constant.EventBusDiscoveryConst;
+import com.survey.dbservice.dao.CashDepositDao;
 import com.survey.dbservice.dao.ProxyLogDao;
 import com.survey.dbservice.dao.SurveySubmitDao;
+import com.survey.dbservice.dao.UserDao;
+import com.survey.etheaction.ProxySurveyAnswer;
 import com.survey.utils.CodeMapping;
 import com.survey.utils.FieldName;
 import com.survey.utils.Log;
@@ -46,20 +49,50 @@ public class AnswerSurveyAction extends InternalSurveyBaseAction {
 						this.CompleteGenerateResponse(CodeMapping.C0000.toString(), CodeMapping.C0000.value(), null,
 								response);
 						Future<JsonObject> lv = Future.future();
-						//Send Push Messae
-						
-						VertxServiceCenter.getInstance().sendNewMessage(
-								EventBusDiscoveryConst.ETHEREUMPROXYDISCOVERY.name(), getMessageBody(), lv);
-						lv.setHandler(handler -> {
-							if (handler.succeeded()) {
-								ProxyLogDao lvDao = new ProxyLogDao();
-								lvDao.storeNewRequest(getMessageBody().getString(FieldName.ACTION), getMessageBody(),
-										handler.result());
-							} else {
-								Log.print("[Submit Answer surveyData] Send Proxy Failed. Cause:"
-										+ handler.cause().getMessage(), Log.ERROR_LOG);
+						String answerID = id.result();
+
+						/*
+						 * VertxServiceCenter.getInstance().sendNewMessage(
+						 * EventBusDiscoveryConst.ETHEREUMPROXYDISCOVERY.name(), getMessageBody(), lv);
+						 * lv.setHandler(handler -> { if (handler.succeeded()) { ProxyLogDao lvDao = new
+						 * ProxyLogDao();
+						 * lvDao.storeNewRequest(getMessageBody().getString(FieldName.ACTION),
+						 * getMessageBody(), handler.result()); } else {
+						 * Log.print("[Submit Answer surveyData] Send Proxy Failed. Cause:" +
+						 * handler.cause().getMessage(), Log.ERROR_LOG); } });
+						 */
+						// Create cash deposit (deposit from survey)
+						UserDao lvUserDao = new UserDao();
+						lvUserDao.doGetUserInfobyUserName(username);
+						lvUserDao.getMvFutureResponse().setHandler(h -> {
+							if (h.succeeded() && h.result() != null) {
+								if (h.result().getString(FieldName.CODE).equals(CodeMapping.U0000.name())) {
+									CashDepositDao lvCashDepositDao = new CashDepositDao();
+									lvCashDepositDao.createSuveyAnswerRefund(surveyID, username, answerID).setHandler(h2 -> {
+										if (h2.succeeded() && h2.result() != null) {
+											String transid = h2.result();
+											ProxySurveyAnswer lvProxySurveyAnswer = new ProxySurveyAnswer(surveyID,
+													username, transid, answerdata);
+											lvProxySurveyAnswer.sendToProxyServer().setHandler(h3 -> {
+												if (h3.succeeded()) {
+													JsonObject etheResponse = h3.result();
+													if (!etheResponse.getString(FieldName.CODE).equals("E200")) {
+														CashDepositDao lvDao = new CashDepositDao();
+														lvDao.updateDeposit(transid, "C", "U", etheResponse.getString(FieldName.CODE));
+													}
+												} else {
+													Log.print("Proxy to ethe error: " + h2.cause().getMessage());
+												}
+											});
+										} else {
+											Log.print("Can not create answer payment for user: " + username
+													+ " surveyid: " + surveyID);
+										}
+									});
+								}
 							}
 						});
+
 					} else {
 						response.complete(MessageDefault.RequestFailed(id.cause().getMessage()));
 					}
@@ -76,6 +109,5 @@ public class AnswerSurveyAction extends InternalSurveyBaseAction {
 
 		}
 	}
-
 
 }

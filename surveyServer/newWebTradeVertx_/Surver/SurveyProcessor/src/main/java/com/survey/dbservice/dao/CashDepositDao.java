@@ -2,6 +2,7 @@ package com.survey.dbservice.dao;
 
 import java.util.Date;
 import com.survey.utils.CodeMapping;
+import com.survey.utils.ECashDepositType;
 import com.survey.utils.FieldName;
 
 import io.vertx.core.Future;
@@ -15,13 +16,13 @@ public class CashDepositDao extends SurveyBaseDao {
 		setCollectionName(DepositCollectionName);
 	}
 
-	public Future<String> storeNewDepositRequest(String targetUserID, String privateToken, String method, double amount,
-			String ccy, String remark, boolean isApproval, String exchagerate) {
+	public Future<String> storeNewDepositRequest(String targetUsername, String privateToken, String method,
+			double amount, String ccy, String remark, boolean isApproval, String exchagerate) {
 		Date lvNow = new Date();
 		JsonObject deposit = new JsonObject();
-		deposit.put(FieldName.USERID, targetUserID).put(FieldName.TOKEN, privateToken).put(FieldName.AMOUNT, amount)
+		deposit.put(FieldName.USERNAME, targetUsername).put(FieldName.TOKEN, privateToken).put(FieldName.AMOUNT, amount)
 				.put(FieldName.STATE, "A").put(FieldName.SETTLESTATUS, "U").put(FieldName.INPUTTIME, lvNow.getTime())
-				.put(FieldName.EXCHANGERATE, exchagerate).put(FieldName.CCY, ccy);
+				.put(FieldName.EXCHANGERATE, exchagerate).put(FieldName.CCY, ccy).put(FieldName.TYPE, ECashDepositType.CLIENTCASH);
 		return this.saveDocumentReturnID(deposit);
 	}
 
@@ -56,4 +57,76 @@ public class CashDepositDao extends SurveyBaseDao {
 			}
 		});
 	}
+
+	public Future<String> createSurveyWithdraw(String surveyID, String username) {
+		return this.saveDocumentReturnID(new JsonObject().put(FieldName.USERNAME, username)
+				.put(FieldName.AGENT, surveyID).put(FieldName.AGENTTYPE, "survey").put(FieldName.AMOUNT, 0).put(FieldName.STATE, "A")
+				.put(FieldName.SETTLESTATUS, "P").put(FieldName.TYPE, ECashDepositType.SURVEYWITHDRAW)
+				.put(FieldName.INPUTTIME, new Date().getTime()));
+	}
+
+	public Future<JsonObject> updateSurveyWithdrawSettleStatus(String id, String status) {
+		Future<JsonObject> lvFuture = Future.future();
+		this.queryDocument(new JsonObject().put(FieldName._ID, id), handler -> {
+			if (handler.succeeded() && handler.result() != null) {
+				if (handler.result().isEmpty()) {
+					lvFuture.fail("Null");
+				} else {
+					this.updateDocument(new JsonObject().put(FieldName._ID, id), new JsonObject()
+							.put(FieldName.SETTLESTATUS, status).put(FieldName.UPDATETIME, new Date().getTime()),
+							new UpdateOptions(false), h2 -> {
+								if (h2.succeeded()) {
+									this.findOneByID(id).setHandler(h3 -> {
+										lvFuture.complete(h3.result());
+									});
+								} else {
+									lvFuture.fail(h2.cause().getMessage());
+								}
+							});
+				}
+			} else {
+				lvFuture.fail("Null");
+			}
+		});
+		return lvFuture;
+	}
+
+	public Future<String> createSuveyAnswerRefund(String surveyID, String username, String answerID) {
+		Future<String> lvResult = Future.future();
+		JsonObject js = new JsonObject().put(FieldName.USERNAME, username).put(FieldName.AGENT, surveyID).put(FieldName.AGENTTYPE, "survey")
+				.put(FieldName.AMOUNT, 0).put(FieldName.STATE, "A").put(FieldName.SETTLESTATUS, "P")
+				.put(FieldName.TYPE, ECashDepositType.SURVEYANSWER);
+		js.put(FieldName.INPUTTIME, new Date().getTime()).put(FieldName.ANSWERID, answerID);
+		this.saveDocumentReturnID(js, lvResult);
+		return lvResult;
+	}
+	
+
+	public Future<JsonObject> updateDeposit(String id, String state, String settleStatus, String confirmCode) {
+		Future<JsonObject> lvFuture = Future.future();
+		this.queryDocument(new JsonObject().put(FieldName._ID, id), handler -> {
+			if (handler.succeeded() && handler.result() != null) {
+				if (handler.result().isEmpty()) {
+					lvFuture.fail("Null");
+				} else {
+					this.updateDocument(new JsonObject().put(FieldName._ID, id), new JsonObject()
+							.put(FieldName.SETTLESTATUS, settleStatus).put(FieldName.STATE, state).put(FieldName.CONFIRMCODE, confirmCode).put(FieldName.UPDATETIME, new Date().getTime()),
+							new UpdateOptions(false), h2 -> {
+								if (h2.succeeded()) {
+									this.findOneByID(id).setHandler(h3 -> {
+										lvFuture.complete(h3.result());
+									});
+								} else {
+									lvFuture.fail(h2.cause().getMessage());
+								}
+							});
+				}
+			} else {
+				lvFuture.fail("Null");
+			}
+		});
+		return lvFuture;
+	}
+	
+
 }

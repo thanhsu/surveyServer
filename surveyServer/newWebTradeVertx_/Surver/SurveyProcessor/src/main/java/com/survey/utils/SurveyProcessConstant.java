@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import com.survey.confirm.actions.BaseConfirmAction;
 import com.survey.confirm.actions.CreateUser;
+import com.survey.confirm.actions.PublishSurveyResult;
 import com.survey.internal.action.AccountBalanceProxyAction;
 import com.survey.internal.action.ActiveUserAction;
 import com.survey.internal.action.AddFavouriteSurveyAction;
@@ -45,14 +46,15 @@ public class SurveyProcessConstant {
 	public static synchronized SurveyProcessConstant getInstance() {
 		if (instance == null) {
 			instance = new SurveyProcessConstant();
-			instance.init();
+			instance.initConfirmAction();
 			instance.initActionMapping();
 		}
 		return instance;
 	}
 
-	public void init() {
+	public void initConfirmAction() {
 		confirmActionMapping.put("create_account", new CreateUser());
+		confirmActionMapping.put("pushlish_survey", new PublishSurveyResult());
 		
 	}
 

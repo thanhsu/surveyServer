@@ -32,7 +32,7 @@ public class MicroServiceVerticle extends AbstractVerticle {
       ADDRESS = config().getString("discoveryaddress");
       NAME = config().getString("discoveryname");
     } catch (Exception e) {
-
+    	
     }
 
   }

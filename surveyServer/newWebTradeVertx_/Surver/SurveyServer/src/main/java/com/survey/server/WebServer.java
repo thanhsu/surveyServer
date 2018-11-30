@@ -2,6 +2,7 @@ package com.survey.server;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -31,6 +32,7 @@ import io.vertx.core.http.HttpMethod;
 import io.vertx.core.http.HttpServer;
 import io.vertx.core.http.HttpServerOptions;
 import io.vertx.core.json.Json;
+import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.net.JksOptions;
 import io.vertx.ext.web.Cookie;
@@ -58,6 +60,7 @@ public class WebServer extends MicroServiceVerticle {
 	private JsonObject mvWebConfig = new JsonObject();
 	private Buffer Webroot = null;
 	private boolean isDebug = false;
+	public static JsonArray LISTACTIONALLOWANONYMOUS = new JsonArray();
 
 	@Override
 	public void init(Vertx vertx, Context context) {
@@ -69,6 +72,7 @@ public class WebServer extends MicroServiceVerticle {
 			BANKGATEWAYDISCOVERY.put(lst[0], lst[1]);
 		});
 		isDebug = config().getBoolean("DebugMode") == null ? false : config().getBoolean("DebugMode");
+		LISTACTIONALLOWANONYMOUS = config().getJsonArray("ListActionAllowAnonymous");
 	}
 
 	@Override
@@ -252,50 +256,57 @@ public class WebServer extends MicroServiceVerticle {
 	}
 
 	private void handlerSurveyAction(RoutingContext pvRtx) {
+		String actionName = pvRtx.pathParam("action");
 		if (isDebug) {
 			JsonObject messageBody = pvRtx.getBodyAsJson();
 			messageBody.put("action", pvRtx.pathParam("action"));
-			discovery.getRecord(
-					new JsonObject().put("name", EventBusDiscoveryConst.SURVEYINTERNALPROCESSORTDISCOVERY.toString()),
-					resultHandler -> {
-						if (resultHandler.succeeded() && resultHandler.result() != null) {
-							Record record = resultHandler.result();
-							mvEventBus.<JsonObject>send(record.getLocation().getString("endpoint"), messageBody,
-									res -> {
-										if (res.succeeded()) {
-											JsonObject resp = res.result().body();
-											doResponseNoRenewCookie(pvRtx, Json.encodePrettily(resp));
-										} else {
-											doResponse(pvRtx, MessageDefault.RequestFailed(CodeMapping.C1111.toString(),
-													res.cause().getMessage()));
-										}
-									});
-
-						} else {
-							doResponse(pvRtx, MessageDefault.RequestFailed(resultHandler.cause().getMessage()));
-						}
-					});
+			handlerAction(pvRtx, messageBody);
 			return;
 		}
 		// check auth
+		if (LISTACTIONALLOWANONYMOUS.contains(actionName)) {
+			JsonObject messageBody = pvRtx.getBodyAsJson();
+			if (pvRtx.session() != null) {
+				if (pvRtx.session().get(FieldName.USERNAME) != null
+						&& (messageBody.getValue(FieldName.USERNAME) != null)) {
+					if (!pvRtx.session().get(FieldName.USERNAME).equals(messageBody.getString(FieldName.USERNAME))) {
+						sendCheckAuthFail(pvRtx);
+						return;
+					}
+				} else {
+					messageBody.put(FieldName.USERNAME, "anonymous_" + pvRtx.session().id());
+				}
+			} else {
+				messageBody.put(FieldName.USERNAME, "anonymous_" + new Date().getTime());
+			}
+			handlerAction(pvRtx, messageBody);
+		} else {
+			if (pvRtx.session() == null) {
+				sendCheckAuthFail(pvRtx);
+				return;
+			} else if (pvRtx.session().get(FieldName.USERNAME) == null) {
+				sendCheckAuthFail(pvRtx);
+				return;
+			}
+			JsonObject messageBody = pvRtx.getBodyAsJson();
+			if (!pvRtx.session().get(FieldName.USERNAME).equals(messageBody.getString(FieldName.USERNAME))) {
 
-		if (pvRtx.session() == null) {
-			sendCheckAuthFail(pvRtx);
-			return;
-		} else if (pvRtx.session().get(FieldName.USERNAME) == null) {
-			sendCheckAuthFail(pvRtx);
-			return;
-		}
-		JsonObject messageBody = pvRtx.getBodyAsJson();
-		if (!pvRtx.session().get(FieldName.USERNAME).equals(messageBody.getString(FieldName.USERNAME))) {
-			sendCheckAuthFail(pvRtx);
-			return;
-		}else{
-			messageBody.put(FieldName.USERID, pvRtx.session().get(FieldName.USERNAME).equals(messageBody.getString(FieldName._ID)));
-		}
-		// Check Message
-		messageBody.put("action", pvRtx.pathParam("action"));
+				sendCheckAuthFail(pvRtx);
+				return;
 
+			} else {
+				messageBody.put(FieldName.USERID,
+						pvRtx.session().get(FieldName.USERNAME).equals(messageBody.getString(FieldName._ID)));
+			}
+			// Check Message
+			messageBody.put("action", pvRtx.pathParam("action"));
+
+			handlerAction(pvRtx, messageBody);
+		}
+
+	}
+
+	private void handlerAction(RoutingContext pvRtx, JsonObject messageBody) {
 		discovery.getRecord(
 				new JsonObject().put("name", EventBusDiscoveryConst.SURVEYINTERNALPROCESSORTDISCOVERY.toString()),
 				resultHandler -> {

@@ -44,8 +44,32 @@ public class UserDao extends SurveyBaseDao {
 					if (Encrypt.compare(password, userData.getString(FieldName.PASSWORD))) {
 						userData.remove(FieldName.PASSWORD);
 						userData.remove(FieldName.PIN);
+						userData.put(FieldName.NEEDCHANGEPASSWORD, false);
+						userData.remove(FieldName.TEMPPASSWORD);
+						userData.remove(FieldName.EXPIREDTIME);
 						this.CompleteGenerateResponse(CodeMapping.C0000.toString(), "Login is success", userData);
 						loginSuccess(userData.getString("_id"));
+					}
+					if (userData.getString(FieldName.TEMPPASSWORD) != null
+							&& userData.getLong(FieldName.EXPIREDTIME) != null) {
+						if (password.equals(userData.getString(FieldName.TEMPPASSWORD))) {
+							long lvNow = new java.util.Date().getTime();
+							if (userData.getLong(FieldName.EXPIREDTIME) < lvNow) {
+								userData.put(FieldName.NEEDCHANGEPASSWORD, true);
+								userData.remove(FieldName.TEMPPASSWORD);
+								userData.remove(FieldName.EXPIREDTIME);
+								this.CompleteGenerateResponse(CodeMapping.C0000.toString(), "Login is success",
+										userData);
+							} else {
+								this.CompleteGenerateResponse(CodeMapping.U2222.toString(), CodeMapping.U2222.value(),
+										null);
+								loginFaile(userData);
+							}
+						} else {
+							this.CompleteGenerateResponse(CodeMapping.U2222.toString(), CodeMapping.U2222.value(),
+									null);
+							loginFaile(userData);
+						}
 					} else {
 						this.CompleteGenerateResponse(CodeMapping.U2222.toString(), CodeMapping.U2222.value(), null);
 						loginFaile(userData);
@@ -57,6 +81,15 @@ public class UserDao extends SurveyBaseDao {
 			}
 		});
 		return mvFutureResponse;
+	}
+
+	public void storeTempPassword(String username, String tempPassword, java.util.Date expiredTime) {
+		JsonObject tmpPassword = new JsonObject().put(FieldName.TEMPPASSWORD, tempPassword).put(FieldName.EXPIREDTIME,
+				expiredTime.getTime());
+		this.updateDocument(new JsonObject().put(FieldName.USERNAME, username), tmpPassword, new UpdateOptions(false),
+				handler -> {
+					this.CompleteGenerateResponse(CodeMapping.C0000.toString(), "", null);
+				});
 	}
 
 	public void loginByGoogle(String userToken) {
@@ -267,7 +300,6 @@ public class UserDao extends SurveyBaseDao {
 				}
 			} else {
 				getMvFutureResponse().fail("user id not found");
-				getMvFutureResponse().complete();
 			}
 
 		});
@@ -386,6 +418,11 @@ public class UserDao extends SurveyBaseDao {
 			updateData.put(FieldName.STATE, "L");
 		}
 		this.updateDocument(query, updateData, new UpdateOptions(false), handler -> {
+		});
+	}
+	
+	public void updateAccountToPendingSate(String username, String reject) {
+		this.updateDocument(new JsonObject().put(FieldName.USERNAME, username), new JsonObject().put(FieldName.STATE, "P").put(FieldName.REMARK, reject), new UpdateOptions(false), handler -> {
 		});
 	}
 

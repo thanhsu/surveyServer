@@ -122,6 +122,16 @@ public class SurveyBaseDao {
 		return result;
 	}
 
+	public void saveDocumentReturnID(JsonObject data, Future<String> result) {
+		BaseDaoConnection.getInstance().getMongoClient().save(CollectionName, data, handler -> {
+			if (handler.succeeded()) {
+				result.complete(handler.result());
+			} else {
+				result.fail(handler.cause());
+			}
+		});
+	}
+	
 	public void saveDocument(JsonObject data) {
 		BaseDaoConnection.getInstance().getMongoClient().save(CollectionName, data, handler -> {
 		});

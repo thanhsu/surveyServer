@@ -5,7 +5,9 @@ public enum UserNotificationEnum {
 	SURVEYPUSHLISH("Survey pushlish"),
 	SURVEYNEWRESPONSE("Survey new response"),
 	ACCOUNT("Account Ssatus update"),
-	ACCOUNTCASH("Account cash balance update"),
+	ACCOUNTBALANCE("Account cash balance update"),
+	CASHDEPOSIT("Account cash deposit"),
+	CASHWITHDRAW ("Account cash withdraw"),
 	UNKNOWN("Unknownw");
 
 	private String description;

@@ -39,6 +39,7 @@ public enum CodeMapping {
 	S8888("Survey Closed or Deleted"),
 	S9999("Pushlish reject. Because Survey was pushlished"),
 	S0001("Survey can not restore"),
+	S0002("Survey status not allow Deposit now"),
 	
 	D1111("Deposit Not Found"),
 	
