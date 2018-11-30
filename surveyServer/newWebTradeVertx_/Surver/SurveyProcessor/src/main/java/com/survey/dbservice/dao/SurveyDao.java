@@ -210,6 +210,120 @@ public class SurveyDao extends SurveyBaseDao {
 		});
 	}
 
+	// New check permission
+	public void CheckPermisstionDoing(String username, String surveyID, JsonObject loginData) {
+		UserDao lvUserDao = new UserDao();
+		lvUserDao.doGetUserInfobyUserName(username);
+		this.queryDocument(new JsonObject().put(FieldName._ID, surveyID), handler -> {
+			if (handler.succeeded() && handler.result() != null) {
+				JsonObject surveyData = handler.result().get(0);
+				if (!surveyData.getString(FieldName.STATE).equals("A")
+						|| !surveyData.getString(FieldName.STATUS).equals("N")
+						|| surveyData.getString(FieldName.USERNAME).equals(username)) {
+					// not pushlish or blabla
+					surveyData.put(FieldName.QUESTIONDATA, new JsonObject());
+					this.CompleteGenerateResponse(CodeMapping.S6666.toString(), CodeMapping.S6666.value(), surveyData);
+					return;
+				}
+
+				JsonObject setting = surveyData.getJsonObject(FieldName.SETTING);
+				// Check date
+				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+				String now = sdf.format(new Date());
+				boolean isStart = now.compareTo(setting.getString(FieldName.STARTDATE)) >= 0;
+				boolean isEnd = false;
+
+				if (isStart) {
+					boolean isEndless = setting.getBoolean(FieldName.ENDLESS) == null ? true
+							: setting.getBoolean(FieldName.ENDLESS);
+					if (!isEndless) {
+						isEnd = now.compareTo(setting.getString(FieldName.ENDDATE)) > 0;
+					}
+				}
+				if (!isStart) {
+					surveyData.put(FieldName.QUESTIONDATA, new JsonObject());
+					this.CompleteGenerateResponse(CodeMapping.S3334.toString(), CodeMapping.S3334.value(), surveyData);
+				} else if (isEnd) {
+					surveyData.put(FieldName.QUESTIONDATA, new JsonObject());
+					this.CompleteGenerateResponse(CodeMapping.S3333.toString(), CodeMapping.S3333.value(), surveyData);
+				} else {
+					boolean isAllowMulti = setting.getBoolean(FieldName.ALLOWMULTIRESPONSE) == null ? true
+							: setting.getBoolean(FieldName.ALLOWMULTIRESPONSE);
+					boolean isPublic = setting.getBoolean(FieldName.ISPUBLIC) == null ? true
+							: setting.getBoolean(FieldName.ISPUBLIC);
+					boolean isLoginRequire = setting.getBoolean(FieldName.ISPUBLIC) == null ? true
+							: setting.getBoolean(FieldName.LOGINREQUIRE);
+
+					if (isLoginRequire) {
+						// check session
+						if (loginData != null) {
+							if (loginData.getString("username").equals(username)) {
+								completeGetAllSurveyData(surveyData, CodeMapping.S5555);
+							} else {
+								surveyData.put(FieldName.QUESTIONDATA, new JsonObject());
+								this.CompleteGenerateResponse(CodeMapping.S0002.toString(), CodeMapping.S0002.value(),
+										surveyData);
+							}
+						} else {
+							surveyData.put(FieldName.QUESTIONDATA, new JsonObject());
+							this.CompleteGenerateResponse(CodeMapping.S0002.toString(), CodeMapping.S0002.value(),
+									surveyData);
+						}
+					} else if (isAllowMulti) {
+						if (isPublic) {
+							completeGetAllSurveyData(surveyData, CodeMapping.S5555);
+						} else {
+							String lstUserName = setting.getString(FieldName.LISTALLOWUSER);
+							if (lstUserName == null || lstUserName.isEmpty()) {
+								completeGetAllSurveyData(surveyData, CodeMapping.S5555);
+							} else {
+								if (lstUserName.contains(username)) {
+									completeGetAllSurveyData(surveyData, CodeMapping.S5555);
+								} else {
+									surveyData.put(FieldName.QUESTIONDATA, new JsonObject());
+									this.CompleteGenerateResponse(CodeMapping.S2222.toString(),
+											CodeMapping.S2222.value(), surveyData);
+								}
+							}
+						}
+					} else {
+						SurveySubmitDao lvSurveySubmitDao = new SurveySubmitDao();
+						lvSurveySubmitDao.queryDocument(
+								new JsonObject().put(FieldName.SURVEYID, surveyID).put(FieldName.USERNAME, username),
+								handlerSub -> {
+									if (handlerSub.succeeded() && handlerSub.result() != null) {
+										if (handlerSub.result().size() > 0) {
+											this.CompleteGenerateResponse(CodeMapping.S4444.toString(),
+													"Multi response is deny", null);
+										} else {
+											if (isPublic) {
+												completeGetAllSurveyData(surveyData, CodeMapping.S5555);
+											} else {
+												String lstUserName = setting.getString(FieldName.LISTALLOWUSER);
+												if (lstUserName == null || lstUserName.isEmpty()) {
+													completeGetAllSurveyData(surveyData, CodeMapping.S5555);
+												} else {
+													if (lstUserName.contains(username)) {
+														completeGetAllSurveyData(surveyData, CodeMapping.S5555);
+													} else {
+														surveyData.put(FieldName.QUESTIONDATA, new JsonObject());
+														this.CompleteGenerateResponse(CodeMapping.S2222.toString(),
+																CodeMapping.S2222.value(), surveyData);
+													}
+												}
+											}
+											// completeGetAllSurveyData(surveyData, CodeMapping.S5555);
+										}
+									}
+								});
+					}
+				}
+			} else {
+				this.CompleteGenerateResponse(CodeMapping.S1111.toString(), CodeMapping.S1111.toString(), null);
+			}
+		});
+	}
+
 	private void completeGetAllSurveyData(JsonObject surveyData, CodeMapping pCode) {
 		this.CompleteGenerateResponse(CodeMapping.C0000.toString(), CodeMapping.C0000.value(), surveyData);
 	}

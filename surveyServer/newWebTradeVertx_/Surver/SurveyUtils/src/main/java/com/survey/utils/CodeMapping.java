@@ -32,6 +32,8 @@ public enum CodeMapping {
 	S1111("Survey not found"),
 	S2222("Permission Denied"),
 	S3333("Survey Expired"),
+	S3334("Survey have not start"),
+	S3335("Survey is out of money"),
 	S4444("Survey Deny Multi Response"),
 	S5555("Check point remain for continute"),
 	S6666("Survey not allow for submit now"),
@@ -44,7 +46,11 @@ public enum CodeMapping {
 	D1111("Deposit Not Found"),
 	
 	W1111("Withdraw amount failed"),
-	W2222("Withdraw transaction can not cancel")
+	W2222("Withdraw transaction can not cancel"),
+	
+	P0000("Proxy ok"),
+	P1111("Proxy data to Ethe server error"),
+	P2222("Request Error")
 	;
 	
 	

@@ -62,7 +62,7 @@ public class VertxServiceCenter {
 									});
 						} else {
 							responseHandler.fail(event.cause());
-							responseHandler.completer();
+							/*responseHandler.completer();*/
 						}
 					}
 				});

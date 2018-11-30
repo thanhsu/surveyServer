@@ -67,6 +67,15 @@ public class RetrieveSurveyAction extends InternalSurveyBaseAction {
 
 	public void retrievepublic(JsonObject request) {
 		JsonObject rs = new JsonObject();
+		JsonObject searchData = request.getJsonObject(FieldName.SEARCH);
+		if (searchData != null) {
+			if (searchData.getString(FieldName.TITLE) != null) {
+				rs.put(FieldName.TITLE, new JsonObject().put("$regex", searchData.getString(FieldName.TITLE)));
+			}
+			if (searchData.getValue(FieldName.LISTCATEGORYID) != null) {
+				rs.put(FieldName.LISTCATEGORYID, searchData.getJsonArray(FieldName.LISTCATEGORYID));
+			}
+		}
 		rs.put(FieldName.STATUS, "N").put(FieldName.STATE, "A").put(FieldName.ISTEMP, false);
 		SurveyDao lvDao = new SurveyDao();
 		Future<JsonObject> lvResult = Future.future();

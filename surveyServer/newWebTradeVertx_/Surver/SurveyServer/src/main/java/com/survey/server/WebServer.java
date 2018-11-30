@@ -263,10 +263,12 @@ public class WebServer extends MicroServiceVerticle {
 			handlerAction(pvRtx, messageBody);
 			return;
 		}
+		
 		// check auth
 		if (LISTACTIONALLOWANONYMOUS.contains(actionName)) {
 			JsonObject messageBody = pvRtx.getBodyAsJson();
 			if (pvRtx.session() != null) {
+				messageBody.put("logindata", (JsonObject) pvRtx.session().get("logindata"));
 				if (pvRtx.session().get(FieldName.USERNAME) != null
 						&& (messageBody.getValue(FieldName.USERNAME) != null)) {
 					if (!pvRtx.session().get(FieldName.USERNAME).equals(messageBody.getString(FieldName.USERNAME))) {
@@ -277,6 +279,7 @@ public class WebServer extends MicroServiceVerticle {
 					messageBody.put(FieldName.USERNAME, "anonymous_" + pvRtx.session().id());
 				}
 			} else {
+				messageBody.put("logindata", new JsonObject());
 				messageBody.put(FieldName.USERNAME, "anonymous_" + new Date().getTime());
 			}
 			handlerAction(pvRtx, messageBody);

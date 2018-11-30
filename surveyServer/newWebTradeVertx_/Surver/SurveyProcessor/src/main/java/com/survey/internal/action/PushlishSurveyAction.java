@@ -3,6 +3,7 @@ package com.survey.internal.action;
 import com.survey.constant.EventBusDiscoveryConst;
 import com.survey.dbservice.dao.ProxyLogDao;
 import com.survey.dbservice.dao.SurveyDao;
+import com.survey.etheaction.ProxyAccountBalance;
 import com.survey.utils.CodeMapping;
 import com.survey.utils.FieldName;
 import com.survey.utils.Log;
@@ -27,14 +28,28 @@ public class PushlishSurveyAction extends InternalSurveyBaseAction {
 		boolean notifi = getMessageBody().getBoolean(FieldName.NOTIFY);
 		float limitFund = getMessageBody().getFloat(FieldName.LIMITFUND);
 		SurveyDao lvSurveyDao = new SurveyDao();
+
 		// Check account balance
+		ProxyAccountBalance lvProxyAccountBalance = new ProxyAccountBalance(username);
+
 		Future<JsonObject> lvAccountBalance = Future.future();
+		lvProxyAccountBalance.sendToProxyServer(lvAccountBalance);
+
 		VertxServiceCenter.getInstance().sendNewMessage(EventBusDiscoveryConst.ETHEREUMPROXYDISCOVERY.name(),
-				new JsonObject().put(FieldName.ACTION, "userinfo").put(FieldName.USERNAME,username), lvAccountBalance);
+				new JsonObject().put(FieldName.ACTION, "userinfo").put(FieldName.USERNAME, username), lvAccountBalance);
 		lvAccountBalance.setHandler(handler -> {
-			if (/*handler.succeeded() && handler.result() != null*/true) {
+			if (handler.succeeded() && handler.result() != null) {
 				// Check account balance
-				JsonObject accountbalance = new JsonObject().put("success", "1").put("balance", "10000000") /*handler.result()*/;
+				/*
+				 * JsonObject accountbalance = new JsonObject().put("success",
+				 * "1").put("balance", "10000000") handler.result() ;
+				 */
+				if (!handler.result().getString(FieldName.CODE).equals("E200")) {
+					this.CompleteGenerateResponse(CodeMapping.P2222.toString(), CodeMapping.P2222.value(),
+							handler.result(), response);
+					return;
+				}
+				JsonObject accountbalance = handler.result().getJsonObject(FieldName.DATA);
 				if (accountbalance.getValue("success").toString().equals("1")) {
 					float balance = Float.parseFloat(accountbalance.getString("balance"));
 					if (balance < initialFund) {

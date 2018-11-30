@@ -121,4 +121,6 @@ public class FieldName {
 	public static final String INITAMOUNT = "initamount";
 	public static final String TIMESTAMP = "timestamp";
 	public static final String ANSWERID="answerid";
+	public static final String LOGINREQUIRE="loginRequire";
+	public static final String BALANCE="balance";
 }

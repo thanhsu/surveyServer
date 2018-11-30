@@ -71,6 +71,7 @@ public class AnswerSurveyAction extends InternalSurveyBaseAction {
 									lvCashDepositDao.createSuveyAnswerRefund(surveyID, username, answerID).setHandler(h2 -> {
 										if (h2.succeeded() && h2.result() != null) {
 											String transid = h2.result();
+											//Proxy to Ethe Server
 											ProxySurveyAnswer lvProxySurveyAnswer = new ProxySurveyAnswer(surveyID,
 													username, transid, answerdata);
 											lvProxySurveyAnswer.sendToProxyServer().setHandler(h3 -> {
