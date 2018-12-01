@@ -30,7 +30,7 @@ public class EtheServiceProxy extends MicroServiceVerticle {
 		JsonArray lvActionMapping = config().getJsonArray("ActionLinkMapping");
 		lvActionMapping.forEach(node -> {
 			String[] lvTmp = ((String) node).split(",");
-			actionMapping.put(lvTmp[1], lvTmp[2]);
+			actionMapping.put(lvTmp[1], "/"+lvTmp[2]);
 			methodActionMapping.put(lvTmp[1], lvTmp[0]);
 		});
 		etheIP = config().getString("EtheServerIP");
@@ -60,8 +60,10 @@ public class EtheServiceProxy extends MicroServiceVerticle {
 					if (isSSL) {
 						httpRequest = webClient.postAbs("https://" + etheIP + ":" + ethePort + "/" + uri);
 					} else {
+						String url = "http://" + etheIP + ":" + ethePort + "/" + uri;
 						httpRequest = webClient.post(ethePort, etheIP, uri);
 					}
+
 					httpRequest.sendJsonObject(body, handler -> {
 						if (handler.succeeded()) {
 							h.reply(handler.result().bodyAsJsonObject());
