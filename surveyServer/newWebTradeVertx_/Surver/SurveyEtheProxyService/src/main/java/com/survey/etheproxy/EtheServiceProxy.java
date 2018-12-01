@@ -67,7 +67,9 @@ public class EtheServiceProxy extends MicroServiceVerticle {
 							h.reply(handler.result().bodyAsJsonObject());
 							future.complete(handler.result().bodyAsBuffer());
 						} else {
-							future.fail("");
+							h.reply(new JsonObject().put(FieldName.CODE, "P1111").put(FieldName.MESSAGE,
+									handler.cause().getMessage()));
+							future.fail(handler.cause().getMessage());
 						}
 					});
 				} else {
