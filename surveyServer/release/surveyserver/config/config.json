@@ -14,9 +14,9 @@
 	"log.Reply": "N",
 	"log.SMTPMessageInterval": "300000",
 	"log.SMTPHost": "mail.tx-tech.com",
-	"HttpPort": 443,
+	"HttpPort": 5050,
 	"HttpSessionTimeout": 6000000,
-	"enabledSSL": true,
+	"enabledSSL": false,
 	"SSLPassword":"wibble",
 	"SSLKey":"config/key/itradekeystore.jks",
 	"EmailServiceConfig": {
