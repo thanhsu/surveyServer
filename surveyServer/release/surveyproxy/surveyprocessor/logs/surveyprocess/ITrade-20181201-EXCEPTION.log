@@ -1,0 +1,18 @@
+[TIME] Sat Dec 01 21:16:29 ICT 2018
+java.lang.ClassNotFoundException: com.survey.dbservices.action.ChangePasswordAction
+	at java.net.URLClassLoader.findClass(Unknown Source)
+	at java.lang.ClassLoader.loadClass(Unknown Source)
+	at sun.misc.Launcher$AppClassLoader.loadClass(Unknown Source)
+	at java.lang.ClassLoader.loadClass(Unknown Source)
+	at java.lang.Class.forName0(Native Method)
+	at java.lang.Class.forName(Unknown Source)
+	at com.survey.dbservices.DBServiceInit.lambda$init$0(DBServiceInit.java:44)
+	at java.lang.Iterable.forEach(Unknown Source)
+	at com.survey.dbservices.DBServiceInit.init(DBServiceInit.java:41)
+	at io.vertx.core.impl.DeploymentManager.lambda$doDeploy$10(DeploymentManager.java:479)
+	at io.vertx.core.impl.ContextImpl.lambda$wrapTask$2(ContextImpl.java:344)
+	at io.netty.util.concurrent.AbstractEventExecutor.safeExecute(AbstractEventExecutor.java:163)
+	at io.netty.util.concurrent.SingleThreadEventExecutor.runAllTasks(SingleThreadEventExecutor.java:403)
+	at io.netty.channel.nio.NioEventLoop.run(NioEventLoop.java:463)
+	at io.netty.util.concurrent.SingleThreadEventExecutor$5.run(SingleThreadEventExecutor.java:858)
+	at java.lang.Thread.run(Unknown Source)
