@@ -62,7 +62,7 @@ public class EtheServiceProxy extends MicroServiceVerticle {
 					} else {
 						httpRequest = webClient.post(ethePort, etheIP, uri);
 					}
-
+					httpRequest.headers().add("clientid", "web_server");
 					httpRequest.sendJsonObject(body, handler -> {
 						if (handler.succeeded()) {
 							h.reply(handler.result().bodyAsJsonObject());
@@ -79,6 +79,7 @@ public class EtheServiceProxy extends MicroServiceVerticle {
 					} else {
 						httpRequest = webClient.get(ethePort, etheIP, uri);
 					}
+					httpRequest.headers().add("clientid", "web_server");
 					httpRequest.sendJsonObject(body, handler -> {
 						if (handler.succeeded()) {
 							h.reply(handler.result().bodyAsJsonObject());
