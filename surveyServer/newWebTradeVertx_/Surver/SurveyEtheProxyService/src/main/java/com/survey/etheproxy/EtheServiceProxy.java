@@ -60,7 +60,6 @@ public class EtheServiceProxy extends MicroServiceVerticle {
 					if (isSSL) {
 						httpRequest = webClient.postAbs("https://" + etheIP + ":" + ethePort + "/" + uri);
 					} else {
-						String url = "http://" + etheIP + ":" + ethePort + "/" + uri;
 						httpRequest = webClient.post(ethePort, etheIP, uri);
 					}
 

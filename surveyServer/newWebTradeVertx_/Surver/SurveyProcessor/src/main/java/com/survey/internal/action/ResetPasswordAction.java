@@ -199,7 +199,7 @@ public class ResetPasswordAction extends InternalSurveyBaseAction {
 					// Check Email
 					String email = msg.getJsonObject(FieldName.DATA).getString(FieldName.EMAIL);
 					JsonObject reset1st = new JsonObject();
-					SimpleDateFormat sdf = new SimpleDateFormat("yyyy:MM:dd HH:MM:SS");
+					SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:MM:SS");
 					Date lvNow = new Date();
 					lvNow.setMinutes(lvNow.getMinutes() + 10);
 					String lvExprired = sdf.format(lvNow);

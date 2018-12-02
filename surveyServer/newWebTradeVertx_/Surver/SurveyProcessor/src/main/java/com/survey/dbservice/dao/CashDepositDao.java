@@ -26,8 +26,8 @@ public class CashDepositDao extends SurveyBaseDao {
 		return this.saveDocumentReturnID(deposit);
 	}
 
-	public Future<JsonObject> retrieveAllDeposit(long fromTime, long toTime, String userID) {
-		JsonObject query = new JsonObject().put(FieldName.USERID, userID).put(FieldName.INPUTTIME,
+	public Future<JsonObject> retrieveAllDeposit(long fromTime, long toTime, String username) {
+		JsonObject query = new JsonObject().put(FieldName.USERNAME, username).put(FieldName.INPUTTIME,
 				new JsonObject().put("$lt", toTime).put("$gt", fromTime));
 		this.queryDocument(query, handler -> {
 			this.CompleteGenerateResponse(CodeMapping.C0000.toString(), "", handler.result());

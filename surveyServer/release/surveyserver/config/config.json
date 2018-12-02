@@ -24,6 +24,7 @@
 		"hostname": "localhost",
 		"port": 25
 	},
-	"ListCashMethodSupport":["paypal,PAYPALGATEWAYDISCOVERY"]
+	"ListCashMethodSupport":["paypal,PAYPALGATEWAYDISCOVERY"],
+	"ListActionAllowAnonymous":["retrieveconfig","activeaccount","retrievesurvey","checkanswerpermission","answer"]
 	
 }

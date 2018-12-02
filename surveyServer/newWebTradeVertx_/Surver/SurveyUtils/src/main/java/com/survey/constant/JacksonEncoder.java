@@ -10,21 +10,20 @@ import java.io.IOException;
  */
 public class JacksonEncoder implements Encoder<JacksonEncoder.Encodable, String> {
 
-    private final ObjectMapper mapper = new ObjectMapper();
+	private final ObjectMapper mapper = new ObjectMapper();
 
-    @Override
-    public String encode(Encodable m) {
-        try {
-            return mapper.writeValueAsString(m);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
+	@Override
+	public String encode(Encodable m) {
+		try {
+			return mapper.writeValueAsString(m);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
 
-    /**
-     * Marker interface for Jackson.
-     */
-    public static interface Encodable {
-    }
+	/**
+	 * Marker interface for Jackson.
+	 */
+	public static interface Encodable {
+	}
 }
-

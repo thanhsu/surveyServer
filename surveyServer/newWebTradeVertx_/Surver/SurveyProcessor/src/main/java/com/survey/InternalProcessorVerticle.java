@@ -37,7 +37,12 @@ public class InternalProcessorVerticle extends MicroServiceVerticle {
 				});
 		publishEventBusService(EventBusDiscoveryConst.SURVEYINTERNALPROCESSORTDISCOVERY.toString(),
 				EventBusDiscoveryConst.SURVEYINTERNALPROCESSORTDISCOVERY.value(), completionHandler -> {
-
+					if (completionHandler.succeeded()) {
+						System.out.print("Pushlish SURVEYINTERNALPROCESSORTDISCOVERY Successed");
+					} else {
+						System.out.print("Pushlish SURVEYINTERNALPROCESSORTDISCOVERY Fail. Cause: "
+								+ completionHandler.cause().getMessage());
+					}
 				});
 	}
 

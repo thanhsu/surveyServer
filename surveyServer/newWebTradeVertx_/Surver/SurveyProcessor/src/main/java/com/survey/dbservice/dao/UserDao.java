@@ -54,7 +54,8 @@ public class UserDao extends SurveyBaseDao {
 							&& userData.getLong(FieldName.EXPIREDTIME) != null) {
 						if (password.equals(userData.getString(FieldName.TEMPPASSWORD))) {
 							long lvNow = new java.util.Date().getTime();
-							if (userData.getLong(FieldName.EXPIREDTIME) < lvNow) {
+							long expired = userData.getLong(FieldName.EXPIREDTIME);
+							if (expired >= lvNow) {
 								userData.put(FieldName.NEEDCHANGEPASSWORD, true);
 								userData.remove(FieldName.TEMPPASSWORD);
 								userData.remove(FieldName.EXPIREDTIME);
@@ -304,6 +305,22 @@ public class UserDao extends SurveyBaseDao {
 
 		});
 	}
+	
+	public Future<String> checkUserState(String username ){
+		Future<String> lvFuture = Future.future();
+		this.queryDocument(new JsonObject().put(FieldName.USERNAME, username), handler->{
+			if(handler.result()!=null) {
+				if(handler.result().isEmpty()) {
+					lvFuture.fail("Username not found");
+				}else {
+					lvFuture.complete(handler.result().get(0).getString(FieldName.STATE));
+				}
+			}else {
+				lvFuture.fail("Usernam not found");
+			}
+		});
+		return lvFuture;
+	}
 
 	public void updateUserInfo(String userID, String fullName, Date birthDate, String national, String ward_city) {
 		JsonObject query = new JsonObject().put("_id", userID);
@@ -411,7 +428,7 @@ public class UserDao extends SurveyBaseDao {
 
 	public void loginFaile(JsonObject userData) {
 		JsonObject query = new JsonObject().put("_id", userData.getString("_id"));
-		int failCount = userData.getInteger(FieldName.FAILLOGINCOUNT);
+		int failCount = userData.getInteger(FieldName.FAILLOGINCOUNT)==null?0:userData.getInteger(FieldName.FAILLOGINCOUNT);
 
 		JsonObject updateData = new JsonObject().put(FieldName.FAILLOGINCOUNT, ++failCount);
 		if (failCount >= getMaxFaild()) {

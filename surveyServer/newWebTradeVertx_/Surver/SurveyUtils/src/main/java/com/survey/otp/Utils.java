@@ -5,11 +5,11 @@ import java.security.SecureRandom;
 import java.util.Arrays;
 import java.util.Date;
 
+import org.apache.commons.codec.binary.Base32;
+import org.apache.commons.codec.digest.DigestUtils;
+
 import com.survey.utils.Log;
 import com.txtech.common.encryption.SHA2PasswordEncryptor;
-
-import shaded.org.apache.commons.codec.binary.Base32;
-import shaded.org.apache.commons.codec.digest.DigestUtils;
 
 public class Utils {
 	public static SecureRandom secureRandom = new SecureRandom();

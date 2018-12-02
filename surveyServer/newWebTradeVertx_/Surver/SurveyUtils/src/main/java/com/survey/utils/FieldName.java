@@ -123,4 +123,7 @@ public class FieldName {
 	public static final String ANSWERID="answerid";
 	public static final String LOGINREQUIRE="loginRequire";
 	public static final String BALANCE="balance";
+	
+	public static final String CASHTRANSFERIN ="cashtransferin";
+	public static final String CASHTRANSFEROUT="cashtransferout";
 }

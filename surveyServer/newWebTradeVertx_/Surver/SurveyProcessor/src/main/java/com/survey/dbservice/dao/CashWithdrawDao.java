@@ -28,8 +28,8 @@ public class CashWithdrawDao extends SurveyBaseDao {
 		return this.saveDocumentReturnID(deposit);
 	}
 
-	public Future<JsonObject> retrieveAllWithdraw(long fromTime, long toTime, String userID) {
-		JsonObject query = new JsonObject().put(FieldName.USERID, userID).put(FieldName.INPUTTIME,
+	public Future<JsonObject> retrieveAllWithdraw(long fromTime, long toTime, String username) {
+		JsonObject query = new JsonObject().put(FieldName.USERNAME, username).put(FieldName.INPUTTIME,
 				new JsonObject().put("$lt", toTime).put("$gt", fromTime));
 		this.queryDocument(query, handler -> {
 			this.CompleteGenerateResponse(CodeMapping.C0000.toString(), "", handler.result());
@@ -101,7 +101,8 @@ public class CashWithdrawDao extends SurveyBaseDao {
 	public Future<JsonObject> updateTransStatus(String tranID, String status, String confirmCode) {
 		Future<JsonObject> lvTranData = Future.future();
 		this.updateDocument(new JsonObject().put(FieldName._ID, tranID),
-				new JsonObject().put(FieldName.SETTLESTATUS, status).put(FieldName.CONFIRMCODE, confirmCode), new UpdateOptions(false), handler -> {
+				new JsonObject().put(FieldName.SETTLESTATUS, status).put(FieldName.CONFIRMCODE, confirmCode),
+				new UpdateOptions(false), handler -> {
 					if (handler.succeeded()) {
 						this.queryDocument(new JsonObject().put(FieldName._ID, tranID), h2 -> {
 							if (h2.succeeded() && h2.result() != null) {

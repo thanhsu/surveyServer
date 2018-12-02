@@ -10,6 +10,8 @@ public enum CodeMapping {
 	C6666("Permission Denied"),
 	C7777("Session Timeout"),
 	
+	D1111("Deposit Not Found"),
+	
 	U0000("Everythings ok"),
 	U1111("Username not found"),
 	U2222("Password wrong"),
@@ -43,14 +45,18 @@ public enum CodeMapping {
 	S0001("Survey can not restore"),
 	S0002("Survey status not allow Deposit now"),
 	
-	D1111("Deposit Not Found"),
+	T0000("Cash transfer is ok"),
+	T1111("Your balance is exceed amount"),
+	T2222("The benifician is unavailable now, please try later"),
+	T3333("The benifician not found!"),
 	
 	W1111("Withdraw amount failed"),
 	W2222("Withdraw transaction can not cancel"),
 	
 	P0000("Proxy ok"),
 	P1111("Proxy data to Ethe server error"),
-	P2222("Request Error")
+	P2222("Request Error from Ethe server")
+	
 	;
 	
 	

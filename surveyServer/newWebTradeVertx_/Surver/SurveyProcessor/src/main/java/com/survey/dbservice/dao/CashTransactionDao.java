@@ -1,10 +1,12 @@
 package com.survey.dbservice.dao;
 
 import java.util.Date;
+import java.util.List;
 
 import com.survey.utils.FieldName;
 
 import io.vertx.core.Future;
+import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.mongo.UpdateOptions;
 
@@ -43,5 +45,14 @@ public class CashTransactionDao extends SurveyBaseDao {
 					}
 				});
 		return lvFuture;
+	}
+	
+	public void retrieveListCashTransferIn (String username, long fromTime, long toTime, Future<JsonArray> resultHandler){
+		this.queryDocumentRunCmd(new JsonObject().put(FieldName.TOUSER, username).put(FieldName.SETTLESTIME,new JsonObject().put("$lt", toTime).put("$gt", fromTime)), new JsonObject(), new JsonObject().put(FieldName.SETTLESTIME, 1), resultHandler);
+		
+	}
+	
+	public void retrieveListCashTransferOut (String username, long fromTime, long toTime, Future<JsonArray> resultHandler){
+		this.queryDocumentRunCmd(new JsonObject().put(FieldName.FROMUSER, username).put(FieldName.INPUTTIME,new JsonObject().put("$lt", toTime).put("$gt", fromTime)),new JsonObject(),new JsonObject().put(FieldName.INPUTTIME, 1), resultHandler);
 	}
 }

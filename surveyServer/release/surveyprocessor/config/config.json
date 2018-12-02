@@ -28,7 +28,7 @@
 		"retrieveconfig-com.survey.dbservices.action.RetrieveConfigAction"
 	],
 	"SurveyHost":"https://server.igo-survey.xyz",
-	
+	"SurveyTokenTimeOut":300000,
 	
 	
 	"ServiceInternalProcessorConfig": {

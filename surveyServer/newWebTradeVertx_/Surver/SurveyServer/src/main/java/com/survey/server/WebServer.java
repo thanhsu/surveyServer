@@ -116,7 +116,7 @@ public class WebServer extends MicroServiceVerticle {
 			}
 		});
 		router.route("/api/register").handler(this::handlerRegister);
-		router.route("/api/login").handler(this::handlerLogin);
+		router.route("/m/login").handler(this::handlerLogin);
 
 		router.route("/api/survey/:action").handler(this::handlerSurveyAction);
 		router.get("/api/activeuser").handler(this::handlerActiveAccount);
@@ -125,6 +125,8 @@ public class WebServer extends MicroServiceVerticle {
 		router.route("/api/admin/confirm").handler(this::handlerAdminConfirm);
 
 		router.route("/api/image/:action").handler(this::handlerSurveyImage);
+
+		router.route("/survey/:id").handler(this::handlerGetSurvey);
 
 		router.get("/test/:message").handler(rtx -> {
 			rtx.response().end("OK");
@@ -162,7 +164,7 @@ public class WebServer extends MicroServiceVerticle {
 			 * pRoutingContext.response().sendFile("./webroot/index.html");
 			 * redirectTo(pRoutingContext, "/login"); } else
 			 */
-			if (session.get(FieldName.USERNAME) != null) {
+			if (session.data().get(FieldName.USERNAME) == null) {
 				redirectTo(pRoutingContext, "/login");
 			} else {
 				responseHomeIndex(pRoutingContext);
@@ -222,7 +224,7 @@ public class WebServer extends MicroServiceVerticle {
 		initConfig();
 	}
 
-	private void handlerLogin(RoutingContext pvRtx) {
+	private void handlerLogin(final RoutingContext pvRtx) {
 		// Check Message
 		JsonObject messageBody = pvRtx.getBodyAsJson();
 		messageBody.put("action", "login");
@@ -236,8 +238,8 @@ public class WebServer extends MicroServiceVerticle {
 								JsonObject resp = res.result().body();
 								if (resp.getString(FieldName.CODE).equals(CodeMapping.C0000.toString())) {
 									Session session = pvRtx.session();
-									session.put("logindata", resp.getValue("data"));
-									session.put(FieldName.USERNAME, messageBody.getString(FieldName.USERNAME));
+									session.data().put("logindata", resp.getValue("data"));
+									session.data().put(FieldName.USERNAME, messageBody.getString(FieldName.USERNAME));
 									loginSuccessResponse(pvRtx, resp, pvRtx.session().id());
 								} else {
 									doResponseNoRenewCookie(pvRtx, Json.encodePrettily(resp));
@@ -263,7 +265,7 @@ public class WebServer extends MicroServiceVerticle {
 			handlerAction(pvRtx, messageBody);
 			return;
 		}
-		
+
 		// check auth
 		if (LISTACTIONALLOWANONYMOUS.contains(actionName)) {
 			JsonObject messageBody = pvRtx.getBodyAsJson();
@@ -348,6 +350,78 @@ public class WebServer extends MicroServiceVerticle {
 							} else {
 								doResponse(rtx, MessageDefault.RequestFailed(CodeMapping.C1111.toString(),
 										res.cause().getMessage()));
+							}
+						});
+					} else {
+						doResponse(rtx, MessageDefault.RequestFailed(resultHandler.cause().getMessage()));
+					}
+				});
+	}
+
+	private void handlerGetSurvey(RoutingContext rtx) {
+		if (mvWebConfig.isEmpty()) {
+			initConfig();
+		}
+		JsonObject tmp = new JsonObject().put("config", mvWebConfig);
+		if (rtx.session().data() != null) {
+			tmp.put("logindata", (JsonObject) rtx.session().get("logindata"));
+		}
+		String lvSurveyId = rtx.pathParam("id");
+		JsonObject messageBody = new JsonObject().put(FieldName.ACTION, "retrievesurveybaseinfo")
+				.put(FieldName.SURVEYID, lvSurveyId);
+		discovery.getRecord(
+				new JsonObject().put("name", EventBusDiscoveryConst.SURVEYINTERNALPROCESSORTDISCOVERY.toString()),
+				resultHandler -> {
+					if (resultHandler.succeeded() && resultHandler.result() != null) {
+						Record record = resultHandler.result();
+						mvEventBus.<JsonObject>send(record.getLocation().getString("endpoint"), messageBody, res -> {
+							if (res.succeeded()) {
+								String config = "<script>window._SURVEYCONFIG_= " + Json.encode(tmp) + "</script>";
+								JsonObject resp = res.result().body();
+								if (resp.getString(FieldName.CODE).equals(CodeMapping.S0000.name())) {
+									String surveyTitle = resp.getJsonObject(FieldName.DATA).getString(FieldName.TITLE);
+									if (Webroot != null) {
+										io.vertx.core.buffer.Buffer bf = Webroot;
+										Buffer z;
+										try {
+											Document doc = Jsoup.parse(bf.toString(), "UTF-8");
+											doc.head().getElementsByTag("title").html(surveyTitle);
+											doc.head().append(config);
+											z = Buffer.buffer(doc.html());
+										} catch (Exception e) {
+											z = bf;
+										}
+										rtx.response().setWriteQueueMaxSize(z.length() * 2);
+										rtx.response().putHeader("Content-Type", "text/html;charset=UTF-8");
+										rtx.response().putHeader("Content-Length", (z.length()) + "");
+										rtx.response().write(z).end();
+									} else {
+										vertx.fileSystem().readFile("./webroot/index.html", handler -> {
+											if (handler.succeeded() && handler.result() != null) {
+												Buffer z;
+												io.vertx.core.buffer.Buffer bf = handler.result();
+
+												try {
+													Document doc = Jsoup.parse(bf.toString(), "UTF-8");
+													doc.head().getElementsByTag("title").html(surveyTitle);
+													doc.head().append(config);
+													z = Buffer.buffer(doc.html());
+												} catch (Exception e) {
+													z = bf;
+												}
+												rtx.response().setWriteQueueMaxSize(z.length() * 2);
+												rtx.response().putHeader("Content-Type", "text/html;charset=UTF-8");
+												rtx.response().putHeader("Content-Length", (z.length()) + "");
+												rtx.response().write(z).end();
+												Webroot = handler.result();
+											}
+										});
+									}
+								} else {
+									responseHomeIndex(rtx);
+								}
+							} else {
+								responseHomeIndex(rtx);
 							}
 						});
 					} else {
@@ -519,6 +593,7 @@ public class WebServer extends MicroServiceVerticle {
 
 		lvMessage.put(FieldName.STEP, step);
 		lvMessage.put(FieldName.ACTION, "resetpassword");
+
 		rtx.queryParams().forEach(action -> {
 			lvMessage.put(action.getKey(), action.getValue());
 		});
@@ -527,10 +602,10 @@ public class WebServer extends MicroServiceVerticle {
 				resultHandler -> {
 					if (resultHandler.succeeded() && resultHandler.result() != null) {
 						Record record = resultHandler.result();
-						VertxServiceCenter.getEventbus().<JsonObject>send(record.getLocation().getString("endpoint"),
-								lvMessage, res -> {
+						VertxServiceCenter.getEventbus().send(record.getLocation().getString("endpoint"), lvMessage,
+								res -> {
 									if (res.succeeded()) {
-										doResponse(rtx, res.result().body());
+										doResponse(rtx, (JsonObject) res.result().body());
 									} else {
 
 										doResponse(rtx,
@@ -620,14 +695,15 @@ public class WebServer extends MicroServiceVerticle {
 	}
 
 	private void responseHomeIndex(RoutingContext rtx) {
+		if (mvWebConfig.isEmpty()) {
+			initConfig();
+		}
 		JsonObject tmp = new JsonObject().put("config", mvWebConfig);
 		tmp.put("logindata", (JsonObject) rtx.session().get("logindata"));
 
-		vertx.fileSystem().readFile("./webroot/home.html", handler -> {
+		vertx.fileSystem().readFile("./webroot/index.html", handler -> {
 			if (handler.succeeded() && handler.result() != null) {
-				if (mvWebConfig.isEmpty()) {
-					initConfig();
-				}
+
 				Buffer z;
 				String x = "<script>window._SURVEYCONFIG_= " + Json.encode(tmp) + "</script>";
 				io.vertx.core.buffer.Buffer bf = handler.result();

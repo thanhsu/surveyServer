@@ -11,6 +11,8 @@ import com.survey.internal.action.AddFavouriteSurveyAction;
 import com.survey.internal.action.AnswerSurveyAction;
 import com.survey.internal.action.CancelCashAction;
 import com.survey.internal.action.CashEnquiryAction;
+import com.survey.internal.action.CashTranserAction;
+import com.survey.internal.action.CashTransferEnquiryAction;
 import com.survey.internal.action.ChangePasswordAction;
 import com.survey.internal.action.CheckPermissionAnswerSurveyAction;
 import com.survey.internal.action.CopySurveyAction;
@@ -31,6 +33,7 @@ import com.survey.internal.action.RetrieveConfigAction;
 import com.survey.internal.action.RetrievePointValueAction;
 import com.survey.internal.action.RetrieveSurveyAction;
 import com.survey.internal.action.RetrieveSurveyAnsweredAction;
+import com.survey.internal.action.RetrieveSurveyBaseInfoAction;
 import com.survey.internal.action.RetrieveUserinfoAction;
 import com.survey.internal.action.Testing;
 import com.survey.internal.action.UpdateSurveyDataAction;
@@ -80,8 +83,13 @@ public class SurveyProcessConstant {
 		mvActionMapping.put("cashenquiry", new CashEnquiryAction());
 		mvActionMapping.put("cancelcash", new CancelCashAction());
 		mvActionMapping.put("payment", new PaymentAction());
+		//-- Cash transfer
+		mvActionMapping.put("cashtransfer", new CashTranserAction());
+		
+		mvActionMapping.put("cashtransferenquiry", new CashTransferEnquiryAction());
 		// 4
 		mvActionMapping.put("retrievesurvey", new RetrieveSurveyAction());
+		mvActionMapping.put("retrievesurveybaseinfo", new RetrieveSurveyBaseInfoAction());
 		mvActionMapping.put("copysurvey", new CopySurveyAction());
 		mvActionMapping.put("newsurvey", new NewSurveyAction());
 		mvActionMapping.put("updatesurvey", new UpdateSurveyDataAction());

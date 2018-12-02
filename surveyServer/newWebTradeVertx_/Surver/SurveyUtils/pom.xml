@@ -77,7 +77,7 @@
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-databind</artifactId>
-			<version>2.9.5</version>
+			<version>2.9.7</version>
 		</dependency>
 
 		<!-- <dependency> <groupId>com.net.sf.json-lib</groupId> <artifactId>Json-lib</artifactId> 
@@ -101,4 +101,5 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
+	
 </project>
