@@ -3,6 +3,7 @@ package com.survey.internal.action;
 import com.survey.constant.EventBusDiscoveryConst;
 import com.survey.dbservice.dao.ProxyLogDao;
 import com.survey.dbservice.dao.UserDao;
+import com.survey.etheaction.ProxyActiveUser;
 import com.survey.utils.CodeMapping;
 import com.survey.utils.FieldName;
 import com.survey.utils.MessageDefault;
@@ -34,12 +35,21 @@ public class ActiveUserAction extends InternalSurveyBaseAction {
 							Future<JsonObject> lvProxyResult = Future.future();
 							JsonObject rq = new JsonObject().put(FieldName.ACTION, "createaccount")
 									.put(FieldName.USERNAME, username).put(FieldName.EMAIL, email);
-							VertxServiceCenter.getInstance().sendNewMessage(
-									EventBusDiscoveryConst.ETHEREUMPROXYDISCOVERY.name(), rq, lvProxyResult);
+						
 							lvProxyResult.setHandler(x -> {
 								ProxyLogDao lvDao = new ProxyLogDao();
 								lvDao.storeNewRequest("createaccount", rq, lvProxyResult.result());
+								if(lvProxyResult.result()!=null) {
+									String code  = lvProxyResult.result().getString(FieldName.CODE)==null?"":lvProxyResult.result().getString(FieldName.CODE);
+									if(!code.equals("E200")) {
+										UserDao lvUserDao2 = new UserDao();
+										lvUserDao2.updateStatus(username, "R");
+									}
+								}
 							});
+							
+							ProxyActiveUser lvProxyActiveUser = new ProxyActiveUser(username, email);
+							lvProxyActiveUser.sendToProxyServer(lvProxyResult);
 						});
 					} else {
 						response.complete(

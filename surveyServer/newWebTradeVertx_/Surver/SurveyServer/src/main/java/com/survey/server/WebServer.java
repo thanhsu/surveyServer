@@ -328,7 +328,7 @@ public class WebServer extends MicroServiceVerticle {
 						});
 
 					} else {
-						doResponse(pvRtx, MessageDefault.RequestFailed(resultHandler.cause().getMessage()));
+						doResponse(pvRtx, MessageDefault.RequestFailed("Service is unavailable"));
 					}
 				});
 

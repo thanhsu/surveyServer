@@ -29,7 +29,7 @@ public class CheckPermissionAnswerSurveyAction extends InternalSurveyBaseAction 
 			if (handler.succeeded()) {
 				JsonObject msg = handler.result();
 				if (msg.getString(FieldName.CODE).equals("E200")) {
-					double surveyBalance = Double.parseDouble(msg.getValue(FieldName.BALANCE).toString());
+					double surveyBalance = Double.parseDouble(msg.getJsonObject(FieldName.DATA).getValue(FieldName.BALANCE).toString());
 					//Need check with point/1_answer
 					if(surveyBalance>0) {
 						SurveyDao lvDao = new SurveyDao();

@@ -1,14 +1,14 @@
 package com.survey.internal.action;
 
-import com.survey.constant.EventBusDiscoveryConst;
-import com.survey.utils.VertxServiceCenter;
+import com.survey.etheaction.ProxyAccountBalance;
+import com.survey.utils.FieldName;
 
 public class AccountBalanceProxyAction extends InternalSurveyBaseAction {
 
 	@Override
 	public void doProccess() {
-		VertxServiceCenter.getInstance().sendNewMessage(EventBusDiscoveryConst.ETHEREUMPROXYDISCOVERY.name(),
-				getMessageBody(), response);
+		ProxyAccountBalance lvProxyAccountBalance = new ProxyAccountBalance(getMessageBody().getString(FieldName.USERNAME));
+		lvProxyAccountBalance.sendToProxyServer(response);
 	}
 
 }

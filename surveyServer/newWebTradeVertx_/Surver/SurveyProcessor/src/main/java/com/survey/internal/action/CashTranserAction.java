@@ -18,8 +18,9 @@ public class CashTranserAction extends InternalSurveyBaseAction {
 		ProxyAccountBalance lvAccountBalance = new ProxyAccountBalance(username);
 		lvAccountBalance.sendToProxyServer().setHandler(handler -> {
 			if (handler.succeeded()) {
-				if (handler.result().getString(FieldName.CODE).equals("E0000")) {
-					double accountBalance = Double.parseDouble(handler.result().getValue(FieldName.BALANCE).toString());
+				if (handler.result().getString(FieldName.CODE).equals("E200")) {
+					double accountBalance = Double.parseDouble(
+							handler.result().getJsonObject(FieldName.DATA).getValue(FieldName.BALANCE).toString());
 					if (amount > accountBalance) {
 						this.CompleteGenerateResponse(CodeMapping.T1111.name(), CodeMapping.T1111.value(),
 								handler.result(), response);
@@ -29,9 +30,10 @@ public class CashTranserAction extends InternalSurveyBaseAction {
 							if (userState.succeeded()) {
 								if (userState.result().equals("A") || userState.result().equals("N")) {
 									CashTransactionDao lvCashTransactionDao = new CashTransactionDao();
-									lvCashTransactionDao.createCashTransferOut(username, toUsername, amount, remark).setHandler(trans->{
-										
-									});
+									lvCashTransactionDao.createCashTransferOut(username, toUsername, amount, remark)
+											.setHandler(trans -> {
+
+											});
 								} else {
 									this.CompleteGenerateResponse(CodeMapping.T2222.name(), CodeMapping.T2222.value(),
 											null, response);

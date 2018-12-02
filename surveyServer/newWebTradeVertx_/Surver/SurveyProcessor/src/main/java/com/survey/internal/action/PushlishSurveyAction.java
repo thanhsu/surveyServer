@@ -1,5 +1,7 @@
 package com.survey.internal.action;
 
+import org.omg.CORBA.FieldNameHelper;
+
 import com.survey.constant.EventBusDiscoveryConst;
 import com.survey.dbservice.dao.ProxyLogDao;
 import com.survey.dbservice.dao.SurveyDao;
@@ -51,7 +53,7 @@ public class PushlishSurveyAction extends InternalSurveyBaseAction {
 				}
 				JsonObject accountbalance = handler.result().getJsonObject(FieldName.DATA);
 				if (accountbalance.getValue("success").toString().equals("1")) {
-					float balance = Float.parseFloat(accountbalance.getString("balance"));
+					float balance = Float.parseFloat(accountbalance.getString(FieldName.BALANCE));
 					if (balance < initialFund) {
 						this.CompleteGenerateResponse(CodeMapping.S7777.toString(), CodeMapping.S7777.value(),
 								getMessageBody().put("accountbalance", accountbalance), response);

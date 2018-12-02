@@ -55,14 +55,27 @@ public class VertxServiceCenter {
 							VertxServiceCenter.getEventbus().<JsonObject>send(
 									record.getLocation().getString("endpoint"), eventBusMessage, rs -> {
 										if (rs.succeeded()) {
-											responseHandler.complete(rs.result().body());
+											JsonObject lvRes = new JsonObject();
+											if (rs.result().body().getString(FieldName.CODE).equals("E200")) {
+												lvRes.put(FieldName.CODE, CodeMapping.P0000.name());
+												lvRes.put(FieldName.MESSAGE, CodeMapping.P0000.value()).put(
+														FieldName.DATA,
+														rs.result().body().getJsonObject(FieldName.DATA));
+
+												responseHandler.complete(lvRes);
+											} else {
+												lvRes.put(FieldName.CODE, CodeMapping.P2222.name());
+												lvRes.put(FieldName.MESSAGE, CodeMapping.P2222.value())
+														.put(FieldName.DATA, rs.result().body());
+												responseHandler.complete(lvRes);
+											}
 										} else {
 											responseHandler.fail(rs.cause().getMessage());
 										}
 									});
 						} else {
 							responseHandler.fail(event.cause());
-							/*responseHandler.completer();*/
+							/* responseHandler.completer(); */
 						}
 					}
 				});
