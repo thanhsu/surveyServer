@@ -241,6 +241,8 @@ public class WebServer extends MicroServiceVerticle {
 									Session session = pvRtx.session();
 									session.data().put("logindata", resp.getValue("data"));
 									session.data().put(FieldName.USERNAME, messageBody.getString(FieldName.USERNAME));
+									session.data().put(FieldName.USERID,
+											resp.getJsonObject(FieldName.DATA).getString(FieldName._ID));
 									loginSuccessResponse(pvRtx, resp, pvRtx.session().id());
 								} else {
 									doResponseNoRenewCookie(pvRtx, Json.encodePrettily(resp));
@@ -262,6 +264,10 @@ public class WebServer extends MicroServiceVerticle {
 		String actionName = pvRtx.pathParam("action");
 		if (isDebug) {
 			JsonObject messageBody = pvRtx.getBodyAsJson();
+			if (pvRtx.session().get(FieldName.USERID) != null) {
+				messageBody.put(FieldName.USERID, pvRtx.session().get(FieldName.USERID).toString());
+			}
+
 			messageBody.put("action", pvRtx.pathParam("action"));
 			handlerAction(pvRtx, messageBody);
 			return;
@@ -302,11 +308,14 @@ public class WebServer extends MicroServiceVerticle {
 				return;
 
 			} else {
+				if (pvRtx.session().get(FieldName.USERID) != null) {
+					messageBody.put(FieldName.USERID, pvRtx.session().get(FieldName.USERID).toString());
+				}
 				messageBody.put(FieldName.USERID,
 						pvRtx.session().get(FieldName.USERNAME).equals(messageBody.getString(FieldName._ID)));
 			}
 			// Check Message
-			messageBody.put("action",actionName);
+			messageBody.put("action", actionName);
 
 			handlerAction(pvRtx, messageBody);
 		}
@@ -319,15 +328,16 @@ public class WebServer extends MicroServiceVerticle {
 				resultHandler -> {
 					if (resultHandler.succeeded() && resultHandler.result() != null) {
 						Record record = resultHandler.result();
-						mvEventBus.<JsonObject>send(record.getLocation().getString("endpoint"), messageBody,new DeliveryOptions().setSendTimeout(180000), res -> {
-							if (res.succeeded()) {
-								JsonObject resp = res.result().body();
-								doResponseNoRenewCookie(pvRtx, Json.encodePrettily(resp));
-							} else {
-								doResponse(pvRtx, MessageDefault.RequestFailed(CodeMapping.C1111.toString(),
-										res.cause().getMessage()));
-							}
-						});
+						mvEventBus.<JsonObject>send(record.getLocation().getString("endpoint"), messageBody,
+								new DeliveryOptions().setSendTimeout(180000), res -> {
+									if (res.succeeded()) {
+										JsonObject resp = res.result().body();
+										doResponseNoRenewCookie(pvRtx, Json.encodePrettily(resp));
+									} else {
+										doResponse(pvRtx, MessageDefault.RequestFailed(CodeMapping.C1111.toString(),
+												res.cause().getMessage()));
+									}
+								});
 
 					} else {
 						doResponse(pvRtx, MessageDefault.RequestFailed("Service is unavailable"));
@@ -481,30 +491,69 @@ public class WebServer extends MicroServiceVerticle {
 			doResponse(rtx, MessageDefault.ActionNotFound());
 			return;
 		}
-		String discoveryKey = BANKGATEWAYDISCOVERY.get(method);
 		JsonObject messageBody = rtx.getBodyAsJson();
-		messageBody.put(FieldName.METHOD, method);
-		messageBody.put("action", "payment");
-		messageBody.put(FieldName.DW, action);
-		messageBody.put(FieldName.DISCOVERYKEY, discoveryKey);
-		discovery.getRecord(
-				new JsonObject().put("name", EventBusDiscoveryConst.SURVEYINTERNALPROCESSORTDISCOVERY.toString()),
-				resultHandler -> {
-					if (resultHandler.succeeded() && resultHandler.result() != null) {
-						Record record = resultHandler.result();
-						mvEventBus.<JsonObject>send(record.getLocation().getString("endpoint"), messageBody, res -> {
-							if (res.succeeded()) {
-								JsonObject resp = res.result().body();
-								doResponseNoRenewCookie(rtx, Json.encodePrettily(resp));
-							} else {
-								doResponse(rtx, MessageDefault.RequestFailed(CodeMapping.C1111.toString(),
-										res.cause().getMessage()));
-							}
-						});
-					} else {
-						doResponse(rtx, MessageDefault.RequestFailed(resultHandler.cause().getMessage()));
-					}
-				});
+		if (isDebug) {
+			if (rtx.session().get(FieldName.USERID) != null) {
+				messageBody.put(FieldName.USERID, rtx.session().get(FieldName.USERID).toString());
+			}
+			String discoveryKey = BANKGATEWAYDISCOVERY.get(method);
+			messageBody.put(FieldName.METHOD, method);
+			messageBody.put("action", "payment");
+			messageBody.put(FieldName.DW, action);
+			messageBody.put(FieldName.DISCOVERYKEY, discoveryKey);
+			discovery.getRecord(
+					new JsonObject().put("name", EventBusDiscoveryConst.SURVEYINTERNALPROCESSORTDISCOVERY.toString()),
+					resultHandler -> {
+						if (resultHandler.succeeded() && resultHandler.result() != null) {
+							Record record = resultHandler.result();
+							mvEventBus.<JsonObject>send(record.getLocation().getString("endpoint"), messageBody,
+									res -> {
+										if (res.succeeded()) {
+											JsonObject resp = res.result().body();
+											doResponseNoRenewCookie(rtx, Json.encodePrettily(resp));
+										} else {
+											doResponse(rtx, MessageDefault.RequestFailed(CodeMapping.C1111.toString(),
+													res.cause().getMessage()));
+										}
+									});
+						} else {
+							doResponse(rtx, MessageDefault.RequestFailed(resultHandler.cause().getMessage()));
+						}
+					});
+		} else {
+			if (rtx.session() == null) {
+				sendCheckAuthFail(rtx);
+				return;
+			} else if (rtx.session().get(FieldName.USERNAME) == null) {
+				sendCheckAuthFail(rtx);
+				return;
+			}
+			String discoveryKey = BANKGATEWAYDISCOVERY.get(method);
+			messageBody.put(FieldName.METHOD, method);
+			messageBody.put("action", "payment");
+			messageBody.put(FieldName.DW, action);
+			messageBody.put(FieldName.DISCOVERYKEY, discoveryKey);
+			discovery.getRecord(
+					new JsonObject().put("name", EventBusDiscoveryConst.SURVEYINTERNALPROCESSORTDISCOVERY.toString()),
+					resultHandler -> {
+						if (resultHandler.succeeded() && resultHandler.result() != null) {
+							Record record = resultHandler.result();
+							mvEventBus.<JsonObject>send(record.getLocation().getString("endpoint"), messageBody,
+									res -> {
+										if (res.succeeded()) {
+											JsonObject resp = res.result().body();
+											doResponseNoRenewCookie(rtx, Json.encodePrettily(resp));
+										} else {
+											doResponse(rtx, MessageDefault.RequestFailed(CodeMapping.C1111.toString(),
+													res.cause().getMessage()));
+										}
+									});
+						} else {
+							doResponse(rtx, MessageDefault.RequestFailed(resultHandler.cause().getMessage()));
+						}
+					});
+		}
+
 		// discovery.getRecord(new JsonObject().put("name", discoveryKey), resultHandler
 		// -> {
 		// if (resultHandler.succeeded() && resultHandler.result() != null) {

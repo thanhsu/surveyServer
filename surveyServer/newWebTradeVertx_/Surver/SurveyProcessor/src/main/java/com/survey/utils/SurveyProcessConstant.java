@@ -10,12 +10,14 @@ import com.survey.confirm.actions.ConfirmSurveyAnswer;
 import com.survey.confirm.actions.ConfirmSurveyDeposit;
 import com.survey.confirm.actions.ConfirmSurveyWithdraw;
 import com.survey.confirm.actions.ConfirmTransaction;
+import com.survey.dbservice.dao.CreateNewBank;
 import com.survey.internal.action.AccountBalanceProxyAction;
 import com.survey.internal.action.ActiveUserAction;
 import com.survey.internal.action.AddFavouriteSurveyAction;
 import com.survey.internal.action.AnswerSurveyAction;
 import com.survey.internal.action.CancelCashAction;
 import com.survey.internal.action.CashEnquiryAction;
+import com.survey.internal.action.CashManualDeposit;
 import com.survey.internal.action.CashTranserAction;
 import com.survey.internal.action.CashTransferEnquiryAction;
 import com.survey.internal.action.ChangePasswordAction;
@@ -93,6 +95,8 @@ public class SurveyProcessConstant {
 		mvActionMapping.put("cashenquiry", new CashEnquiryAction());
 		mvActionMapping.put("cancelcash", new CancelCashAction());
 		mvActionMapping.put("payment", new PaymentAction());
+		mvActionMapping.put("manualdeposit", new CashManualDeposit());
+		
 		//-- Cash transfer
 		mvActionMapping.put("cashtransfer", new CashTranserAction());
 		
@@ -113,6 +117,7 @@ public class SurveyProcessConstant {
 		mvActionMapping.put("removefavouritesurvey",new RemoveFavouriteSurveyAction());
 		mvActionMapping.put("retrievesurveyresponse", new RetrieveSurveyAnsweredAction());
 		//5
+		mvActionMapping.put("addbank",new CreateNewBank());
 		
 	}
 

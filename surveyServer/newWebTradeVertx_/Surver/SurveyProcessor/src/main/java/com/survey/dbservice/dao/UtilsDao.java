@@ -130,9 +130,9 @@ public class UtilsDao extends SurveyBaseDao {
 		this.setCollectionName(EthereumPointValue);
 		this.queryDocument(new JsonObject().put(FieldName.ISHISTORY, isHistory), handler -> {
 			if (handler.succeeded()) {
-				this.CompleteGenerateResponse("0000", "", handler.result());
+				this.CompleteGenerateResponse("C0000", "", handler.result());
 			} else {
-				this.CompleteGenerateResponse("1111", handler.cause().getMessage(), null);
+				this.CompleteGenerateResponse("C1111", handler.cause().getMessage(), null);
 			}
 		});
 		return mvFutureResponse;
@@ -142,9 +142,9 @@ public class UtilsDao extends SurveyBaseDao {
 		this.setCollectionName(CashMethodCollectionName);
 		this.queryDocument(new JsonObject().put(FieldName.STATUS, "N"), handler -> {
 			if (handler.succeeded()) {
-				this.CompleteGenerateResponse("0000", "", handler.result());
+				this.CompleteGenerateResponse("C0000", "", handler.result());
 			} else {
-				this.CompleteGenerateResponse("1111", handler.cause().getMessage(), null);
+				this.CompleteGenerateResponse("C1111", handler.cause().getMessage(), null);
 			}
 		});
 		return mvFutureResponse;

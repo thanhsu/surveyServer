@@ -24,7 +24,9 @@ public class DepositAction extends InternalSurveyBaseAction {
 	public void doProccess() {
 		CashDepositDao lvCashDepositDao = new CashDepositDao();
 		String userid = getMessageBody().getString(FieldName.USERID);
-
+		if(userid==null) {
+			this.response.complete(MessageDefault.SessionTimeOut());
+		}
 		UtilsDao lvUtilsDao = new UtilsDao();
 		lvUtilsDao.retrieveEthePointValue(false).setHandler(point -> {
 			try {

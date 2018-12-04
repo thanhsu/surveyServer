@@ -11,6 +11,7 @@ public enum CodeMapping {
 	C7777("Session Timeout"),
 	
 	D1111("Deposit Not Found"),
+	D2222("Service unavailable"),
 	
 	U0000("Everythings ok"),
 	U1111("Username not found"),

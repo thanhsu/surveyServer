@@ -15,7 +15,7 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.ext.mongo.MongoClientDeleteResult;
 import io.vertx.ext.mongo.UpdateOptions;
 
-public class SurveyBaseDao {
+public abstract class SurveyBaseDao {
 
 	protected Future<JsonObject> mvFutureResponse = Future.future();
 

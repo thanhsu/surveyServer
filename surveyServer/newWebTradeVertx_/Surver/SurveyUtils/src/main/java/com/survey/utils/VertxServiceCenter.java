@@ -46,7 +46,8 @@ public class VertxServiceCenter {
 		sharedData = vertx.sharedData();
 	}
 
-	public void sendNewMessage(String discoveryName, JsonObject eventBusMessage, Future<JsonObject> responseHandler) {
+	public void sendNewMessageProxy(String discoveryName, JsonObject eventBusMessage,
+			Future<JsonObject> responseHandler) {
 		VertxServiceCenter.getInstance().getDiscovery().getRecord(new JsonObject().put("name", discoveryName),
 				new Handler<AsyncResult<Record>>() {
 					@Override
@@ -54,7 +55,8 @@ public class VertxServiceCenter {
 						if (event.succeeded() && event.result() != null) {
 							Record record = event.result();
 							VertxServiceCenter.getEventbus().<JsonObject>send(
-									record.getLocation().getString("endpoint"), eventBusMessage, new DeliveryOptions().setSendTimeout(100000),rs -> {
+									record.getLocation().getString("endpoint"), eventBusMessage,
+									new DeliveryOptions().setSendTimeout(100000), rs -> {
 										if (rs.succeeded()) {
 											JsonObject lvRes = new JsonObject();
 											if (rs.result().body().getString(FieldName.CODE).equals("E200")) {
@@ -70,6 +72,31 @@ public class VertxServiceCenter {
 														.put(FieldName.DATA, rs.result().body());
 												responseHandler.complete(lvRes);
 											}
+										} else {
+											responseHandler.fail(rs.cause().getMessage());
+										}
+									});
+						} else {
+							responseHandler.fail(event.cause());
+							/* responseHandler.completer(); */
+						}
+					}
+				});
+	}
+
+	public void sendNewMessage(String discoveryName, JsonObject eventBusMessage, Future<JsonObject> responseHandler) {
+		VertxServiceCenter.getInstance().getDiscovery().getRecord(new JsonObject().put("name", discoveryName),
+				new Handler<AsyncResult<Record>>() {
+					@Override
+					public void handle(AsyncResult<Record> event) {
+						if (event.succeeded() && event.result() != null) {
+							Record record = event.result();
+							VertxServiceCenter.getEventbus().<JsonObject>send(
+									record.getLocation().getString("endpoint"), eventBusMessage,
+									new DeliveryOptions().setSendTimeout(100000), rs -> {
+										if (rs.succeeded()) {
+											JsonObject lvRes =rs.result().body();
+											responseHandler.complete(lvRes);
 										} else {
 											responseHandler.fail(rs.cause().getMessage());
 										}

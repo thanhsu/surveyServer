@@ -50,7 +50,7 @@ public class PaymentAction extends InternalSurveyBaseAction {
 									CashTransactionDao lvCashTransactionDao = new CashTransactionDao();
 									lvCashTransactionDao.newTransaction(username, trandID, "D",
 											lvRes.getJsonObject("data"), "P");
-									this.response.complete(lvRes);
+									this.CompleteGenerateResponse(CodeMapping.C0000.name(), "OK", lvRes, response);
 								} else {
 									this.response.complete(MessageDefault.RequestFailed(res.cause().getMessage()));
 								}

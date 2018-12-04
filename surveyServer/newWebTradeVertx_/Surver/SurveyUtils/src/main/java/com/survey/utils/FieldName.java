@@ -98,6 +98,7 @@ public class FieldName {
 	public static final String CLIENT_TOKEN = "client_token";
 	public static final String AVATAR = "avatar";
 	public static final String IMAGEID = "imageid";
+	public static final String IMAGE = "image";
 	public static final String PUSHLISHREJECTCAUSE = "pushlishrejectcause";
 	public static final String RESPONSE = "response";
 	public static final String ENDLESS = "endless";
@@ -130,4 +131,11 @@ public class FieldName {
 	public static final String TOTALSURVEYBALANCE ="totalsurveybalance";
 	public static final String ACCOUNTBALANCE="accountbalance";
 	public static final String RESULT="result";
+	public static final String BANKID="bankid";
+	public static final String BANKNAME="bankname";
+	public static final String BANKACCOUNTCODE="bankaccountcode";
+	public static final String BANKACCOUNTADDRESS="bankaccountaddress";
+	public static final String BANKACCOUNTNAME="bankaccountname";
+	public static final String LISTBANK="listbank";
+	public static final String REGEXTRANSFERREMARK="regextransferremark";
 }

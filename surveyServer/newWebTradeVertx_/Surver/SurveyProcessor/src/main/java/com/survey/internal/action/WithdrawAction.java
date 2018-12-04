@@ -11,6 +11,7 @@ import javax.crypto.NoSuchPaddingException;
 import com.survey.constant.EventBusDiscoveryConst;
 import com.survey.dbservice.dao.CashWithdrawDao;
 import com.survey.dbservice.dao.UtilsDao;
+import com.survey.etheaction.ProxyAccountBalance;
 import com.survey.utils.CodeMapping;
 import com.survey.utils.FieldName;
 import com.survey.utils.MessageDefault;
@@ -30,11 +31,13 @@ public class WithdrawAction extends InternalSurveyBaseAction {
 		int amount = getMessageBody().getInteger(FieldName.AMOUNT);
 		// Check balance
 		Future<JsonObject> lvGetAccountBalance = Future.future();
-		VertxServiceCenter.getInstance().sendNewMessage(EventBusDiscoveryConst.ETHEREUMPROXYDISCOVERY.name(),
-				getMessageBody(), lvGetAccountBalance);
+		ProxyAccountBalance lvProxyAccountBalance = new ProxyAccountBalance(username);
+		lvProxyAccountBalance.sendToProxyServer(lvGetAccountBalance);
+
 		lvGetAccountBalance.setHandler(balance -> {
 			if (balance.succeeded()) {
-				double etheAmount = balance.result().getDouble("balance");
+				double etheAmount = Double
+						.parseDouble(balance.result().getJsonObject(FieldName.DATA).getValue("balance").toString());
 				if (Utils.checkWithdraw(amount, etheAmount)) {
 					CashWithdrawDao lvCashWithdrawDao = new CashWithdrawDao();
 					UtilsDao lvUtilsDao = new UtilsDao();
@@ -45,8 +48,7 @@ public class WithdrawAction extends InternalSurveyBaseAction {
 
 							lvCashWithdrawDao
 									.storeNewWithdrawRequest(userid, privateToken, "",
-											getMessageBody().getInteger(FieldName.AMOUNT),
-											getMessageBody().getString(FieldName.CCY),
+											getMessageBody().getInteger(FieldName.AMOUNT), "",
 											getMessageBody().getString(FieldName.REMARK), false, exchangeRate)
 									.setHandler(handler -> {
 										if (handler.succeeded()) {
@@ -81,9 +83,9 @@ public class WithdrawAction extends InternalSurveyBaseAction {
 					UtilsDao lvUtilsDao = new UtilsDao();
 					lvUtilsDao.retrieveEthePointValue(false).setHandler(point -> {
 						try {
-							String exchangeRate = point.result().getString(FieldName.VALUE);
+							String exchangeRate = point.result().getJsonArray(FieldName.DATA).getJsonObject(0).getString(FieldName.VALUE);
 							String privateToken = RSAEncrypt.getIntance().encrypt(userid);
-							float rate = Float.parseFloat(exchangeRate);
+							double rate = Double.parseDouble(exchangeRate);
 							lvCashWithdrawDao
 									.storeNewWithdrawRequest(userid, privateToken, "",
 											getMessageBody().getInteger(FieldName.AMOUNT),
