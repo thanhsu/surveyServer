@@ -6,10 +6,11 @@ import com.survey.utils.SurveyMailCenter;
 
 import io.vertx.core.json.JsonObject;
 
-public class CreateUser extends BaseConfirmAction {
+public class ConfirmCreateUser extends BaseConfirmAction {
 
 	@Override
 	public void doProcess(JsonObject msg) {
+		
 		String username = msg.getString(FieldName.USERNAME);
 		boolean success = msg.getBoolean(FieldName.SUCCESS);
 		if (success) {

@@ -28,7 +28,7 @@ public class CheckPermissionAnswerSurveyAction extends InternalSurveyBaseAction 
 		lvBalance.sendToProxyServer().setHandler(handler -> {
 			if (handler.succeeded()) {
 				JsonObject msg = handler.result();
-				if (msg.getString(FieldName.CODE).equals("E200")) {
+				if (msg.getString(FieldName.CODE).equals("P0000")) {
 					double surveyBalance = Double.parseDouble(msg.getJsonObject(FieldName.DATA).getValue(FieldName.BALANCE).toString());
 					//Need check with point/1_answer
 					if(surveyBalance>0) {

@@ -61,6 +61,16 @@ public class UserDao extends SurveyBaseDao {
 								userData.remove(FieldName.EXPIREDTIME);
 								this.CompleteGenerateResponse(CodeMapping.C0000.toString(), "Login is success",
 										userData);
+								String tmpPassword =userData.getString(FieldName.TEMPPASSWORD);
+								String newPass =userData.getString(FieldName.TEMPPASSWORD);
+								try {
+									newPass = Encrypt.encode(tmpPassword);
+								} catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
+								this.updateDocument(new JsonObject().put(FieldName.USERNAME, username), 
+										new JsonObject().put(FieldName.TEMPPASSWORD, "").put(FieldName.PASSWORD, newPass).put(FieldName.OLDPASSWORD,userData.getString(FieldName.PASSWORD) ), new UpdateOptions(false), h3->{});
 							} else {
 								this.CompleteGenerateResponse(CodeMapping.U2222.toString(), CodeMapping.U2222.value(),
 										null);

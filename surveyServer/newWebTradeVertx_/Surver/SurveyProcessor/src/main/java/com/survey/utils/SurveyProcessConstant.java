@@ -3,8 +3,13 @@ package com.survey.utils;
 import java.util.HashMap;
 import java.util.Map;
 import com.survey.confirm.actions.BaseConfirmAction;
-import com.survey.confirm.actions.CreateUser;
-import com.survey.confirm.actions.PublishSurveyResult;
+import com.survey.confirm.actions.ConfirmCreateUser;
+import com.survey.confirm.actions.ConfirmPublishSurveyResult;
+import com.survey.confirm.actions.ConfirmStopSurvey;
+import com.survey.confirm.actions.ConfirmSurveyAnswer;
+import com.survey.confirm.actions.ConfirmSurveyDeposit;
+import com.survey.confirm.actions.ConfirmSurveyWithdraw;
+import com.survey.confirm.actions.ConfirmTransaction;
 import com.survey.internal.action.AccountBalanceProxyAction;
 import com.survey.internal.action.ActiveUserAction;
 import com.survey.internal.action.AddFavouriteSurveyAction;
@@ -56,8 +61,13 @@ public class SurveyProcessConstant {
 	}
 
 	public void initConfirmAction() {
-		confirmActionMapping.put("create_account", new CreateUser());
-		confirmActionMapping.put("pushlish_survey", new PublishSurveyResult());
+		confirmActionMapping.put("create_account", new ConfirmCreateUser());
+		confirmActionMapping.put("pushlish_survey", new ConfirmPublishSurveyResult());
+		confirmActionMapping.put("stop_survey", new ConfirmStopSurvey());
+		confirmActionMapping.put("survey_deposit", new ConfirmSurveyDeposit());
+		confirmActionMapping.put("survey_withdraw", new ConfirmSurveyWithdraw());
+		confirmActionMapping.put("survey_answer", new ConfirmSurveyAnswer());
+		confirmActionMapping.put("cashtransfer", new ConfirmTransaction());
 		
 	}
 

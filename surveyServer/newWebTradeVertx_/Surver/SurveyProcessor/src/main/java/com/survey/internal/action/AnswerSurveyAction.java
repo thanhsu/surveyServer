@@ -77,7 +77,7 @@ public class AnswerSurveyAction extends InternalSurveyBaseAction {
 											lvProxySurveyAnswer.sendToProxyServer().setHandler(h3 -> {
 												if (h3.succeeded()) {
 													JsonObject etheResponse = h3.result();
-													if (!etheResponse.getString(FieldName.CODE).equals("E200")) {
+													if (!etheResponse.getString(FieldName.CODE).equals("P0000")) {
 														CashDepositDao lvDao = new CashDepositDao();
 														lvDao.updateDeposit(transid, "C", "U", etheResponse.getString(FieldName.CODE));
 													}

@@ -10,6 +10,7 @@ import com.survey.utils.MessageDefault;
 import com.survey.utils.VertxServiceCenter;
 
 import io.vertx.core.Future;
+import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonObject;
 
 public class ActiveUserAction extends InternalSurveyBaseAction {
@@ -29,25 +30,28 @@ public class ActiveUserAction extends InternalSurveyBaseAction {
 						UserDao lvUserDao1 = new UserDao();
 						final String username = getMessageBody().getString(FieldName.USERNAME);
 						final String email = getMessageBody().getString(FieldName.EMAIL);
-						lvUserDao1.updateStatus(getMessageBody().getString(FieldName.USERNAME), "N");
+						lvUserDao1.updateStatus(getMessageBody().getString(FieldName.USERNAME), "P");
 						lvUserDao1.getMvFutureResponse().setHandler(handlerx -> {
 							response.complete(handlerx.result());
 							Future<JsonObject> lvProxyResult = Future.future();
 							JsonObject rq = new JsonObject().put(FieldName.ACTION, "createaccount")
 									.put(FieldName.USERNAME, username).put(FieldName.EMAIL, email);
-						
+
 							lvProxyResult.setHandler(x -> {
 								ProxyLogDao lvDao = new ProxyLogDao();
 								lvDao.storeNewRequest("createaccount", rq, lvProxyResult.result());
-								if(lvProxyResult.result()!=null) {
-									String code  = lvProxyResult.result().getString(FieldName.CODE)==null?"":lvProxyResult.result().getString(FieldName.CODE);
-									if(!code.equals("E200")) {
+								if (lvProxyResult.result() != null) {
+									String code = lvProxyResult.result().getString(FieldName.CODE) == null ? ""
+											: lvProxyResult.result().getString(FieldName.CODE);
+									if (!code.equals("P0000")) {
 										UserDao lvUserDao2 = new UserDao();
 										lvUserDao2.updateStatus(username, "R");
+									} else {
+										System.out.println("Request create user success"+ Json.encode(lvProxyResult.result()));
 									}
 								}
 							});
-							
+
 							ProxyActiveUser lvProxyActiveUser = new ProxyActiveUser(username, email);
 							lvProxyActiveUser.sendToProxyServer(lvProxyResult);
 						});

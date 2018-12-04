@@ -18,7 +18,7 @@ public class CashTranserAction extends InternalSurveyBaseAction {
 		ProxyAccountBalance lvAccountBalance = new ProxyAccountBalance(username);
 		lvAccountBalance.sendToProxyServer().setHandler(handler -> {
 			if (handler.succeeded()) {
-				if (handler.result().getString(FieldName.CODE).equals("E200")) {
+				if (handler.result().getString(FieldName.CODE).equals("P0000")) {
 					double accountBalance = Double.parseDouble(
 							handler.result().getJsonObject(FieldName.DATA).getValue(FieldName.BALANCE).toString());
 					if (amount > accountBalance) {

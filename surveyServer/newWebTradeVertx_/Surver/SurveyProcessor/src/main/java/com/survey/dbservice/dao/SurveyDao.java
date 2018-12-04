@@ -7,6 +7,7 @@ import java.util.List;
 
 import com.survey.constant.EventBusDiscoveryConst;
 import com.survey.constant.UserNotificationEnum;
+import com.survey.etheaction.ProxyCreateSurvey;
 import com.survey.notification.actions.NotifiSurveyStatusUpdate;
 import com.survey.utils.CodeMapping;
 import com.survey.utils.FieldName;
@@ -342,12 +343,12 @@ public class SurveyDao extends SurveyBaseDao {
 		return lvResult;
 	}
 
-	public void pushlishSurvey(String surveyID, String username, double limitResp, float pointPerOne, float initialFund,
-			boolean noti, float limitFund) {
+	public void pushlishSurvey(String surveyID, String username, double limitResp, double pointPerOne, double initialFund,
+			boolean noti, double limitFund) {
 		this.queryDocument(new JsonObject().put(FieldName._ID, surveyID), handler -> {
 			if (handler.succeeded() && handler.result() != null) {
-				if (handler.result().get(0) == null) {
-					this.CompleteGenerateResponse(CodeMapping.S1111.toString(), CodeMapping.S1111.toString(), null);
+				if (handler.result().isEmpty()) {
+					this.CompleteGenerateResponse(CodeMapping.S1111.toString(), CodeMapping.S1111.value(), null);
 				} else {
 					JsonObject surveyData = handler.result().get(0);
 					if (surveyData.getString(FieldName.USERNAME).equals(username)) {
@@ -366,9 +367,23 @@ public class SurveyDao extends SurveyBaseDao {
 								lvSurveyPushlishDao.newPushlishAction(surveyID, limitResp, pointPerOne, initialFund,
 										noti, limitFund).setHandler(push -> {
 											if (push.succeeded()) {
-												this.updateSurveyData(surveyID,
-														new JsonObject().put(FieldName.STATUS, "P")
-																.put(FieldName.PUSHLISHDATE, new Date().getTime()));
+												ProxyCreateSurvey lvProxyCreateSurvey = new ProxyCreateSurvey(surveyID, username, initialFund, limitFund, noti, pointPerOne, limitResp, push.result());
+												lvProxyCreateSurvey.sendToProxyServer().setHandler(h2->{
+													if(h2.succeeded()&&h2.result()!=null) {
+														if(h2.result().getString(FieldName.CODE).equals("P0000")) {
+															this.updateSurveyData(surveyID,
+																	new JsonObject().put(FieldName.STATUS, "P")
+																			.put(FieldName.PUSHLISHDATE, new Date().getTime()));
+														}else {
+															this.CompleteGenerateResponse(CodeMapping.P2222.toString(),
+																	CodeMapping.P2222.value(), h2.result());
+														}
+													}else {
+														this.CompleteGenerateResponse(CodeMapping.C1111.toString(),
+																CodeMapping.C1111.value(), null);
+													}
+												});
+												
 											} else {
 												this.CompleteGenerateResponse(CodeMapping.C3333.toString(),
 														CodeMapping.C3333.value(), null);
@@ -627,6 +642,16 @@ public class SurveyDao extends SurveyBaseDao {
 					}
 				});
 		return deleteResult;
+	}
+
+	public Future<List<JsonObject>> retrieveSurveyPushlished(String username) {
+		 Future<List<JsonObject>> handler = Future.future();
+		JsonObject query = new JsonObject();
+		query.put(FieldName.USERNAME, username);
+		query.put(FieldName.STATE, new JsonObject().put("$in", new JsonArray().add("A").add("C")));
+		query.put(FieldName.STATUS, new JsonObject().put("$in", new JsonArray().add("N").add("P")));
+		this.queryDocument(query, handler);
+		return handler;
 	}
 
 	private void sendNotification(String surveyID, boolean isProvate, boolean isPublic) {

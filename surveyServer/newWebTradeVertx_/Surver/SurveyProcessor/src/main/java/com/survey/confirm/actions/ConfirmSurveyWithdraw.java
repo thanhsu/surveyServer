@@ -9,7 +9,7 @@ import com.survey.utils.FieldName;
 
 import io.vertx.core.json.JsonObject;
 
-public class SurveyWithdraw extends BaseConfirmAction {
+public class ConfirmSurveyWithdraw extends BaseConfirmAction {
 
 	@Override
 	public void doProcess(JsonObject msg) {

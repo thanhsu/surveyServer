@@ -16,8 +16,8 @@ public class SurveyPushlishDao extends SurveyBaseDao {
 		setCollectionName(collectionname);
 	}
 
-	public Future<String> newPushlishAction(String surveyID, double limitResp, float pointPerOne, float initialFund,
-			boolean noti, float limitFund) {
+	public Future<String> newPushlishAction(String surveyID, double limitResp, double pointPerOne, double initialFund,
+			boolean noti, double limitFund) {
 		return this.saveDocumentReturnID(new JsonObject().put(FieldName.SURVEYID, surveyID)
 				.put(FieldName.INITIALFUND, String.valueOf(initialFund))
 				.put(FieldName.LIMITFUND, String.valueOf(limitFund))

@@ -9,11 +9,11 @@ public class ProxyCreateSurvey extends BaseEtheProxyAction {
 	private double limitfund;
 	private boolean notify;
 	private double payout;
-	private int limitresponse;
+	private double limitresponse;
 	private String pushlishID;
 
 	public ProxyCreateSurvey(String pSurveyID, String pUsername, double pInitialfund, double pLimitfund,
-			boolean pNotify, double pPayout, int pLimitResponse, String pPushlishID) {
+			boolean pNotify, double pPayout, double pLimitResponse, String pPushlishID) {
 		this.setSurveyid(pSurveyID);
 		this.setUsername(pUsername);
 		this.setInitialfund(pInitialfund);
@@ -22,6 +22,7 @@ public class ProxyCreateSurvey extends BaseEtheProxyAction {
 		this.setPayout(pPayout);
 		this.setLimitresponse(pLimitResponse);
 		this.setPushlishID(pPushlishID);
+		action = "publishsurvey";
 	}
 
 	public String getSurveyid() {
@@ -72,11 +73,11 @@ public class ProxyCreateSurvey extends BaseEtheProxyAction {
 		this.payout = payout;
 	}
 
-	public int getLimitresponse() {
+	public double getLimitresponse() {
 		return limitresponse;
 	}
 
-	public void setLimitresponse(int limitresponse) {
+	public void setLimitresponse(double limitresponse) {
 		this.limitresponse = limitresponse;
 	}
 

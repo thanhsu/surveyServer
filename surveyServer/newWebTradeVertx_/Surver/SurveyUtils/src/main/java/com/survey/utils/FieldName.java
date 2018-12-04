@@ -126,4 +126,8 @@ public class FieldName {
 	
 	public static final String CASHTRANSFERIN ="cashtransferin";
 	public static final String CASHTRANSFEROUT="cashtransferout";
+	public static final String LISTSURVEYBALANCE="listsurveybalance";
+	public static final String TOTALSURVEYBALANCE ="totalsurveybalance";
+	public static final String ACCOUNTBALANCE="accountbalance";
+	public static final String RESULT="result";
 }

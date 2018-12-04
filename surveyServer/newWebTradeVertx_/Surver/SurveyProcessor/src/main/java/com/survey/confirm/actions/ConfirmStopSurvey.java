@@ -4,7 +4,7 @@ import com.survey.utils.FieldName;
 
 import io.vertx.core.json.JsonObject;
 
-public class StopSurvey extends BaseConfirmAction {
+public class ConfirmStopSurvey extends BaseConfirmAction {
 
 	@Override
 	public void doProcess(JsonObject msg) {

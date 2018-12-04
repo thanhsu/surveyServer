@@ -8,7 +8,7 @@ import com.survey.utils.FieldName;
 
 import io.vertx.core.json.JsonObject;
 
-public class Transaction extends BaseConfirmAction {
+public class ConfirmTransaction extends BaseConfirmAction {
 
 	@Override
 	public void doProcess(JsonObject msg) {

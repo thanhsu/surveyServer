@@ -9,7 +9,7 @@ import com.survey.utils.Log;
 import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonObject;
 
-public class PublishSurveyResult extends BaseConfirmAction {
+public class ConfirmPublishSurveyResult extends BaseConfirmAction {
 
 	@Override
 	public void doProcess(JsonObject msg) {

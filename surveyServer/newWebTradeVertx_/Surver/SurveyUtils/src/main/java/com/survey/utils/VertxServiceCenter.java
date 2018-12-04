@@ -4,6 +4,7 @@ import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
+import io.vertx.core.eventbus.DeliveryOptions;
 import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.shareddata.AsyncMap;
@@ -53,7 +54,7 @@ public class VertxServiceCenter {
 						if (event.succeeded() && event.result() != null) {
 							Record record = event.result();
 							VertxServiceCenter.getEventbus().<JsonObject>send(
-									record.getLocation().getString("endpoint"), eventBusMessage, rs -> {
+									record.getLocation().getString("endpoint"), eventBusMessage, new DeliveryOptions().setSendTimeout(100000),rs -> {
 										if (rs.succeeded()) {
 											JsonObject lvRes = new JsonObject();
 											if (rs.result().body().getString(FieldName.CODE).equals("E200")) {

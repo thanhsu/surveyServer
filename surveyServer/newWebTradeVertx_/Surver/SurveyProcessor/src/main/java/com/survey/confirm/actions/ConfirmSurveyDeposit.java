@@ -11,7 +11,7 @@ import com.survey.utils.FieldName;
 
 import io.vertx.core.json.JsonObject;
 
-public class SurveyDeposit extends BaseConfirmAction {
+public class ConfirmSurveyDeposit extends BaseConfirmAction {
 
 	@Override
 	public void doProcess(JsonObject msg) {

@@ -48,7 +48,7 @@ public class ProcessorInit extends AbstractVerticle {
 			}
 		});
 
-		vertx.deployVerticle(DBServiceInit.class, new DeploymentOptions().setConfig(config()), h -> {
+		vertx.deployVerticle(DBServiceInit.class, new DeploymentOptions().setConfig(config()).setWorker(true), h -> {
 			if (h.succeeded()) {
 				Log.print("DBServiceInit init Success");
 			} else {
@@ -58,8 +58,16 @@ public class ProcessorInit extends AbstractVerticle {
 				vertx.close();
 			}
 		});
-		// vertx.deployVerticle(ServiceMailCenter.class, new
-		// DeploymentOptions().setConfig(config()));
-
+		//deploy InternalConfirmVerticle
+		vertx.deployVerticle(InternalConfirmVerticle.class, new DeploymentOptions().setConfig(config()).setWorker(true),h->{
+			if (h.succeeded()) {
+				Log.print("InternalConfirmVerticle init Success");
+			} else {
+				Log.print("InternalConfirmVerticle init Failed. Cause: " + h.cause().getMessage());
+				System.out.println("InternalConfirmVerticle init Failed. Cause: " + h.cause().getMessage());
+				System.exit(-1);
+				vertx.close();
+			}
+		});
 	}
 }

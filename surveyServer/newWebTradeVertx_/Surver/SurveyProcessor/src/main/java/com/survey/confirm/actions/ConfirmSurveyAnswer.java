@@ -6,11 +6,10 @@ import com.survey.notification.actions.NotifiCashDeposit;
 import com.survey.processor.bean.UserBalanceUpdateBean;
 import com.survey.utils.ECashDepositType;
 import com.survey.utils.FieldName;
-import io.fabric8.kubernetes.api.model.EditablePodSecurityContext;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.mongo.UpdateOptions;
 
-public class SurveyAnswer extends BaseConfirmAction {
+public class ConfirmSurveyAnswer extends BaseConfirmAction {
 
 	@Override
 	public void doProcess(JsonObject msg) {
