@@ -128,6 +128,10 @@ public class WebServer extends MicroServiceVerticle {
 		router.route("/api/image/:action").handler(this::handlerSurveyImage);
 
 		router.route("/survey/:id").handler(this::handlerGetSurvey);
+		
+		router.route("/hero/*").handler(pRoutingContext -> {
+			responseHomeIndex(pRoutingContext);
+		});
 
 		router.get("/test/:message").handler(rtx -> {
 			rtx.response().end("OK");
@@ -141,7 +145,7 @@ public class WebServer extends MicroServiceVerticle {
 					});
 		});
 
-		router.get("/m").handler(pRoutingContext -> {
+		router.get("/m/*").handler(pRoutingContext -> {
 			Session session = pRoutingContext.session();
 			if (session == null) {
 				redirectTo(pRoutingContext, "/login");
@@ -207,6 +211,7 @@ public class WebServer extends MicroServiceVerticle {
 			lvBuilder.resource(PushManager.class).httpServer(this.mvHttpServer).url("/push/:module/:action/:clientID")
 					.webroot("webroot").initParam(ApplicationConfig.WEBSOCKET_CONTENT_TYPE, "application/json")
 					.vertx(this.vertx).build();
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

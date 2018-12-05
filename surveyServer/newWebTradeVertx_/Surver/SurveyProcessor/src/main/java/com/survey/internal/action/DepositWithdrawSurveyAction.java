@@ -102,8 +102,7 @@ public class DepositWithdrawSurveyAction extends InternalSurveyBaseAction {
 									handler1.result());
 						});
 						SurveyDao lvSurveyDao = new SurveyDao();
-						lvSurveyDao.closesurvey(username, getMessageBody().getString(FieldName.USERID), surveyID, true,
-								remark);
+						lvSurveyDao.closesurvey(username, surveyID, true, remark);
 
 					});
 

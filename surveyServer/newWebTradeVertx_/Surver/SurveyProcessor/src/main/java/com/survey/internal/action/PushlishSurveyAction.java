@@ -27,7 +27,6 @@ public class PushlishSurveyAction extends InternalSurveyBaseAction {
 		float initialFund = getMessageBody().getFloat(FieldName.INITIALFUND);
 		boolean notifi = getMessageBody().getBoolean(FieldName.NOTIFY);
 		float limitFund = getMessageBody().getFloat(FieldName.LIMITFUND);
-		SurveyDao lvSurveyDao = new SurveyDao();
 
 		// Check account balance
 		ProxyAccountBalance lvProxyAccountBalance = new ProxyAccountBalance(username);

@@ -12,7 +12,7 @@ public class DisableSurveyAction extends InternalSurveyBaseAction {
 		String lvUserid = getMessageBody().getString(FieldName.USERID);
 		String surveyID = getMessageBody().getString(FieldName.SURVEYID);
 		String remark = getMessageBody().getString(FieldName.REMARK);
-		lvDao.closesurvey(username, lvUserid, surveyID, true, remark);
+		lvDao.closesurvey(username, surveyID, true, remark);
 		lvDao.getMvFutureResponse().setHandler(handler -> {
 			response.complete(handler.result());
 		});

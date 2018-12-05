@@ -44,6 +44,21 @@ public class SurveyDao extends SurveyBaseDao {
 		tmpSurvey.put(FieldName.STATE, "A");
 		tmpSurvey.put(FieldName.STATUS, "L");
 		tmpSurvey.put(FieldName.INPUTTIME, new Date().getTime());
+		
+		JsonObject tmpSetting = new JsonObject();
+		tmpSetting.put(FieldName.LOGINREQUIRE, false);
+		tmpSetting.put(FieldName.FAVOURITE_ENABLE, false);
+		tmpSetting.put(FieldName.ALLOWMULTIRESPONSE, false);
+		tmpSetting.put(FieldName.ISPUBLIC, true);
+		tmpSetting.put(FieldName.ENDLESS, true);
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+        String strDate = formatter.format(new Date());
+		tmpSetting.put(FieldName.STARTDATE, strDate);
+		tmpSetting.put(FieldName.TITLE, title);
+		tmpSetting.put(FieldName.DESCRIPTION, description);
+		tmpSetting.put(FieldName.ENABLEDIRECTURL, false);
+		
+		tmpSurvey.put(FieldName.SETTING, tmpSetting);
 		return this.saveDocumentReturnID(tmpSurvey);
 	}
 
@@ -64,7 +79,7 @@ public class SurveyDao extends SurveyBaseDao {
 	}
 
 	public void UpdateSurvey(String surveyID, JsonArray questionData, JsonObject settingID, JsonObject ruleData,
-			JsonObject theme, String title) {
+			JsonObject theme, String title, String description) {
 		JsonObject tmpSurvey = new JsonObject();
 		if (questionData != null) {
 			tmpSurvey.put(FieldName.QUESTIONDATA, questionData);
@@ -83,6 +98,9 @@ public class SurveyDao extends SurveyBaseDao {
 		}
 		if (title != null) {
 			tmpSurvey.put(FieldName.TITLE, title);
+		}
+		if (description != null) {
+			tmpSurvey.put(FieldName.DESCRIPTION, description);
 		}
 
 		tmpSurvey.put(FieldName.UPDATETIME, new Date().getTime());
@@ -401,7 +419,7 @@ public class SurveyDao extends SurveyBaseDao {
 		});
 	}
 
-	public void closesurvey(String username, String userID, String surveyID, boolean isStop, String remark) {
+	public void closesurvey(String username, String surveyID, boolean isStop, String remark) {
 		this.queryDocument(new JsonObject().put(FieldName._ID, surveyID).put(FieldName.USERNAME, username), handler -> {
 			if (handler.succeeded() && handler.result() != null && !handler.result().isEmpty()) {
 				JsonObject lvSurveyNewStatus = new JsonObject();

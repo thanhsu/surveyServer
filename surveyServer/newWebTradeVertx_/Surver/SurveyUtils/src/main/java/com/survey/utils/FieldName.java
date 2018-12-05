@@ -138,4 +138,5 @@ public class FieldName {
 	public static final String BANKACCOUNTNAME="bankaccountname";
 	public static final String LISTBANK="listbank";
 	public static final String REGEXTRANSFERREMARK="regextransferremark";
+	public static final String ENABLEDIRECTURL = "enabledDirectURL";
 }

@@ -19,7 +19,8 @@ public class UpdateSurveyDataAction extends InternalSurveyBaseAction {
 
 		SurveyDao lvSurveyDao = new SurveyDao();
 		lvSurveyDao.UpdateSurvey(lvSurveyID, question, setting, rule, themeData,
-				getMessageBody().getString(FieldName.TITLE));
+				getMessageBody().getString(FieldName.TITLE),
+				getMessageBody().getString(FieldName.DESCRIPTION));
 		lvSurveyDao.getMvFutureResponse().setHandler(handler->{
 			response.complete(handler.result());
 		});
