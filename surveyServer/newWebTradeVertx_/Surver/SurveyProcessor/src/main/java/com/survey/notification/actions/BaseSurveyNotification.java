@@ -27,13 +27,15 @@ public abstract class BaseSurveyNotification implements ISurveyNotification {
 		if (isPrivate && username != null) {
 			// Send to Private and store if send fail
 			PushServerSender.sendMessageByPushServer(getUsername(), JsonObject.mapFrom(message)).setHandler(handler -> {
-				if (handler.succeeded() && handler.result()) {
+				if (handler.succeeded() && handler.result() != null) {
 					//
-					Log.print("Send message private to user " + username + " success");
-				} else {
-					mvUserNotificationDao = new UserNotificationDao();
-					mvUserNotificationDao.storeNewNotification(username, message.getData(), message.getType());
+					if (handler.result()) {
+						Log.print("Send message private to user " + username + " success");
+						return;
+					}
 				}
+				mvUserNotificationDao = new UserNotificationDao();
+				mvUserNotificationDao.storeNewNotification(username, message.getData(), message.getType());
 			});
 		}
 
@@ -54,13 +56,16 @@ public abstract class BaseSurveyNotification implements ISurveyNotification {
 		if (isPrivate && username != null) {
 			// Send to Private and store if send fail
 			PushServerSender.sendMessageByPushServer(getUsername(), JsonObject.mapFrom(message)).setHandler(handler -> {
-				if (handler.succeeded() && handler.result()) {
+				if (handler.succeeded() && handler.result() != null) {
 					//
-					Log.print("Send message private to user " + username + " success");
-				} else {
-					mvUserNotificationDao = new UserNotificationDao();
-					mvUserNotificationDao.storeNewNotification(username, message.getData(), message.getType());
+					if (handler.result()) {
+						Log.print("Send message private to user " + username + " success");
+						return;
+					}
 				}
+				mvUserNotificationDao = new UserNotificationDao();
+				mvUserNotificationDao.storeNewNotification(username, message.getData(), message.getType());
+
 			});
 		}
 	}

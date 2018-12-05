@@ -134,6 +134,7 @@ public abstract class SurveyBaseDao {
 	
 	public void saveDocument(JsonObject data) {
 		BaseDaoConnection.getInstance().getMongoClient().save(CollectionName, data, handler -> {
+			mvFutureResponse.complete();
 		});
 	}
 

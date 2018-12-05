@@ -40,7 +40,7 @@ public class PushServer extends MicroServiceVerticle {
 				message -> {
 					JsonObject body = message.body();
 					message.reply(new JsonObject().put("success", AtmosphereAPI.getInstance().pushTopicToUser("survey",
-							body.getString("action"), body.getString("session"), body.getJsonObject(FieldName.DATA))));
+							"notification", body.getString(FieldName.USERNAME), body.getJsonObject(FieldName.DATA))));
 				});
 
 		this.publishEventBusService(EventBusDiscoveryConst.SURVEYPUSHPRIVATESERVERDISCOVEY.name(),

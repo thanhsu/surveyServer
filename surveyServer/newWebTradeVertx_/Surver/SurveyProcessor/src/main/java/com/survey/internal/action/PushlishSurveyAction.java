@@ -22,7 +22,8 @@ public class PushlishSurveyAction extends InternalSurveyBaseAction {
 		String username = getMessageBody().getString(FieldName.USERNAME);
 
 		double limitResp = getMessageBody().getDouble(FieldName.LIMITRESPONSE);
-		float pointPerOne = getMessageBody().getFloat(FieldName.PAYOUT);
+		float pointPerOne = getMessageBody().getFloat(FieldName.PAYOUT) == null ? 0
+				: getMessageBody().getFloat(FieldName.PAYOUT);
 
 		float initialFund = getMessageBody().getFloat(FieldName.INITIALFUND);
 		boolean notifi = getMessageBody().getBoolean(FieldName.NOTIFY);
@@ -34,8 +35,11 @@ public class PushlishSurveyAction extends InternalSurveyBaseAction {
 		Future<JsonObject> lvAccountBalance = Future.future();
 		lvProxyAccountBalance.sendToProxyServer(lvAccountBalance);
 
-		/*VertxServiceCenter.getInstance().sendNewMessage(EventBusDiscoveryConst.ETHEREUMPROXYDISCOVERY.name(),
-				new JsonObject().put(FieldName.ACTION, "userinfo").put(FieldName.USERNAME, username), lvAccountBalance);*/
+		/*
+		 * VertxServiceCenter.getInstance().sendNewMessage(EventBusDiscoveryConst.
+		 * ETHEREUMPROXYDISCOVERY.name(), new JsonObject().put(FieldName.ACTION,
+		 * "userinfo").put(FieldName.USERNAME, username), lvAccountBalance);
+		 */
 		lvAccountBalance.setHandler(handler -> {
 			if (handler.succeeded() && handler.result() != null) {
 				// Check account balance
@@ -49,7 +53,7 @@ public class PushlishSurveyAction extends InternalSurveyBaseAction {
 					return;
 				}
 				JsonObject accountbalance = handler.result().getJsonObject(FieldName.DATA);
-				if (accountbalance.getValue(FieldName.BALANCE)!=null) {
+				if (accountbalance.getValue(FieldName.BALANCE) != null) {
 					float balance = Float.parseFloat(accountbalance.getString(FieldName.BALANCE));
 					if (balance < initialFund) {
 						this.CompleteGenerateResponse(CodeMapping.S7777.toString(), CodeMapping.S7777.value(),

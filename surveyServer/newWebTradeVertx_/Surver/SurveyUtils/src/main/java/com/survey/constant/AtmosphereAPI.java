@@ -182,8 +182,8 @@ public class AtmosphereAPI {
 	// Will Broacast to ALL
 	public boolean pushTopicNotification(final String module, final String action, final String session, Object o) {
 		HashMap<String, String> data = new HashMap<>();
-		data.put(CONTRACT_SESSION, session);
-		data.put(CONTRACT_ACTION, "data");
+		data.put(CONTRACT_SESSION, "message");
+		data.put(CONTRACT_ACTION, "system");
 		data.put(CONTRACT_MODULE, module);
 		String lvBid = contract(data);
 		

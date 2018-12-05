@@ -22,7 +22,8 @@ public class SurveyPushlishDao extends SurveyBaseDao {
 				.put(FieldName.INITIALFUND, String.valueOf(initialFund))
 				.put(FieldName.LIMITFUND, String.valueOf(limitFund))
 				.put(FieldName.LIMITRESPONSE, String.valueOf(limitResp))
-				.put(FieldName.PAYOUT, String.valueOf(pointPerOne)).put(FieldName.NOTIFY, noti));
+				.put(FieldName.PAYOUT, String.valueOf(pointPerOne))
+				.put(FieldName.NOTIFY, noti));
 
 	}
 

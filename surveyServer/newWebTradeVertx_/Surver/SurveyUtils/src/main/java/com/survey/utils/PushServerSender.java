@@ -13,7 +13,7 @@ public class PushServerSender {
 		final JsonObject lvMessage = new JsonObject().put(FieldName.DATA, message).put(FieldName.USERNAME, username);
 		Future<Boolean> lvResult = Future.future();
 		VertxServiceCenter.getInstance().getDiscovery().getRecord(
-				new JsonObject().put("name", EventBusDiscoveryConst.SURVEYINTERNALPROCESSORTDISCOVERY.toString()),
+				new JsonObject().put("name", EventBusDiscoveryConst.SURVEYPUSHPRIVATESERVERDISCOVEY.toString()),
 				rs -> {
 					if (rs.succeeded() && rs.result() != null) {
 						Record record = rs.result();
@@ -21,7 +21,7 @@ public class PushServerSender {
 								.<JsonObject>send(record.getLocation().getString("endpoint"), lvMessage, res -> {
 									if (res.succeeded()) {
 										JsonObject resp = res.result().body();
-										lvResult.complete(resp.getBoolean(FieldName.SUCCESS));
+										lvResult.complete(resp.getBoolean(FieldName.SUCCESS)==null?false:resp.getBoolean(FieldName.SUCCESS));
 									} else {
 										lvResult.complete(false);
 									}
@@ -37,7 +37,7 @@ public class PushServerSender {
 	public static Future<Boolean> sendMessagePublicByPushServer(JsonObject message) {
 		Future<Boolean> lvResult = Future.future();
 		VertxServiceCenter.getInstance().getDiscovery().getRecord(
-				new JsonObject().put("name", EventBusDiscoveryConst.SURVEYINTERNALPROCESSORTDISCOVERY.toString()),
+				new JsonObject().put("name", EventBusDiscoveryConst.SURVEYPUSHPUBLICSERVERDISCOVEY.toString()),
 				rs -> {
 					if (rs.succeeded() && rs.result() != null) {
 						Record record = rs.result();
