@@ -46,6 +46,7 @@ import com.survey.internal.action.RetrieveSurveyBalanceAction;
 import com.survey.internal.action.RetrieveSurveyBaseInfoAction;
 import com.survey.internal.action.RetrieveUserNotificationAction;
 import com.survey.internal.action.RetrieveUserinfoAction;
+import com.survey.internal.action.StopPushlishAction;
 import com.survey.internal.action.Testing;
 import com.survey.internal.action.UpdateSurveyDataAction;
 import com.survey.internal.action.UpdateUserInfoAction;
@@ -122,6 +123,7 @@ public class SurveyProcessConstant {
 		mvActionMapping.put("retrievesurveyresponse", new RetrieveSurveyAnsweredAction());
 		mvActionMapping.put("surveybalance", new RetrieveSurveyBalanceAction());
 		mvActionMapping.put("surveydw", new DepositWithdrawSurveyAction());
+		mvActionMapping.put("stopsurvey", new StopPushlishAction());
 		//5
 		mvActionMapping.put("addbank",new CreateNewBank());
 		mvActionMapping.put("retrieveusernotification", new RetrieveUserNotificationAction());

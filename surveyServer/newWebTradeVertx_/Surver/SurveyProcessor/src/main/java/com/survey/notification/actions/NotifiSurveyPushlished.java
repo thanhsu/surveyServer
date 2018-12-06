@@ -7,6 +7,7 @@ import com.survey.utils.PushMessageBean;
 
 public class NotifiSurveyPushlished extends BaseSurveyNotification {
 	private String surveyID;
+	private UserNotificationEnum lvNotificationEnum = UserNotificationEnum.SURVEYPUSHLISH;
 
 	public NotifiSurveyPushlished(String username, PushMessageBean pPushMessageBean) {
 		super(username, pPushMessageBean);
@@ -40,6 +41,14 @@ public class NotifiSurveyPushlished extends BaseSurveyNotification {
 
 	public void setSurveyID(String surveyID) {
 		this.surveyID = surveyID;
+	}
+
+	public UserNotificationEnum getLvNotificationEnum() {
+		return lvNotificationEnum;
+	}
+
+	public void setLvNotificationEnum(UserNotificationEnum lvNotificationEnum) {
+		this.lvNotificationEnum = lvNotificationEnum;
 	}
 
 }
