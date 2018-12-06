@@ -55,6 +55,10 @@ public abstract class InternalSurveyBaseAction {
 		mvResponse.put(FieldName.CODE, code);
 		mvResponse.put(FieldName.MESSAGE, message);
 		mvResponse.put(FieldName.DATA, data);
+		if(result.isComplete()) {
+			result.tryComplete(mvResponse);
+			return;
+		}
 		result.complete(mvResponse);
 	}
 	
@@ -63,6 +67,10 @@ public abstract class InternalSurveyBaseAction {
 		mvResponse.put(FieldName.CODE, code);
 		mvResponse.put(FieldName.MESSAGE, message);
 		mvResponse.put(FieldName.DATA, data);
+		if(result.isComplete()) {
+			result.tryComplete(mvResponse);
+			return;
+		}
 		result.complete(mvResponse);
 	}
 
