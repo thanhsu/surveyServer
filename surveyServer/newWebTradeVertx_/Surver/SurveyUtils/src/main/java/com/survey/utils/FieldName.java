@@ -143,4 +143,5 @@ public class FieldName {
 	public static final String UNIT="unit";
 	public static final String CARDID="cardid";
 	public static final String REJECTCAUSE="rejectcause";
+	public static final String ANSWERDATA="answerdata";
 }

@@ -1,8 +1,10 @@
 package com.survey.confirm.actions;
 
+import com.survey.constant.UserNotificationEnum;
 import com.survey.dbservice.dao.CashDepositDao;
 import com.survey.notification.actions.NotifiAccountBalance;
 import com.survey.notification.actions.NotifiCashDeposit;
+import com.survey.notification.actions.NotifiNewAnswerData;
 import com.survey.processor.bean.UserBalanceUpdateBean;
 import com.survey.utils.ECashDepositType;
 import com.survey.utils.FieldName;
@@ -40,10 +42,24 @@ public class ConfirmSurveyAnswer extends BaseConfirmAction {
 
 		CashDepositDao lvCashDepositDao = new CashDepositDao();
 		lvCashDepositDao.updateDocument(new JsonObject().put(FieldName._ID, transID),
-				new JsonObject().put(FieldName.SETTLESTATUS, sucess ? "S" : "U").put(FieldName.AMOUNT, point), new UpdateOptions(false), handler -> {
+				new JsonObject().put(FieldName.SETTLESTATUS, sucess ? "S" : "U").put(FieldName.AMOUNT, point),
+				new UpdateOptions(false), handler -> {
 					if (handler.succeeded()) {
 						NotifiCashDeposit lvNotifiCashDeposit = new NotifiCashDeposit(transID);
+						lvNotifiCashDeposit.setType(UserNotificationEnum.ANSWERSURVEYPAYOUT);
 						lvNotifiCashDeposit.generate();
+
+						CashDepositDao lvCashDepositDao2 = new CashDepositDao();
+						lvCashDepositDao2.queryDocument(new JsonObject().put(FieldName._ID, transID), h2 -> {
+							if (h2.succeeded()) {
+								String answerId = h2.result().get(0).getString(FieldName.ANSWERID);
+								NotifiNewAnswerData lvNotifiNewAnswerData = new NotifiNewAnswerData();
+								lvNotifiNewAnswerData.setAnswerID(answerId);
+								lvNotifiNewAnswerData.setAmount(point);
+								lvNotifiNewAnswerData.setTranID(transID);
+								lvNotifiNewAnswerData.generate();
+							}
+						});
 					}
 				});
 	}

@@ -10,9 +10,7 @@ import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 
 import com.survey.ProcessorInit;
-import com.survey.constant.EventBusDiscoveryConst;
 import com.survey.dbservice.dao.CashDepositDao;
-import com.survey.dbservice.dao.ProxyLogDao;
 import com.survey.dbservice.dao.SurveySubmitDao;
 import com.survey.dbservice.dao.UserDao;
 import com.survey.etheaction.ProxySurveyAnswer;
@@ -21,7 +19,6 @@ import com.survey.utils.FieldName;
 import com.survey.utils.Log;
 import com.survey.utils.MessageDefault;
 import com.survey.utils.RSAEncrypt;
-import com.survey.utils.VertxServiceCenter;
 
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;

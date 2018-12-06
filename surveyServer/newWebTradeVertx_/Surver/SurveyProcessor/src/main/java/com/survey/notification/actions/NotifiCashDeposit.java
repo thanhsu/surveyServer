@@ -9,6 +9,8 @@ import io.vertx.core.json.JsonObject;
 
 public class NotifiCashDeposit extends BaseSurveyNotification {
 	private String depositId;
+	private UserNotificationEnum type= UserNotificationEnum.CASHDEPOSIT;
+	
 
 	public NotifiCashDeposit(String pDepositID) {
 		depositId = pDepositID;
@@ -22,8 +24,8 @@ public class NotifiCashDeposit extends BaseSurveyNotification {
 				if(!handler.result().isEmpty()) {
 					message = new PushMessageBean();
 					message.setData(handler.result().get(0));
-					message.setType(UserNotificationEnum.CASHDEPOSIT);
-					message.setDescription(UserNotificationEnum.CASHDEPOSIT.getDescription());
+					message.setType(type);
+					message.setDescription(type.getDescription());
 					
 					setPrivate(true);
 					setPublic(false);
@@ -33,6 +35,14 @@ public class NotifiCashDeposit extends BaseSurveyNotification {
 		});
 		
 		
+	}
+
+	public UserNotificationEnum getType() {
+		return type;
+	}
+
+	public void setType(UserNotificationEnum type) {
+		this.type = type;
 	}
 
 }

@@ -21,11 +21,11 @@ public class CashEnquiryAction extends InternalSurveyBaseAction {
 		String userid = getMessageBody().getString(FieldName.USERID);
 		String username = getMessageBody().getString(FieldName.USERNAME);
 		CashDepositDao lvCashDepositDao = new CashDepositDao();
-		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
+		
 		Date from;
 		try {
-			from = sdf.parse(getMessageBody().getString(FieldName.FROMDATE) + " 00:00:00");
-			Date to = sdf.parse(getMessageBody().getString(FieldName.TODATE) + " 23:59:59");
+			from = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss").parse(getMessageBody().getString(FieldName.FROMDATE) + " 00:00:00");
+			Date to = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss").parse(getMessageBody().getString(FieldName.TODATE) + " 23:59:59");
 			Future<JsonObject> lvListCashDeposit = lvCashDepositDao.retrieveAllDeposit(from.getTime(), to.getTime(),
 					username);
 			CashWithdrawDao lvCashWithdrawDao = new CashWithdrawDao();

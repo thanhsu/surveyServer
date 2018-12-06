@@ -41,6 +41,19 @@ public class SurveySubmitDao extends SurveyBaseDao {
 		return lvResp;
 	}
 
+	public Future<JsonObject> retrieveAllAnswer(String id) {
+		Future<JsonObject> lvResp = Future.future();
+		this.queryDocument(new JsonObject().put(FieldName._ID, id), handler -> {
+			if (handler.result() != null) {
+				if (!handler.result().isEmpty()) {
+					lvResp.complete(handler.result().get(0));
+				}
+			}
+			lvResp.fail("Not found");
+		});
+		return lvResp;
+	}
+
 	public Future<Integer> countAllSubmitResult(String surveyID) {
 		Future<Integer> lvResult = Future.future();
 		this.queryDocument(new JsonObject().put(FieldName.SURVEYID, surveyID), handler -> {

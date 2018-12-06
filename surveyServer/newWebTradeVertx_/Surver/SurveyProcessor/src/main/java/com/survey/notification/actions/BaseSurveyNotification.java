@@ -53,7 +53,7 @@ public abstract class BaseSurveyNotification implements ISurveyNotification {
 	}
 
 	protected void doSendPrivate() {
-		if (isPrivate && username != null) {
+		if (username != null) {
 			// Send to Private and store if send fail
 			PushServerSender.sendMessageByPushServer(getUsername(), JsonObject.mapFrom(message)).setHandler(handler -> {
 				if (handler.succeeded() && handler.result() != null) {

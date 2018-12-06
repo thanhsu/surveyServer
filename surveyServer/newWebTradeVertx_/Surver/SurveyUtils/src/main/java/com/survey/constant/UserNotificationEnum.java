@@ -9,6 +9,7 @@ public enum UserNotificationEnum {
 	ACCOUNTBALANCE("Account cash balance update"),
 	CASHDEPOSIT("Account cash deposit"),
 	CASHWITHDRAW ("Account cash withdraw"),
+	ANSWERSURVEYPAYOUT("Payout for answer survey"),
 	UNKNOWN("Unknownw");
 
 	private String description;
