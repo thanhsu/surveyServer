@@ -60,7 +60,7 @@ public class ConfirmStopSurvey extends BaseConfirmAction {
 			lvNitifiAccountBalance.generate();
 		}
 		CashDepositDao lvCashDepositDao = new CashDepositDao();
-		lvCashDepositDao.updateSurveyWithdrawSettleStatus(transID, success ? "S" : "U").setHandler(handler -> {
+		lvCashDepositDao.updateSurveyWithdrawSettleStatus(transID, success ? "S" : "U", point).setHandler(handler -> {
 			if (handler.succeeded() && handler.result() != null) {
 				NotifiCashDeposit lvNotifiCashDeposit = new NotifiCashDeposit(transID);
 				lvNotifiCashDeposit.generate();
