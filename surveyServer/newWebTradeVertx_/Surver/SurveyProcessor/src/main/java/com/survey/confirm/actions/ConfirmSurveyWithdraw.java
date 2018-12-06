@@ -16,7 +16,7 @@ public class ConfirmSurveyWithdraw extends BaseConfirmAction {
 		String username = msg.getString(FieldName.USERNAME);
 		String surveyID = msg.getString(FieldName.SURVEYID);
 		String transID = msg.getString(FieldName.TRANID);
-		double point = Double.parseDouble(msg.getString(FieldName.POINT));
+		double point = Double.parseDouble(msg.getValue(FieldName.POINT).toString());
 		double userBalance = Double.parseDouble(msg.getString(FieldName.USERBALANCE));
 
 		boolean success = msg.getBoolean(FieldName.SUCCESS);

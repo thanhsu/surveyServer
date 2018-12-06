@@ -79,7 +79,7 @@ public class CashWithdrawDao extends SurveyBaseDao {
 		});
 	}
 
-	public Future<String> createSurveyCashDeposit(String pSurveyID, String username, double pAmount) {
+	public Future<String> createSurveyCashDeposit(String pSurveyID, String username, String pAmount,String remark) {
 		Future<String> lvResult = Future.future();
 		JsonObject js = new JsonObject();
 		SurveyDao lvSurveyDao = new SurveyDao();
@@ -97,6 +97,7 @@ public class CashWithdrawDao extends SurveyBaseDao {
 						js.put(FieldName.TYPE, ECashWithdrawType.SURVEYDEPOSIT.name());
 						js.put(FieldName.STATE, "A");
 						js.put(FieldName.SETTLESTATUS, "P");
+						js.put(FieldName.REMARK, remark);
 						this.saveDocumentReturnID(js, lvResult);
 					}
 				}

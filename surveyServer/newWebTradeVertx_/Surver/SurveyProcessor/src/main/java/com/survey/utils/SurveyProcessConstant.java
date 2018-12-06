@@ -26,6 +26,7 @@ import com.survey.internal.action.CheckPermissionAnswerSurveyAction;
 import com.survey.internal.action.CopySurveyAction;
 import com.survey.internal.action.DeleteSurveyAction;
 import com.survey.internal.action.DepositAction;
+import com.survey.internal.action.DepositWithdrawSurveyAction;
 import com.survey.internal.action.DisableSurveyAction;
 import com.survey.internal.action.InternalSurveyBaseAction;
 import com.survey.internal.action.LoginAction;
@@ -41,6 +42,7 @@ import com.survey.internal.action.RetrieveConfigAction;
 import com.survey.internal.action.RetrievePointValueAction;
 import com.survey.internal.action.RetrieveSurveyAction;
 import com.survey.internal.action.RetrieveSurveyAnsweredAction;
+import com.survey.internal.action.RetrieveSurveyBalanceAction;
 import com.survey.internal.action.RetrieveSurveyBaseInfoAction;
 import com.survey.internal.action.RetrieveUserNotificationAction;
 import com.survey.internal.action.RetrieveUserinfoAction;
@@ -118,6 +120,8 @@ public class SurveyProcessConstant {
 		mvActionMapping.put("addfavouritesurvey", new AddFavouriteSurveyAction());
 		mvActionMapping.put("removefavouritesurvey",new RemoveFavouriteSurveyAction());
 		mvActionMapping.put("retrievesurveyresponse", new RetrieveSurveyAnsweredAction());
+		mvActionMapping.put("surveybalance", new RetrieveSurveyBalanceAction());
+		mvActionMapping.put("surveydw", new DepositWithdrawSurveyAction());
 		//5
 		mvActionMapping.put("addbank",new CreateNewBank());
 		mvActionMapping.put("retrieveusernotification", new RetrieveUserNotificationAction());

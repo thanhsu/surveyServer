@@ -1,12 +1,12 @@
 package com.survey.etheaction;
 
-public class SurveyWithdraw extends BaseEtheProxyAction {
+public class ProxySurveyWithdraw extends BaseEtheProxyAction {
 	private String surveyid;
 	private String username;
 	private String transid;
 	private String point;
 
-	public SurveyWithdraw(String pSurveyid, String pUsername, String pTransid, String pPoint) {
+	public ProxySurveyWithdraw(String pSurveyid, String pUsername, String pTransid, String pPoint) {
 		action =("surveywithdraw");
 		this.setSurveyid(pSurveyid);
 		this.setUsername(pUsername);

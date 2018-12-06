@@ -70,7 +70,7 @@ public class FieldName {
 	public static final String PAYPALIDTYPE = "paypalidtype";
 	public static final String TRANID = "transid";
 	public static final String DISCOVERYKEY = "discoverykey";
-	public static final String DW = "DW";
+	public static final String DW = "dw";
 	public static final String TRANSACTIONDATA = "trandata";
 	public static final String ISHISTORY = "ishistory";
 	public static final String VALUE = "value";
@@ -142,4 +142,5 @@ public class FieldName {
 	public static final String LISTVALUE = "listvalue";
 	public static final String UNIT="unit";
 	public static final String CARDID="cardid";
+	public static final String REJECTCAUSE="rejectcause";
 }

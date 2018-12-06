@@ -45,6 +45,8 @@ public enum CodeMapping {
 	S9999("Pushlish reject. Because Survey was pushlished"),
 	S0001("Survey can not restore"),
 	S0002("Survey status not allow Deposit now"),
+	S0003("Survey balance is 0"),
+	S0007("Amount greater than survey balance"),
 	
 	T0000("Cash transfer is ok"),
 	T1111("Your balance is exceed amount"),

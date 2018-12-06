@@ -68,3 +68,4 @@ SUPHAM/fe80:0:0:0:91d0:8a49:f13e:76d8%18
 
 [INF vert.x-eventloop-thread-3,12-06 08:06:19.233072]:Socket Received: web_server subscribe success!
 [INF vert.x-eventloop-thread-3,12-06 08:15:27.698668]:Socket Received: {"action":"survey_answer","username":"tanpn2402","surveyid":"5c0812627a70af0898840c98","transid":"5c087828f73868156c3a4642","success":false,"code":"E702","message":"invalid user"}
+[INF vert.x-eventloop-thread-3,12-06 08:21:21.156877]:Socket Received: {"action":"survey_answer","username":"tanpn2402","surveyid":"5c0812627a70af0898840c98","transid":"5c08798ef73868156c3a4644","success":false,"code":"E702","message":"invalid user"}
