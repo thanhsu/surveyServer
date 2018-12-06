@@ -3,10 +3,12 @@ package com.survey.dbservice.dao;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.survey.utils.CodeMapping;
 import com.survey.utils.FieldName;
 
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
+import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.mongo.UpdateOptions;
 
@@ -23,7 +25,7 @@ public class CardDao extends SurveyBaseDao {
 		this.queryDocument(qr, handler);
 	}
 
-	public void addNewCategory(String categoryID, String categoryName, String imageLink) {
+	public void addNewCategory(String categoryID, String categoryName, String imageLink, JsonArray lstValue) {
 		this.setCollectionName(collectionCardCategory);
 		JsonObject js = new JsonObject();
 		this.queryDocument(new JsonObject().put(FieldName.CATEGORYID, categoryID).put(FieldName.STATE, "A"),
@@ -33,7 +35,9 @@ public class CardDao extends SurveyBaseDao {
 							js.put(FieldName.CATEGORYID, categoryID).put(FieldName.CATEGORY, categoryName)
 									.put(FieldName.IMAGE, imageLink).put(FieldName.STATE, "A");
 							js.put(FieldName._ID, handler.result().get(0).getString(FieldName._ID));
+							js.put(FieldName.LISTVALUE, lstValue);
 							this.saveDocument(js);
+							return;
 						}
 					}
 					js.put(FieldName.CATEGORYID, categoryID).put(FieldName.CATEGORY, categoryName)
@@ -44,9 +48,10 @@ public class CardDao extends SurveyBaseDao {
 	}
 
 	public void disableCardCategory(String categoryID) {
+		this.setCollectionName(collectionCardCategory);
 		this.updateDocument(new JsonObject().put(FieldName.CATEGORYID, categoryID),
 				new JsonObject().put(FieldName.STATE, "D"), new UpdateOptions(false), handler -> {
-
+					this.CompleteGenerateResponse(CodeMapping.C0000.name(),CodeMapping.C0000.value(), null);
 				});
 	}
 
@@ -75,6 +80,12 @@ public class CardDao extends SurveyBaseDao {
 	public void doneThisCard(String id, String username) {
 		this.updateDocument(new JsonObject().put(FieldName._ID, id).put(FieldName.USERNAME, username),
 				new JsonObject().put(FieldName.STATE, "D"), new UpdateOptions(false), handler -> {
+				});
+	}
+	
+	public void revertThisCard(String id) {
+		this.updateDocument(new JsonObject().put(FieldName._ID, id).put(FieldName.USERNAME, ""),
+				new JsonObject().put(FieldName.STATE, "A"), new UpdateOptions(false), handler -> {
 				});
 	}
 }

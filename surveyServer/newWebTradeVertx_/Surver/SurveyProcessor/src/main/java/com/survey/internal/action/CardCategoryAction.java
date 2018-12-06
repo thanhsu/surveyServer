@@ -7,6 +7,7 @@ import com.survey.utils.CodeMapping;
 import com.survey.utils.FieldName;
 import com.survey.utils.MessageDefault;
 
+import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 
 public class CardCategoryAction extends InternalSurveyBaseAction {
@@ -15,7 +16,7 @@ public class CardCategoryAction extends InternalSurveyBaseAction {
 	public void doProccess() {
 		String method = getMessageBody().getString(FieldName.METHOD);
 		switch (method) {
-		case "retrive":
+		case "retrieve":
 			CardDao lvCardDao = new CardDao();
 			lvCardDao.getListCardCateGory("A", handler -> {
 				List<JsonObject> rs = handler.result();
@@ -31,7 +32,8 @@ public class CardCategoryAction extends InternalSurveyBaseAction {
 			String categoryID = getMessageBody().getString(FieldName.CATEGORYID);
 			String categoryName = getMessageBody().getString(FieldName.CATEGORY);
 			String imageLink = getMessageBody().getString(FieldName.IMAGE);
-			lvCardDao2.addNewCategory(categoryID, categoryName, imageLink);
+			JsonArray lstVl = getMessageBody().getJsonArray(FieldName.LISTVALUE);
+			lvCardDao2.addNewCategory(categoryID, categoryName, imageLink,lstVl);
 			lvCardDao2.getMvFutureResponse().setHandler(handler -> {
 				if (handler.succeeded()) {
 					this.CompleteGenerateResponse(CodeMapping.C0000.name(), CodeMapping.C0000.value(), null, response);
@@ -44,6 +46,9 @@ public class CardCategoryAction extends InternalSurveyBaseAction {
 			CardDao lvCardDao3 = new CardDao();
 			String categoryID2 = getMessageBody().getString(FieldName.CATEGORYID);
 			lvCardDao3.disableCardCategory(categoryID2);
+			lvCardDao3.getMvFutureResponse().setHandler(handler->{
+				response.complete(handler.result());
+			});
 			break;
 		case "all":
 			CardDao lvCardDao4 = new CardDao();

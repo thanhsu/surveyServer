@@ -24,6 +24,7 @@ public class NotifiCashDeposit extends BaseSurveyNotification {
 					message.setData(handler.result().get(0));
 					message.setType(UserNotificationEnum.CASHDEPOSIT);
 					message.setDescription(UserNotificationEnum.CASHDEPOSIT.getDescription());
+					
 					setPrivate(true);
 					setPublic(false);
 					doSend();

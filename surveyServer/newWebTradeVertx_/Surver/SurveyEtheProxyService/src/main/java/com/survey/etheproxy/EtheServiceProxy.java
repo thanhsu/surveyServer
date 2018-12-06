@@ -88,6 +88,7 @@ public class EtheServiceProxy extends MicroServiceVerticle {
 						} else {
 							future.fail(handler.cause());
 						}
+						
 					});
 				}
 			}).setHandler(ar -> {

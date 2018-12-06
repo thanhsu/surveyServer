@@ -70,7 +70,8 @@ public class BaseDaoConnection {
 	private MongoClient connectDB() {
 		if (mongoClient == null) {
 			try {
-				mongoClient = MongoClient.createShared(getVertx(), getDbConfig());
+				//mongoClient = MongoClient.createShared(getVertx(), getDbConfig());
+				mongoClient = MongoClient.createNonShared(getVertx(), getDbConfig());
 			} catch (Exception e) {
 				Log.print("Can not connect to DB: " + e);
 			}

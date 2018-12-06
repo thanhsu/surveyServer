@@ -30,7 +30,7 @@ public class SurveyPushlishDao extends SurveyBaseDao {
 	public Future<JsonObject> retrievePushlishSuvey(String id) {
 		Future<JsonObject> lvResult = Future.future();
 		BaseDaoConnection.getInstance().getMongoClient().findWithOptions(getCollectionName(),
-				new JsonObject().put(FieldName._ID, id), new FindOptions(), resultHandler -> {
+				new JsonObject().put(FieldName.SURVEYID, id), new FindOptions(), resultHandler -> {
 					if (resultHandler.succeeded() && resultHandler.result() != null) {
 						if (resultHandler.result().isEmpty()) {
 							lvResult.complete(null);

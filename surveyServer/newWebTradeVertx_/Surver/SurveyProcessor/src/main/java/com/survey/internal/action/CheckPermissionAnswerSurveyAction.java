@@ -37,7 +37,7 @@ public class CheckPermissionAnswerSurveyAction extends InternalSurveyBaseAction 
 					lvSurveyPushlishDao.retrievePushlishSuvey(surveyID).setHandler(h2 -> {
 						if (h2.succeeded() && h2.result() != null) {
 							double pointPerOne = Double
-									.parseDouble(getMessageBody().getValue(FieldName.PAYOUT).toString());
+									.parseDouble(h2.result().getValue(FieldName.PAYOUT).toString());
 							if (pointPerOne > surveyBalance) {
 								this.CompleteGenerateResponse(CodeMapping.S3335.name(), CodeMapping.S3335.value(), null,
 										response);

@@ -18,7 +18,7 @@ public class CashWithdrawDao extends SurveyBaseDao {
 		this.setCollectionName(cashWithdrawCollectionName);
 	}
 
-	public Future<String> storeNewWithdrawRequest(String targetUserID, String privateToken, String method, int amount,
+	public Future<String> storeNewWithdrawRequest(String targetUserID, String privateToken, String method, double amount,
 			String ccy, String remark, boolean isApproval, String exchagerate) {
 		Date lvNow = new Date();
 		JsonObject deposit = new JsonObject();
@@ -27,6 +27,20 @@ public class CashWithdrawDao extends SurveyBaseDao {
 				.put(FieldName.EXCHANGERATE, exchagerate).put(FieldName.CCY, ccy);
 		return this.saveDocumentReturnID(deposit);
 	}
+	
+	public Future<String> storeNewWithdrawBuyCard(double amount,
+			String ccy, String remark, double exchagerate, String cardID) {
+		Date lvNow = new Date();
+		JsonObject deposit = new JsonObject();
+		deposit.put(FieldName.POINT, amount)
+				.put(FieldName.STATE, "A").put(FieldName.SETTLESTATUS, "U")
+				.put(FieldName.INPUTTIME, lvNow.getTime())
+				.put(FieldName.EXCHANGERATE, exchagerate).put(FieldName.CCY, ccy);
+		deposit.put(FieldName.TYPE, ECashWithdrawType.BUYCARD.name());
+		deposit.put(FieldName.CARDID, cardID);
+		return this.saveDocumentReturnID(deposit);
+	}
+
 
 	public Future<JsonObject> retrieveAllWithdraw(long fromTime, long toTime, String username) {
 		JsonObject query = new JsonObject().put(FieldName.USERNAME, username).put(FieldName.INPUTTIME,

@@ -56,8 +56,9 @@ public enum CodeMapping {
 	
 	P0000("Proxy ok"),
 	P1111("Proxy data to Ethe server error"),
-	P2222("Request Error from Ethe server")
-	
+	P2222("Request Error from Ethe server"),
+	CR00("Card request ok, please wait the confirm"),
+	CR11("Card is over with your chose, please try another")
 	;
 	
 	

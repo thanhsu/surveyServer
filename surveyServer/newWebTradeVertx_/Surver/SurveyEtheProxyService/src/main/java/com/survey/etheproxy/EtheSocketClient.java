@@ -11,6 +11,7 @@ import io.vertx.core.Context;
 import io.vertx.core.Future;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpClient;
+import io.vertx.core.http.RequestOptions;
 import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonObject;
 import io.vertx.servicediscovery.Record;
@@ -32,7 +33,7 @@ public class EtheSocketClient extends AbstractVerticle {
 		System.out.println("*************************************************");
 		System.out.println(String.format("Init socket connection to %s port %d", host, port));
 		HttpClient client = vertx.createHttpClient();
-
+		
 		client.websocket(port, host, "/", websocket -> {
 			websocket.handler(data -> {
 				System.out.println("Received data " + data.toString());
@@ -53,8 +54,7 @@ public class EtheSocketClient extends AbstractVerticle {
 									VertxServiceCenter.getEventbus().<JsonObject>send(
 											record.getLocation().getString("endpoint"), data.toJsonObject(), res -> {
 												if (res.succeeded()) {
-
-													System.out.println("Send to Service confirm success:"+res.result().body().toString());
+													System.out.println("Send to Service confirm success:"+res.result().toString());
 												} else {
 													System.out.println("Send to service confirm error");
 												}

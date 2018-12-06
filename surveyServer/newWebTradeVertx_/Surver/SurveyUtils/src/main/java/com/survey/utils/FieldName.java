@@ -139,4 +139,7 @@ public class FieldName {
 	public static final String LISTBANK="listbank";
 	public static final String REGEXTRANSFERREMARK="regextransferremark";
 	public static final String ENABLEDIRECTURL = "enabledDirectURL";
+	public static final String LISTVALUE = "listvalue";
+	public static final String UNIT="unit";
+	public static final String CARDID="cardid";
 }
