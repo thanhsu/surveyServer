@@ -58,14 +58,14 @@ public class CashDepositDao extends SurveyBaseDao {
 		});
 	}
 
-	public Future<String> createSurveyWithdraw(String surveyID, String username) {
+	public Future<String> createSurveyWithdraw(String surveyID, String username,ECashDepositType type) {
 		return this.saveDocumentReturnID(new JsonObject().put(FieldName.USERNAME, username)
 				.put(FieldName.AGENT, surveyID).put(FieldName.AGENTTYPE, "survey").put(FieldName.AMOUNT, 0).put(FieldName.STATE, "A")
-				.put(FieldName.SETTLESTATUS, "P").put(FieldName.TYPE, ECashDepositType.SURVEYWITHDRAW)
+				.put(FieldName.SETTLESTATUS, "P").put(FieldName.TYPE, type)
 				.put(FieldName.INPUTTIME, new Date().getTime()));
 	}
 
-	public Future<JsonObject> updateSurveyWithdrawSettleStatus(String id, String status) {
+	public Future<JsonObject> updateSurveyWithdrawSettleStatus(String id, String status, double amount) {
 		Future<JsonObject> lvFuture = Future.future();
 		this.queryDocument(new JsonObject().put(FieldName._ID, id), handler -> {
 			if (handler.succeeded() && handler.result() != null) {
@@ -73,7 +73,7 @@ public class CashDepositDao extends SurveyBaseDao {
 					lvFuture.fail("Null");
 				} else {
 					this.updateDocument(new JsonObject().put(FieldName._ID, id), new JsonObject()
-							.put(FieldName.SETTLESTATUS, status).put(FieldName.UPDATETIME, new Date().getTime()),
+							.put(FieldName.SETTLESTATUS, status).put(FieldName.UPDATETIME, new Date().getTime()).put(FieldName.AMOUNT, amount),
 							new UpdateOptions(false), h2 -> {
 								if (h2.succeeded()) {
 									this.findOneByID(id).setHandler(h3 -> {

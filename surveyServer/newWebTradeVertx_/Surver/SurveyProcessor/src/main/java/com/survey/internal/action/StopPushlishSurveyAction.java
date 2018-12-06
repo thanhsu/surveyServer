@@ -4,11 +4,12 @@ import com.survey.dbservice.dao.CashDepositDao;
 import com.survey.dbservice.dao.SurveyDao;
 import com.survey.etheaction.ProxyStopSurvey;
 import com.survey.utils.CodeMapping;
+import com.survey.utils.ECashDepositType;
 import com.survey.utils.FieldName;
 
 import io.vertx.core.json.JsonObject;
 
-public class StopPushlishAction extends InternalSurveyBaseAction {
+public class StopPushlishSurveyAction extends InternalSurveyBaseAction {
 
 	@Override
 	public void doProccess() {
@@ -22,7 +23,7 @@ public class StopPushlishAction extends InternalSurveyBaseAction {
 					String state = h.result().get(0).getString(FieldName.STATE);
 					if(state.equals("A")||state.equals("C")) {
 						CashDepositDao lvCashDepositDao = new CashDepositDao();
-						lvCashDepositDao.createSurveyWithdraw(surveyID, username).setHandler(handler->{
+						lvCashDepositDao.createSurveyWithdraw(surveyID, username ,ECashDepositType.SURVEYREFUND ).setHandler(handler->{
 							if(handler.result()!=null) {
 								ProxyStopSurvey lvProxyStopSurvey = new ProxyStopSurvey(surveyID, username, handler.result());
 								lvProxyStopSurvey.sendToProxyServer().setHandler(handler2->{

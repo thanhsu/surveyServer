@@ -1,6 +1,7 @@
 package com.survey.internal.action;
 
 import com.survey.constant.EventBusDiscoveryConst;
+import com.survey.dbservice.dao.CashDepositDao;
 import com.survey.dbservice.dao.CashWithdrawDao;
 import com.survey.dbservice.dao.ProxyLogDao;
 import com.survey.dbservice.dao.SurveyCashDWDao;
@@ -10,6 +11,7 @@ import com.survey.etheaction.ProxySurveyBalance;
 import com.survey.etheaction.ProxySurveyDeposit;
 import com.survey.etheaction.ProxySurveyWithdraw;
 import com.survey.utils.CodeMapping;
+import com.survey.utils.ECashDepositType;
 import com.survey.utils.FieldName;
 import com.survey.utils.MessageDefault;
 import com.survey.utils.VertxServiceCenter;
@@ -85,7 +87,7 @@ public class DepositWithdrawSurveyAction extends InternalSurveyBaseAction {
 			break;
 		case "W":
 			// Check survey balance
-			CashWithdrawDao lvCashWDao = new CashWithdrawDao();
+			CashDepositDao lvCashWDao = new CashDepositDao();
 			Future<JsonObject> lvResp1 = Future.future();
 			ProxySurveyBalance lvProxySurveyBalance = new ProxySurveyBalance(surveyID);
 			lvProxySurveyBalance.sendToProxyServer(lvResp1);
@@ -99,7 +101,6 @@ public class DepositWithdrawSurveyAction extends InternalSurveyBaseAction {
 					double surveyBalance = Double
 							.parseDouble(handler.result().getJsonObject(FieldName.DATA).getString("balance"));
 					double lvTmpAmout = Double.parseDouble(amount);
-					String lvTmpamount = amount;
 					boolean isStop = true;
 					if (lvTmpAmout > surveyBalance) {
 						this.CompleteGenerateResponse(CodeMapping.S0007.toString(), CodeMapping.S0007.value(),
@@ -108,32 +109,35 @@ public class DepositWithdrawSurveyAction extends InternalSurveyBaseAction {
 
 					}
 					// Change survey status to pending close and send cash withdraw request
-					lvCashWDao.createSurveyCashDeposit(surveyID, username, lvTmpamount, remark).setHandler(handler2 -> {
-						String tranID = handler2.result();
-						Future<JsonObject> lvResp2 = Future.future();
-						this.CompleteGenerateResponse(CodeMapping.C0000.toString(), "Withdraw success",
-								new JsonObject().put(FieldName.SUCCESS, true).put(FieldName.TRANID, tranID), response);
+					lvCashWDao.createSurveyWithdraw(surveyID, username,ECashDepositType.SURVEYWITHDRAW ).setHandler(handler2 -> {
+						if (handler2.result() != null) {
+							String tranID = handler2.result();
+							Future<JsonObject> lvResp2 = Future.future();
+							this.CompleteGenerateResponse(CodeMapping.C0000.toString(), "Withdraw success",
+									new JsonObject().put(FieldName.SUCCESS, true).put(FieldName.TRANID, tranID),
+									response);
 
-						ProxySurveyWithdraw lvProxySurveyWithdraw = new ProxySurveyWithdraw(surveyID, username, tranID,
-								amount);
-						lvProxySurveyWithdraw.sendToProxyServer(lvResp2);
+							ProxySurveyWithdraw lvProxySurveyWithdraw = new ProxySurveyWithdraw(surveyID, username,
+									tranID, amount);
+							lvProxySurveyWithdraw.sendToProxyServer(lvResp2);
 
-						lvResp2.setHandler(handler1 -> {
-							// TODO if error
-							// If success
-							if (isStop) {
-								SurveyDao lvSurveyDao = new SurveyDao();
-								lvSurveyDao.closesurvey(username, surveyID, true, remark);
-							}
-							ProxyLogDao lvDao = new ProxyLogDao();
-							lvDao.storeNewRequest("withdraw",
-									new JsonObject().put(FieldName.ACTION, "withdraw").put(FieldName.USERNAME, username)
-											.put(FieldName.SURVEYID, surveyID).put(FieldName.AMOUNT, amount)
-											.put(FieldName.TRANID, tranID),
-									handler1.result());
-
-						});
-
+							lvResp2.setHandler(handler1 -> {
+								// TODO if error
+								// If success
+								if (isStop) {
+									SurveyDao lvSurveyDao = new SurveyDao();
+									lvSurveyDao.closesurvey(username, surveyID, true, remark);
+								}
+								ProxyLogDao lvDao = new ProxyLogDao();
+								lvDao.storeNewRequest("withdraw",
+										new JsonObject().put(FieldName.ACTION, "withdraw")
+												.put(FieldName.USERNAME, username).put(FieldName.SURVEYID, surveyID)
+												.put(FieldName.AMOUNT, amount).put(FieldName.TRANID, tranID),
+										handler1.result());
+							});
+						} else {
+							this.CompleteGenerateResponse(CodeMapping.S0004.name(), CodeMapping.S0004.value(),null , response);
+						}
 					});
 
 				} else {

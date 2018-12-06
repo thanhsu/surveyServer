@@ -429,20 +429,17 @@ public class SurveyDao extends SurveyBaseDao {
 					lvSurveyNewStatus.put(FieldName.STATE, "C");
 					lvSurveyNewStatus.put(FieldName.REMARK, remark);
 					this.updateSurveyData(surveyID, lvSurveyNewStatus);
-					// Send remain money to ethe Server
-					Future<JsonObject> response = Future.future();
-					VertxServiceCenter.getInstance().sendNewMessage(
-							EventBusDiscoveryConst.ETHEREUMPROXYDISCOVERY.name(),
-							new JsonObject().put(FieldName.SURVEYID, surveyID).put(FieldName.USERNAME, username)
-									.put(FieldName.ACTION, "closesurvey"),
-							response);
-					response.setHandler(handler1 -> {
-						ProxyLogDao lvDao = new ProxyLogDao();
-						lvDao.storeNewRequest(
-								"closesurvey", new JsonObject().put(FieldName.SURVEYID, surveyID)
-										.put(FieldName.USERNAME, username).put(FieldName.ACTION, "closesurvey"),
-								handler1.result());
-					});
+					/*
+					 * // Send remain money to ethe Server Future<JsonObject> response =
+					 * Future.future(); VertxServiceCenter.getInstance().sendNewMessage(
+					 * EventBusDiscoveryConst.ETHEREUMPROXYDISCOVERY.name(), new
+					 * JsonObject().put(FieldName.SURVEYID, surveyID).put(FieldName.USERNAME,
+					 * username) .put(FieldName.ACTION, "closesurvey"), response);
+					 * response.setHandler(handler1 -> { ProxyLogDao lvDao = new ProxyLogDao();
+					 * lvDao.storeNewRequest( "closesurvey", new
+					 * JsonObject().put(FieldName.SURVEYID, surveyID) .put(FieldName.USERNAME,
+					 * username).put(FieldName.ACTION, "closesurvey"), handler1.result()); });
+					 */
 				} else {
 
 					lvSurveyNewStatus.put(FieldName.STATE, "S");

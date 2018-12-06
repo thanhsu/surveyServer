@@ -46,6 +46,7 @@ public class ConfirmSurveyDeposit extends BaseConfirmAction {
 		CashWithdrawDao lvCashWithdrawDao = new CashWithdrawDao();
 		lvCashWithdrawDao.updateTransStatus(transID, success ? "S" : "U", code).setHandler(h -> {
 			NotifiCashWithdraw lvNotificationCashWithdraw = new NotifiCashWithdraw(transID);
+			lvNotificationCashWithdraw.setUsername(username);
 			lvNotificationCashWithdraw.generate();
 		});
 

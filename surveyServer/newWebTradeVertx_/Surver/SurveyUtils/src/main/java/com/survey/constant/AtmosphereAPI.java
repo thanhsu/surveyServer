@@ -142,7 +142,7 @@ public class AtmosphereAPI {
 		data.put(CONTRACT_ACTION, action);
 		data.put(CONTRACT_MODULE, module);
 		String lvBid = contract(data);
-		this.mvMetaBroadcaster.broadcastTo(lvBid, o);
+		//this.mvMetaBroadcaster.broadcastTo(lvBid, o);
 		Broadcaster lvBroadcaster = lookupBroadcaster(lvBid, false);
 		if (lvBroadcaster == null) {
 			return false;
