@@ -1,1 +1,4 @@
 /target/
+/SurveyEtheProxyService/logs/
+/SurveyProcessor/logs/
+/SurveyServer/logs/

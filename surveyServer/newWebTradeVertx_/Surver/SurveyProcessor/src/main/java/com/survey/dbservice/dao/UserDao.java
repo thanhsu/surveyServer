@@ -323,7 +323,7 @@ public class UserDao extends SurveyBaseDao {
 				if(handler.result().isEmpty()) {
 					lvFuture.fail("Username not found");
 				}else {
-					lvFuture.complete(handler.result().get(0).getString(FieldName.STATE));
+					lvFuture.complete(handler.result().get(0).getString(FieldName.STATUS));
 				}
 			}else {
 				lvFuture.fail("Usernam not found");
