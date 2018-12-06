@@ -31,6 +31,8 @@ public class ConfirmPublishSurveyResult extends BaseConfirmAction {
 					lvDao.updateSurveyData(lvSurveyID,data );
 					if(success){
 						NotifiSurveyPushlished lvPushlished = new NotifiSurveyPushlished(lvSurveyID);
+						lvPushlished.setPrivate(true);
+						lvPushlished.setPublic(false);
 						lvPushlished.generate();
 					}else {
 						NotifiSurveyPushlished lvPushlished = new NotifiSurveyPushlished(lvSurveyID);
