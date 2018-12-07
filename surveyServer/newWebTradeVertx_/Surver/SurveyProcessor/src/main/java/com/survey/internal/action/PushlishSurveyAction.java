@@ -65,17 +65,6 @@ public class PushlishSurveyAction extends InternalSurveyBaseAction {
 						lvSurveyDao1.getMvFutureResponse().setHandler(create -> {
 							if (create.result().getString(FieldName.CODE).equals(CodeMapping.C0000.toString())) {
 								response.complete(create.result());
-								// Send to servey
-								/*
-								 * Future<JsonObject> lvPushlish = Future.future();
-								 * VertxServiceCenter.getInstance().sendNewMessage(
-								 * EventBusDiscoveryConst.ETHEREUMPROXYDISCOVERY.name(), getMessageBody(),
-								 * lvPushlish); lvPushlish.setHandler(x -> { if (x.succeeded()) { ProxyLogDao lv
-								 * = new ProxyLogDao(); lv.storeNewRequest("pushlish", getMessageBody(),
-								 * x.result()); } else {
-								 * Log.print("Cannot Proxy action pushlish survey to ethereum survey!Cause: " +
-								 * x.cause().getMessage()); } });
-								 */
 							} else {
 								response.complete(create.result());
 							}

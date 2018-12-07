@@ -3,6 +3,7 @@ package com.survey.confirm.actions;
 import com.survey.constant.UserNotificationEnum;
 import com.survey.dbservice.dao.CashDepositDao;
 import com.survey.dbservice.dao.SurveyDao;
+import com.survey.dbservice.dao.SurveyPushlishDao;
 import com.survey.notification.actions.NotifiAccountBalance;
 import com.survey.notification.actions.NotifiCashDeposit;
 import com.survey.notification.actions.NotifiSurveyPushlished;
@@ -12,6 +13,7 @@ import com.survey.utils.FieldName;
 import com.survey.utils.Log;
 import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonObject;
+import io.vertx.ext.mongo.UpdateOptions;
 
 public class ConfirmStopSurvey extends BaseConfirmAction {
 
@@ -35,6 +37,8 @@ public class ConfirmStopSurvey extends BaseConfirmAction {
 		if (success) {
 			data.put(FieldName.STATUS, "S");
 			lvDao.updateSurveyData(surveyID, data);
+			SurveyPushlishDao lvSurveyPushlishDao = new SurveyPushlishDao();
+			lvSurveyPushlishDao.updateDocument(new JsonObject().put(FieldName.SURVEYID, surveyID), new JsonObject().put(FieldName.STATE, "D"), new UpdateOptions(false), handler->{});
 		}
 
 		NotifiSurveyPushlished lvPushlished = new NotifiSurveyPushlished(surveyID);

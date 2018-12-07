@@ -31,6 +31,8 @@ public class NotifiNewAnswerData extends BaseSurveyNotification {
 									JsonObject msg = new JsonObject();
 									String title =h.result().get(0).getString(FieldName.TITLE);
 									msg.put(FieldName.TITLE, title);
+									msg.put(FieldName.SURVEYID, answerDt.getString(FieldName.SURVEYID));
+									msg.put(FieldName.AMOUNT, amount);
 									msg.put(FieldName.ANSWERDATA, answerDt.getJsonObject(FieldName.DATA));
 									message = new PushMessageBean();
 									message.setData(msg);

@@ -8,6 +8,7 @@ import java.util.List;
 import com.survey.constant.EventBusDiscoveryConst;
 import com.survey.constant.UserNotificationEnum;
 import com.survey.etheaction.ProxyCreateSurvey;
+import com.survey.etheaction.ProxyRePushlish;
 import com.survey.notification.actions.NotifiSurveyStatusUpdate;
 import com.survey.utils.CodeMapping;
 import com.survey.utils.FieldName;
@@ -44,20 +45,20 @@ public class SurveyDao extends SurveyBaseDao {
 		tmpSurvey.put(FieldName.STATE, "A");
 		tmpSurvey.put(FieldName.STATUS, "L");
 		tmpSurvey.put(FieldName.INPUTTIME, new Date().getTime());
-		
+
 		JsonObject tmpSetting = new JsonObject();
 		tmpSetting.put(FieldName.LOGINREQUIRE, false);
 		tmpSetting.put(FieldName.FAVOURITE_ENABLE, false);
 		tmpSetting.put(FieldName.ALLOWMULTIRESPONSE, false);
 		tmpSetting.put(FieldName.ISPUBLIC, true);
 		tmpSetting.put(FieldName.ENDLESS, true);
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-        String strDate = formatter.format(new Date());
+		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+		String strDate = formatter.format(new Date());
 		tmpSetting.put(FieldName.STARTDATE, strDate);
 		tmpSetting.put(FieldName.TITLE, title);
 		tmpSetting.put(FieldName.DESCRIPTION, description);
 		tmpSetting.put(FieldName.ENABLEDIRECTURL, false);
-		
+
 		tmpSurvey.put(FieldName.SETTING, tmpSetting);
 		return this.saveDocumentReturnID(tmpSurvey);
 	}
@@ -361,8 +362,8 @@ public class SurveyDao extends SurveyBaseDao {
 		return lvResult;
 	}
 
-	public void pushlishSurvey(String surveyID, String username, double limitResp, double pointPerOne, double initialFund,
-			boolean noti, double limitFund) {
+	public void pushlishSurvey(String surveyID, String username, double limitResp, double pointPerOne,
+			double initialFund, boolean noti, double limitFund) {
 		this.queryDocument(new JsonObject().put(FieldName._ID, surveyID), handler -> {
 			if (handler.succeeded() && handler.result() != null) {
 				if (handler.result().isEmpty()) {
@@ -379,29 +380,68 @@ public class SurveyDao extends SurveyBaseDao {
 								// tiền thì có thể nộp tiền hoặc rút tiền
 								this.CompleteGenerateResponse(CodeMapping.S9999.toString(), CodeMapping.S9999.value(),
 										null);
+							} else if (surveyData.getString(FieldName.STATUS).equals("S")) {
+								//TODO
+								SurveyPushlishDao lvSurveyPushlishDao = new SurveyPushlishDao();
+								lvSurveyPushlishDao.newPushlishAction(surveyID, limitResp, pointPerOne, initialFund,
+										noti, limitFund).setHandler(push -> {
+											if(push.succeeded()) {
+												ProxyRePushlish lvProxyRePushlish = new ProxyRePushlish();
+												lvProxyRePushlish.setSurveyid(surveyID);
+												lvProxyRePushlish.setInitialfund(initialFund);
+												lvProxyRePushlish.setLimitfund(limitFund);
+												lvProxyRePushlish.setLimitresponse(limitResp);
+												lvProxyRePushlish.setNotify(noti);
+												lvProxyRePushlish.setPayout(pointPerOne);
+												lvProxyRePushlish.setPushlishID(push.result());
+												lvProxyRePushlish.setUsername(username);
+												lvProxyRePushlish.sendToProxyServer().setHandler(h2 -> {
+													if (h2.succeeded() && h2.result() != null) {
+														if (h2.result().getString(FieldName.CODE).equals("P0000")) {
+															this.updateSurveyData(surveyID,
+																	new JsonObject().put(FieldName.STATUS, "P").put(
+																			FieldName.PUSHLISHDATE,
+																			new Date().getTime()));
+														} else {
+															this.CompleteGenerateResponse(CodeMapping.P2222.toString(),
+																	CodeMapping.P2222.value(), h2.result());
+														}
+													} else {
+														this.CompleteGenerateResponse(CodeMapping.C1111.toString(),
+																CodeMapping.C1111.value(), null);
+													}
+												});
+											}else {
+												this.CompleteGenerateResponse(CodeMapping.C3333.toString(),
+														CodeMapping.C3333.value(), null);
+											}
+										});
 							} else {
 								// Tao moi thong tin pushlish
 								SurveyPushlishDao lvSurveyPushlishDao = new SurveyPushlishDao();
 								lvSurveyPushlishDao.newPushlishAction(surveyID, limitResp, pointPerOne, initialFund,
 										noti, limitFund).setHandler(push -> {
 											if (push.succeeded()) {
-												ProxyCreateSurvey lvProxyCreateSurvey = new ProxyCreateSurvey(surveyID, username, initialFund, limitFund, noti, pointPerOne, limitResp, push.result());
-												lvProxyCreateSurvey.sendToProxyServer().setHandler(h2->{
-													if(h2.succeeded()&&h2.result()!=null) {
-														if(h2.result().getString(FieldName.CODE).equals("P0000")) {
+												ProxyCreateSurvey lvProxyCreateSurvey = new ProxyCreateSurvey(surveyID,
+														username, initialFund, limitFund, noti, pointPerOne, limitResp,
+														push.result());
+												lvProxyCreateSurvey.sendToProxyServer().setHandler(h2 -> {
+													if (h2.succeeded() && h2.result() != null) {
+														if (h2.result().getString(FieldName.CODE).equals("P0000")) {
 															this.updateSurveyData(surveyID,
-																	new JsonObject().put(FieldName.STATUS, "P")
-																			.put(FieldName.PUSHLISHDATE, new Date().getTime()));
-														}else {
+																	new JsonObject().put(FieldName.STATUS, "P").put(
+																			FieldName.PUSHLISHDATE,
+																			new Date().getTime()));
+														} else {
 															this.CompleteGenerateResponse(CodeMapping.P2222.toString(),
 																	CodeMapping.P2222.value(), h2.result());
 														}
-													}else {
+													} else {
 														this.CompleteGenerateResponse(CodeMapping.C1111.toString(),
 																CodeMapping.C1111.value(), null);
 													}
 												});
-												
+
 											} else {
 												this.CompleteGenerateResponse(CodeMapping.C3333.toString(),
 														CodeMapping.C3333.value(), null);
@@ -660,7 +700,7 @@ public class SurveyDao extends SurveyBaseDao {
 	}
 
 	public Future<List<JsonObject>> retrieveSurveyPushlished(String username) {
-		 Future<List<JsonObject>> handler = Future.future();
+		Future<List<JsonObject>> handler = Future.future();
 		JsonObject query = new JsonObject();
 		query.put(FieldName.USERNAME, username);
 		query.put(FieldName.STATE, new JsonObject().put("$in", new JsonArray().add("A").add("C")));

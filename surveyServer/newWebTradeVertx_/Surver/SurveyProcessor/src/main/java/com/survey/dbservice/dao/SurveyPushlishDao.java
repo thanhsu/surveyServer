@@ -23,6 +23,7 @@ public class SurveyPushlishDao extends SurveyBaseDao {
 				.put(FieldName.LIMITFUND, String.valueOf(limitFund))
 				.put(FieldName.LIMITRESPONSE, String.valueOf(limitResp))
 				.put(FieldName.PAYOUT, String.valueOf(pointPerOne))
+				.put(FieldName.STATE, "A")
 				.put(FieldName.NOTIFY, noti));
 
 	}
@@ -30,7 +31,7 @@ public class SurveyPushlishDao extends SurveyBaseDao {
 	public Future<JsonObject> retrievePushlishSuvey(String id) {
 		Future<JsonObject> lvResult = Future.future();
 		BaseDaoConnection.getInstance().getMongoClient().findWithOptions(getCollectionName(),
-				new JsonObject().put(FieldName.SURVEYID, id), new FindOptions(), resultHandler -> {
+				new JsonObject().put(FieldName.SURVEYID, id).put(FieldName.STATE, "A"), new FindOptions(), resultHandler -> {
 					if (resultHandler.succeeded() && resultHandler.result() != null) {
 						if (resultHandler.result().isEmpty()) {
 							lvResult.complete(null);

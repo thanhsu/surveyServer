@@ -5,13 +5,15 @@ public class ProxyTransactionTransfer extends BaseEtheProxyAction {
 	private String touser;
 	private String amount;
 	private String transid;
+	private String type;
 
-	public ProxyTransactionTransfer(String pFromuser, String pTouser, String pAmout, String pTransid) {
+	public ProxyTransactionTransfer(String pFromuser, String pTouser, String pAmout, String pTransid, String type) {
 		action="cashtranser";
 		this.setFromuser(pFromuser);
 		this.setTouser(pTouser);
 		this.setAmount(pAmout);
 		this.setTransid(pTransid);
+		this.setType(type);
 	}
 
 	public String getFromuser() {
@@ -44,6 +46,14 @@ public class ProxyTransactionTransfer extends BaseEtheProxyAction {
 
 	public void setTransid(String transid) {
 		this.transid = transid;
+	}
+
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
 	}
 
 }

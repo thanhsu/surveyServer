@@ -40,7 +40,7 @@ public class CashTranserAction extends InternalSurveyBaseAction {
 												if (trans.result() != null) {
 													ProxyTransactionTransfer lvTransfer = new ProxyTransactionTransfer(
 															username, toUsername, String.valueOf(amount),
-															trans.result());
+															trans.result(),"T");
 													lvTransfer.sendToProxyServer().setHandler(h -> {
 														if (h.result() != null) {
 															if (h.result().getString(FieldName.CODE).equals("P0000")) {
