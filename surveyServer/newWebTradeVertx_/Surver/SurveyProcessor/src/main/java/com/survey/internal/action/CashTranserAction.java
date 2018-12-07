@@ -1,10 +1,15 @@
 package com.survey.internal.action;
 
+import java.util.Date;
+
 import com.survey.dbservice.dao.CashTransactionDao;
 import com.survey.dbservice.dao.UserDao;
 import com.survey.etheaction.ProxyAccountBalance;
+import com.survey.etheaction.ProxyTransactionTransfer;
 import com.survey.utils.CodeMapping;
 import com.survey.utils.FieldName;
+
+import io.vertx.core.json.JsonObject;
 
 public class CashTranserAction extends InternalSurveyBaseAction {
 
@@ -32,7 +37,34 @@ public class CashTranserAction extends InternalSurveyBaseAction {
 									CashTransactionDao lvCashTransactionDao = new CashTransactionDao();
 									lvCashTransactionDao.createCashTransferOut(username, toUsername, amount, remark)
 											.setHandler(trans -> {
+												if (trans.result() != null) {
+													ProxyTransactionTransfer lvTransfer = new ProxyTransactionTransfer(
+															username, toUsername, String.valueOf(amount),
+															trans.result());
+													lvTransfer.sendToProxyServer().setHandler(h -> {
+														if (h.result() != null) {
+															if (h.result().getString(FieldName.CODE).equals("P0000")) {
+																this.CompleteGenerateResponse(CodeMapping.T0000.name(),
+																		"Success", new JsonObject()
+																				.put(FieldName.TRANID, trans.result()),
+																		response);
+																return;
+															}
+														}
+														// Fail
+														
+														this.CompleteGenerateResponse(CodeMapping.P1111.name(),
+																CodeMapping.P1111.value(),
+																h.result().getJsonObject(FieldName.DATA), response);
+														CashTransactionDao lvCashTransactionDao2 = new CashTransactionDao();
+														lvCashTransactionDao2.updateCashTransferStatus(trans.result(),
+																"U", new Date().getTime(), 0, 0);
 
+													});
+												} else {
+													this.CompleteGenerateResponse(CodeMapping.T1111.name(),
+															CodeMapping.T1111.value(), null, response);
+												}
 											});
 								} else {
 									this.CompleteGenerateResponse(CodeMapping.T2222.name(), CodeMapping.T2222.value(),

@@ -37,6 +37,7 @@ import com.survey.internal.action.RegisterAction;
 import com.survey.internal.action.RemoveFavouriteSurveyAction;
 import com.survey.internal.action.ResetPasswordAction;
 import com.survey.internal.action.RestoreSurveyAction;
+import com.survey.internal.action.RetrieveAccountBaseInfo;
 import com.survey.internal.action.RetrieveCashMethodAction;
 import com.survey.internal.action.RetrieveConfigAction;
 import com.survey.internal.action.RetrievePointValueAction;
@@ -104,7 +105,7 @@ public class SurveyProcessConstant {
 		
 		//-- Cash transfer
 		mvActionMapping.put("cashtransfer", new CashTranserAction());
-		
+		mvActionMapping.put("verifyuser", new RetrieveAccountBaseInfo());
 		mvActionMapping.put("cashtransferenquiry", new CashTransferEnquiryAction());
 		// 4
 		mvActionMapping.put("retrievesurvey", new RetrieveSurveyAction());

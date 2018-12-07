@@ -61,16 +61,20 @@ public class UserDao extends SurveyBaseDao {
 								userData.remove(FieldName.EXPIREDTIME);
 								this.CompleteGenerateResponse(CodeMapping.C0000.toString(), "Login is success",
 										userData);
-								String tmpPassword =userData.getString(FieldName.TEMPPASSWORD);
-								String newPass =userData.getString(FieldName.TEMPPASSWORD);
+								String tmpPassword = userData.getString(FieldName.TEMPPASSWORD);
+								String newPass = userData.getString(FieldName.TEMPPASSWORD);
 								try {
 									newPass = Encrypt.encode(tmpPassword);
 								} catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
 									// TODO Auto-generated catch block
 									e.printStackTrace();
 								}
-								this.updateDocument(new JsonObject().put(FieldName.USERNAME, username), 
-										new JsonObject().put(FieldName.TEMPPASSWORD, "").put(FieldName.PASSWORD, newPass).put(FieldName.OLDPASSWORD,userData.getString(FieldName.PASSWORD) ), new UpdateOptions(false), h3->{});
+								this.updateDocument(new JsonObject().put(FieldName.USERNAME, username),
+										new JsonObject().put(FieldName.TEMPPASSWORD, "")
+												.put(FieldName.PASSWORD, newPass)
+												.put(FieldName.OLDPASSWORD, userData.getString(FieldName.PASSWORD)),
+										new UpdateOptions(false), h3 -> {
+										});
 							} else {
 								this.CompleteGenerateResponse(CodeMapping.U2222.toString(), CodeMapping.U2222.value(),
 										null);
@@ -286,7 +290,33 @@ public class UserDao extends SurveyBaseDao {
 					userData.remove(FieldName.PASSWORD);
 					userData.remove(FieldName._ID);
 					userData.remove(FieldName.TOKEN);
+
 					this.CompleteGenerateResponse(CodeMapping.U0000.toString(), CodeMapping.U0000.value(), userData);
+					return;
+				}
+			} else {
+				getMvFutureResponse().fail("user id not found");
+				getMvFutureResponse().complete();
+			}
+
+		});
+	}
+
+	public void doGetUserBaseInfo(String username) {
+		JsonObject query = new JsonObject().put(FieldName.USERNAME, username);
+		this.queryDocument(query, handler -> {
+
+			if (handler.succeeded() && handler.result() != null) {
+				if (handler.result().isEmpty() || handler.result().get(0) == null) {
+					this.CompleteGenerateResponse(CodeMapping.U1111.toString(), CodeMapping.U1111.value(), null);
+				} else {
+					JsonObject userData = handler.result().get(0);
+					JsonObject userFull = new JsonObject()
+							.put(FieldName.USERNAME, userData.getString(FieldName.USERNAME))
+							.put(FieldName.AVATAR, userData.getString(FieldName.AVATAR))
+							.put(FieldName.FULLNAME, userData.getString(FieldName.FULLNAME));
+
+					this.CompleteGenerateResponse(CodeMapping.U0000.toString(), CodeMapping.U0000.value(), userFull);
 					return;
 				}
 			} else {
@@ -315,17 +345,17 @@ public class UserDao extends SurveyBaseDao {
 
 		});
 	}
-	
-	public Future<String> checkUserState(String username ){
+
+	public Future<String> checkUserState(String username) {
 		Future<String> lvFuture = Future.future();
-		this.queryDocument(new JsonObject().put(FieldName.USERNAME, username), handler->{
-			if(handler.result()!=null) {
-				if(handler.result().isEmpty()) {
+		this.queryDocument(new JsonObject().put(FieldName.USERNAME, username), handler -> {
+			if (handler.result() != null) {
+				if (handler.result().isEmpty()) {
 					lvFuture.fail("Username not found");
-				}else {
+				} else {
 					lvFuture.complete(handler.result().get(0).getString(FieldName.STATUS));
 				}
-			}else {
+			} else {
 				lvFuture.fail("Usernam not found");
 			}
 		});
@@ -438,7 +468,8 @@ public class UserDao extends SurveyBaseDao {
 
 	public void loginFaile(JsonObject userData) {
 		JsonObject query = new JsonObject().put("_id", userData.getString("_id"));
-		int failCount = userData.getInteger(FieldName.FAILLOGINCOUNT)==null?0:userData.getInteger(FieldName.FAILLOGINCOUNT);
+		int failCount = userData.getInteger(FieldName.FAILLOGINCOUNT) == null ? 0
+				: userData.getInteger(FieldName.FAILLOGINCOUNT);
 
 		JsonObject updateData = new JsonObject().put(FieldName.FAILLOGINCOUNT, ++failCount);
 		if (failCount >= getMaxFaild()) {
@@ -447,10 +478,12 @@ public class UserDao extends SurveyBaseDao {
 		this.updateDocument(query, updateData, new UpdateOptions(false), handler -> {
 		});
 	}
-	
+
 	public void updateAccountToPendingSate(String username, String reject) {
-		this.updateDocument(new JsonObject().put(FieldName.USERNAME, username), new JsonObject().put(FieldName.STATE, "P").put(FieldName.REMARK, reject), new UpdateOptions(false), handler -> {
-		});
+		this.updateDocument(new JsonObject().put(FieldName.USERNAME, username),
+				new JsonObject().put(FieldName.STATE, "P").put(FieldName.REMARK, reject), new UpdateOptions(false),
+				handler -> {
+				});
 	}
 
 	public static int getMaxFaild() {

@@ -33,7 +33,7 @@ public class ConfirmStopSurvey extends BaseConfirmAction {
 		SurveyDao lvDao = new SurveyDao();
 		JsonObject data = new JsonObject();
 		if (success) {
-			data.put(FieldName.STATUS, "L");
+			data.put(FieldName.STATUS, "S");
 			lvDao.updateSurveyData(surveyID, data);
 		}
 

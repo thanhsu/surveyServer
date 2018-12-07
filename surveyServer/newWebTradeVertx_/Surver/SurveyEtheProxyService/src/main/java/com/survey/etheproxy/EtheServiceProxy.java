@@ -4,6 +4,7 @@ import java.util.HashMap;
 
 import com.survey.constant.EventBusDiscoveryConst;
 import com.survey.utils.FieldName;
+import com.survey.utils.Log;
 import com.survey.utils.controller.MicroServiceVerticle;
 
 import io.vertx.circuitbreaker.CircuitBreaker;
@@ -30,7 +31,7 @@ public class EtheServiceProxy extends MicroServiceVerticle {
 		JsonArray lvActionMapping = config().getJsonArray("ActionLinkMapping");
 		lvActionMapping.forEach(node -> {
 			String[] lvTmp = ((String) node).split(",");
-			actionMapping.put(lvTmp[1], "/"+lvTmp[2]);
+			actionMapping.put(lvTmp[1], "/" + lvTmp[2]);
 			methodActionMapping.put(lvTmp[1], lvTmp[0]);
 		});
 		etheIP = config().getString("EtheServerIP");
@@ -66,8 +67,15 @@ public class EtheServiceProxy extends MicroServiceVerticle {
 					httpRequest.timeout(100000);
 					httpRequest.sendJsonObject(body, handler -> {
 						if (handler.succeeded()) {
-							h.reply(handler.result().bodyAsJsonObject());
-							future.complete(handler.result().bodyAsBuffer());
+							try {
+								h.reply(handler.result().bodyAsJsonObject());
+								future.complete(handler.result().bodyAsBuffer());
+							} catch (Exception e) {
+								Log.print("Error: " + e);
+								h.reply(new JsonObject().put(FieldName.CODE, "P1111").put(FieldName.MESSAGE,
+										handler.result().bodyAsString()));
+								future.fail(handler.cause().getMessage());
+							}
 						} else {
 							h.reply(new JsonObject().put(FieldName.CODE, "P1111").put(FieldName.MESSAGE,
 									handler.cause().getMessage()));
@@ -88,7 +96,7 @@ public class EtheServiceProxy extends MicroServiceVerticle {
 						} else {
 							future.fail(handler.cause());
 						}
-						
+
 					});
 				}
 			}).setHandler(ar -> {

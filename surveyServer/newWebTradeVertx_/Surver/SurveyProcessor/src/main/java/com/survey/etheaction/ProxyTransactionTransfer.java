@@ -7,6 +7,7 @@ public class ProxyTransactionTransfer extends BaseEtheProxyAction {
 	private String transid;
 
 	public ProxyTransactionTransfer(String pFromuser, String pTouser, String pAmout, String pTransid) {
+		action="cashtranser";
 		this.setFromuser(pFromuser);
 		this.setTouser(pTouser);
 		this.setAmount(pAmout);
