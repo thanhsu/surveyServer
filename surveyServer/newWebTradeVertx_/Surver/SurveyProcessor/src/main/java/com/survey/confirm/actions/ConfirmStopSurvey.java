@@ -24,7 +24,7 @@ public class ConfirmStopSurvey extends BaseConfirmAction {
 		String username = msg.getString(FieldName.USERNAME);
 		double point = 0;
 		try {
-			point = Double.parseDouble(msg.getValue(FieldName.POINT).toString());
+			point = Double.parseDouble(msg.getValue(FieldName.REFUNDPOINT).toString());
 		} catch (Exception e) {
 			// TODO: handle exception
 		}
@@ -38,11 +38,14 @@ public class ConfirmStopSurvey extends BaseConfirmAction {
 			data.put(FieldName.STATUS, "S");
 			lvDao.updateSurveyData(surveyID, data);
 			SurveyPushlishDao lvSurveyPushlishDao = new SurveyPushlishDao();
-			lvSurveyPushlishDao.updateDocument(new JsonObject().put(FieldName.SURVEYID, surveyID), new JsonObject().put(FieldName.STATE, "D"), new UpdateOptions(false), handler->{});
+			lvSurveyPushlishDao.updateDocument(new JsonObject().put(FieldName.SURVEYID, surveyID),
+					new JsonObject().put(FieldName.STATE, "D"), new UpdateOptions(false), handler -> {
+					});
 		}
 
 		NotifiSurveyPushlished lvPushlished = new NotifiSurveyPushlished(surveyID);
 		lvPushlished.setLvNotificationEnum(UserNotificationEnum.SURVEYSTOP);
+		lvPushlished.setSurveybalance(msg.getValue(FieldName.SURVEYBALANCE).toString());
 		lvPushlished.setPrivate(true);
 		lvPushlished.setPublic(false);
 		lvPushlished.generate();

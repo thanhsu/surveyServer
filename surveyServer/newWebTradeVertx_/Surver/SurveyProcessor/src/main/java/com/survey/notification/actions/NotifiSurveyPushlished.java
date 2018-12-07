@@ -8,7 +8,7 @@ import com.survey.utils.PushMessageBean;
 public class NotifiSurveyPushlished extends BaseSurveyNotification {
 	private String surveyID;
 	private UserNotificationEnum lvNotificationEnum = UserNotificationEnum.SURVEYPUSHLISH;
-
+	private String surveybalance;
 	public NotifiSurveyPushlished(String username, PushMessageBean pPushMessageBean) {
 		super(username, pPushMessageBean);
 	}
@@ -25,12 +25,15 @@ public class NotifiSurveyPushlished extends BaseSurveyNotification {
 		lvSurveyDao.retrieveSurveyStatus(getSurveyID()).setHandler(handler -> {
 			if (handler.succeeded()) {
 				message = new PushMessageBean();
-				message.setData(handler.result());
 				this.setUsername(handler.result().getString(FieldName.USERNAME));
 				handler.result().remove(FieldName.USERNAME);
-				message.setType(UserNotificationEnum.SURVEYPUSHLISH);
+				handler.result().put(FieldName.SURVEYBALANCE, getSurveybalance());
+				message.setData(handler.result());
+				
+				
+				message.setType(lvNotificationEnum);
 				message.setDescription(UserNotificationEnum.SURVEYPUSHLISH.getDescription());
-				this.doSend();
+				this.doSendPrivate();
 			}
 		});
 	}
@@ -49,6 +52,14 @@ public class NotifiSurveyPushlished extends BaseSurveyNotification {
 
 	public void setLvNotificationEnum(UserNotificationEnum lvNotificationEnum) {
 		this.lvNotificationEnum = lvNotificationEnum;
+	}
+
+	public String getSurveybalance() {
+		return surveybalance;
+	}
+
+	public void setSurveybalance(String surveybalance) {
+		this.surveybalance = surveybalance;
 	}
 
 }
