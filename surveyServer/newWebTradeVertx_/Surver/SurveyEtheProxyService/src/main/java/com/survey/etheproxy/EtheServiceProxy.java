@@ -24,7 +24,8 @@ public class EtheServiceProxy extends MicroServiceVerticle {
 	public boolean isSSL;
 	public static HashMap<String, String> actionMapping = new HashMap<>();
 	public static HashMap<String, String> methodActionMapping = new HashMap<>();
-
+	private String clientID="webServer";
+	
 	@Override
 	public void init(Vertx vertx, Context context) {
 		super.init(vertx, context);
@@ -37,6 +38,7 @@ public class EtheServiceProxy extends MicroServiceVerticle {
 		etheIP = config().getString("EtheServerIP");
 		ethePort = config().getInteger("EtheServerPort");
 		isSSL = config().getBoolean("EtheServerIsSSL");
+		clientID =  config().getString("EtheClientID")==null?"webServer": config().getString("EtheClientID");
 	}
 
 	@Override
@@ -63,7 +65,7 @@ public class EtheServiceProxy extends MicroServiceVerticle {
 					} else {
 						httpRequest = webClient.post(ethePort, etheIP, uri);
 					}
-					httpRequest.headers().add("clientid", "web_server");
+					httpRequest.headers().add("clientid", clientID);
 					httpRequest.timeout(100000);
 					httpRequest.sendJsonObject(body, handler -> {
 						if (handler.succeeded()) {

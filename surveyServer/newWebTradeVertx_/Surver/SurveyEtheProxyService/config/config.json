@@ -35,6 +35,7 @@
 	],
 	"EtheServerIP": "35.201.171.178",
 	"EtheServerPort": 9000,
+	"EtheClientID":"webserver1",
 	"EtheServerIsSSL": false,
 	"EtheSocketHost":"35.201.171.178",
 	"EtheSocketPort":9000

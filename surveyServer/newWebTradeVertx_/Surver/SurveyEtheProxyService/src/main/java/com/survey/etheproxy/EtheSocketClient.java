@@ -19,12 +19,14 @@ import io.vertx.servicediscovery.Record;
 public class EtheSocketClient extends AbstractVerticle {
 	private String host;
 	private int port;
+	private String clientID="webServer";
 
 	@Override
 	public void init(Vertx vertx, Context context) {
 		super.init(vertx, context);
 		host = config().getString("EtheSocketHost");
 		port = config().getInteger("EtheSocketPort");
+		clientID =  config().getString("EtheClientID")==null?"webServer": config().getString("EtheClientID");
 	}
 
 	@Override
@@ -67,7 +69,7 @@ public class EtheSocketClient extends AbstractVerticle {
 				}
 				// client.close();
 			});
-			websocket.write(new JsonObject().put("clientid", "web_server").toBuffer());
+			websocket.write(new JsonObject().put("clientid", clientID).toBuffer());
 		});
 
 		/*
