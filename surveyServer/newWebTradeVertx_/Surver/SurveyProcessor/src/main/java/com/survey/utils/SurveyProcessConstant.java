@@ -28,6 +28,7 @@ import com.survey.internal.action.DeleteSurveyAction;
 import com.survey.internal.action.DepositAction;
 import com.survey.internal.action.DepositWithdrawSurveyAction;
 import com.survey.internal.action.DisableSurveyAction;
+import com.survey.internal.action.EtheTransactionHistory;
 import com.survey.internal.action.InternalSurveyBaseAction;
 import com.survey.internal.action.LoginAction;
 import com.survey.internal.action.NewSurveyAction;
@@ -35,6 +36,7 @@ import com.survey.internal.action.PaymentAction;
 import com.survey.internal.action.PushlishSurveyAction;
 import com.survey.internal.action.RegisterAction;
 import com.survey.internal.action.RemoveFavouriteSurveyAction;
+import com.survey.internal.action.RenewPINAction;
 import com.survey.internal.action.ResetPasswordAction;
 import com.survey.internal.action.RestoreSurveyAction;
 import com.survey.internal.action.RetrieveAccountBaseInfo;
@@ -51,6 +53,7 @@ import com.survey.internal.action.StopPushlishAction;
 import com.survey.internal.action.Testing;
 import com.survey.internal.action.UpdateSurveyDataAction;
 import com.survey.internal.action.UpdateUserInfoAction;
+import com.survey.internal.action.VerifyPINAction;
 import com.survey.internal.action.WithdrawAction;
 
 public class SurveyProcessConstant {
@@ -88,6 +91,8 @@ public class SurveyProcessConstant {
 		mvActionMapping.put("resetpassword", new ResetPasswordAction());
 		mvActionMapping.put("userinfo", new RetrieveUserinfoAction());
 		mvActionMapping.put("updateuserinfo", new UpdateUserInfoAction());
+		mvActionMapping.put("verifypin", new VerifyPINAction());
+		mvActionMapping.put("newpin",new RenewPINAction());
 
 		// 2
 		mvActionMapping.put("retrieveconfig", new RetrieveConfigAction());
@@ -107,6 +112,7 @@ public class SurveyProcessConstant {
 		mvActionMapping.put("cashtransfer", new CashTranserAction());
 		mvActionMapping.put("verifyuser", new RetrieveAccountBaseInfo());
 		mvActionMapping.put("cashtransferenquiry", new CashTransferEnquiryAction());
+		mvActionMapping.put("ethetranshistory", new EtheTransactionHistory());
 		// 4
 		mvActionMapping.put("retrievesurvey", new RetrieveSurveyAction());
 		mvActionMapping.put("retrievesurveybaseinfo", new RetrieveSurveyBaseInfoAction());
