@@ -381,11 +381,11 @@ public class SurveyDao extends SurveyBaseDao {
 								this.CompleteGenerateResponse(CodeMapping.S9999.toString(), CodeMapping.S9999.value(),
 										null);
 							} else if (surveyData.getString(FieldName.STATUS).equals("S")) {
-								//TODO
+								// TODO
 								SurveyPushlishDao lvSurveyPushlishDao = new SurveyPushlishDao();
 								lvSurveyPushlishDao.newPushlishAction(surveyID, limitResp, pointPerOne, initialFund,
 										noti, limitFund).setHandler(push -> {
-											if(push.succeeded()) {
+											if (push.succeeded()) {
 												ProxyRePushlish lvProxyRePushlish = new ProxyRePushlish();
 												lvProxyRePushlish.setSurveyid(surveyID);
 												lvProxyRePushlish.setInitialfund(initialFund);
@@ -402,16 +402,20 @@ public class SurveyDao extends SurveyBaseDao {
 																	new JsonObject().put(FieldName.STATUS, "P").put(
 																			FieldName.PUSHLISHDATE,
 																			new Date().getTime()));
-														} else {
-															this.CompleteGenerateResponse(CodeMapping.P2222.toString(),
-																	CodeMapping.P2222.value(), h2.result());
+															return;
 														}
-													} else {
-														this.CompleteGenerateResponse(CodeMapping.C1111.toString(),
-																CodeMapping.C1111.value(), null);
 													}
+													SurveyPushlishDao lvSurveyPushlishDao2 = new SurveyPushlishDao();
+													lvSurveyPushlishDao2.updateDocument(
+															new JsonObject().put(FieldName._ID, push.result()),
+															new JsonObject().put(FieldName.STATE, "D"),
+															new UpdateOptions(false), handler3 -> {
+															});
+													this.CompleteGenerateResponse(CodeMapping.P2222.toString(),
+															CodeMapping.P2222.value(), h2.result());
+
 												});
-											}else {
+											} else {
 												this.CompleteGenerateResponse(CodeMapping.C3333.toString(),
 														CodeMapping.C3333.value(), null);
 											}
