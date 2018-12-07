@@ -35,8 +35,8 @@ public class StopPushlishAction extends InternalSurveyBaseAction {
 														if (handler2.result().getString(FieldName.CODE)
 																.equals("P0000")) {
 															// Update survey state = D
-															SurveyDao lvSurveyDao2 = new SurveyDao();
-															lvSurveyDao2.closesurvey(username, surveyID, true, remark);
+															//SurveyDao lvSurveyDao2 = new SurveyDao();
+															//lvSurveyDao2.closesurvey(username, surveyID, true, remark);
 															this.CompleteGenerateResponse(CodeMapping.C0000.name(),
 																	"Success", new JsonObject().put(FieldName.TRANID,
 																			handler.result()),
