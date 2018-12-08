@@ -6,9 +6,9 @@ import com.survey.dbservice.dao.UtilsDao;
 import com.survey.etheaction.ProxyAccountBalance;
 import com.survey.etheaction.ProxyCashWithdrawWithSystem;
 import com.survey.utils.CodeMapping;
+import com.survey.utils.ECashWithdrawType;
 import com.survey.utils.FieldName;
 import com.survey.utils.MessageDefault;
-import com.survey.utils.Utils;
 
 import io.vertx.core.Future;
 import io.vertx.core.json.*;;
@@ -22,7 +22,15 @@ public class CardDataAction extends InternalSurveyBaseAction {
 		case "buy":
 			buyCard();
 			break;
-
+		case "new":
+			newCard();
+			break;
+		case "disable":
+			disableCard();
+			break;
+		case "all":
+			retriveALl();
+			break;
 		default:
 			response.complete(MessageDefault.ActionNotFound());
 			break;
@@ -38,8 +46,10 @@ public class CardDataAction extends InternalSurveyBaseAction {
 		UtilsDao lvUtilsDao = new UtilsDao();
 		lvUtilsDao.retrieveEthePointValue(false).setHandler(handler -> {
 			if (handler.result() != null) {
-				double value = Double.parseDouble(handler.result().getValue(FieldName.VALUE).toString());
-				int unit = Integer.parseInt(handler.result().getValue(FieldName.UNIT).toString());
+				double value = Double.parseDouble(handler.result().getJsonArray(FieldName.DATA).getJsonObject(0)
+						.getValue(FieldName.VALUE).toString());
+				double unit = Double.parseDouble(handler.result().getJsonArray(FieldName.DATA).getJsonObject(0)
+						.getValue(FieldName.UNIT).toString());
 				double pointForBuy = (amount / value) * unit;
 				ProxyAccountBalance lvProxyAccountBalance = new ProxyAccountBalance(userName);
 				lvProxyAccountBalance.sendToProxyServer().setHandler(h2 -> {
@@ -54,38 +64,47 @@ public class CardDataAction extends InternalSurveyBaseAction {
 							}
 							// Kiem tra tinh hop le va so the con trong
 							CardDao lvCardDao = new CardDao();
-							Future<JsonObject> lvFuture = Future.future();
-							lvCardDao.retrieveCard(userName, categoryID, strAmount, lvFuture);
-							if (lvFuture.succeeded() && lvFuture.result() != null) {
-								CashWithdrawDao lvCashWithdrawDao = new CashWithdrawDao();
-								String cardID = lvFuture.result().getString(FieldName._ID);
-								lvCashWithdrawDao.storeNewWithdrawBuyCard(amount, "VND", "Buy Card "+categoryID+" value: "+strAmount, value, lvFuture.result().getString(FieldName._ID)).setHandler(h3->{
-									if(h3.result()!=null) {
-										ProxyCashWithdrawWithSystem lvCashWithdrawWithSystem = new ProxyCashWithdrawWithSystem();
-										lvCashWithdrawWithSystem.setAmount(String.valueOf(pointForBuy));
-										lvCashWithdrawWithSystem.setFromuser(userName);
-										lvCashWithdrawWithSystem.setTransid(h3.result());
-										lvCashWithdrawWithSystem.sendToProxyServer().setHandler(h4->{
-											if(h4.result()!=null) {
-												if(h4.result().getString(FieldName.CODE).equals("P0000")) {
-													this.CompleteGenerateResponse(CodeMapping.CR00.name(), CodeMapping.CR00.value(), "", response);
-													return;
+							Future<JsonObject> lvFuture;
+							lvFuture = lvCardDao.retrieveCard(userName, categoryID, strAmount);
+							lvFuture.setHandler(h3 -> {
+								if (h3.result() != null) {
+									CashWithdrawDao lvCashWithdrawDao = new CashWithdrawDao();
+									String cardID = h3.result().getString(FieldName._ID);
+									lvCashWithdrawDao.storeNewWithdrawBuyCard(amount, "VND",
+											"Buy Card " + categoryID + " value: " + strAmount, value,
+											h3.result().getString(FieldName._ID)).setHandler(h4 -> {
+												if (h4.result() != null) {
+													ProxyCashWithdrawWithSystem lvCashWithdrawWithSystem = new ProxyCashWithdrawWithSystem();
+													lvCashWithdrawWithSystem.setAmount(String.valueOf(pointForBuy));
+													lvCashWithdrawWithSystem.setFromuser(userName);
+													lvCashWithdrawWithSystem.setTransid(h4.result());
+													lvCashWithdrawWithSystem
+															.setTrantype(ECashWithdrawType.BUYCARD.name());
+													lvCashWithdrawWithSystem.sendToProxyServer().setHandler(h5 -> {
+														if (h5.result() != null) {
+															if (h5.result().getString(FieldName.CODE).equals("P0000")) {
+																this.CompleteGenerateResponse(CodeMapping.CR00.name(),
+																		CodeMapping.CR00.value(), "", response);
+																return;
+															}
+														}
+														CardDao lvCardDao2 = new CardDao();
+														lvCardDao2.revertThisCard(cardID);
+														this.CompleteGenerateResponse(CodeMapping.P2222.name(),
+																CodeMapping.P2222.value(), h5.result().getJsonObject(FieldName.DATA), response);
+													});
+												} else {
+													CardDao lvCardDao2 = new CardDao();
+													lvCardDao2.revertThisCard(cardID);
+													this.CompleteGenerateResponse(CodeMapping.C4444.name(),
+															CodeMapping.C4444.value(), null, response);
 												}
-											}
-											CardDao lvCardDao2 = new CardDao();
-											lvCardDao2.revertThisCard(cardID);
-											this.CompleteGenerateResponse(CodeMapping.C4444.name(), CodeMapping.C4444.value(), null, response);
-										});
-									}else {
-										CardDao lvCardDao2 = new CardDao();
-										lvCardDao2.revertThisCard(cardID);
-										this.CompleteGenerateResponse(CodeMapping.C4444.name(), CodeMapping.C4444.value(), null, response);
-									}
-								});
-							} else {
-								this.CompleteGenerateResponse(CodeMapping.CR11.name(), CodeMapping.CR11.value(), null,
-										response);
-							}
+											});
+								} else {
+									this.CompleteGenerateResponse(CodeMapping.CR11.name(), CodeMapping.CR11.value(),
+											null, response);
+								}
+							});
 							return;
 						}
 					}
@@ -96,7 +115,40 @@ public class CardDataAction extends InternalSurveyBaseAction {
 				this.CompleteGenerateResponse(CodeMapping.C4444.name(), CodeMapping.C4444.value(), null, response);
 			}
 		});
-		ProxyAccountBalance lvAccountBalance = new ProxyAccountBalance(userName);
 	}
 
+	private void newCard() {
+		String categoryID = getMessageBody().getString(FieldName.CATEGORYID);
+		String value = getMessageBody().getString(FieldName.VALUE);
+		String amount = getMessageBody().getString(FieldName.AMOUNT);
+		String seriesID = getMessageBody().getString(FieldName.SERIESID);
+		String code = getMessageBody().getString(FieldName.CODE);
+		CardDao card = new CardDao();
+		card.newCardData(categoryID, value, amount, seriesID, code);
+		card.getMvFutureResponse().setHandler(handler -> {
+			response.complete(handler.result());
+		});
+	}
+
+	private void retriveALl() {
+		String state = getMessageBody().getString(FieldName.STATE);
+		state = state==null?"":state;
+		JsonObject query = new JsonObject();
+		if(!state.equals("")) {
+			query.put(FieldName.STATE, state);
+		}
+		CardDao  lvCardDao= new CardDao();
+		lvCardDao.retrieveCardDetail(query).setHandler(handler->{
+			this.CompleteGenerateResponse(CodeMapping.C0000.name(), "", handler.result(), response);
+		});
+		
+	}
+	
+	private void disableCard() {
+		String id = getMessageBody().getString(FieldName.CARDID);
+		String username = getMessageBody().getString(FieldName.USERNAME);
+		CardDao cardDao = new CardDao();
+		cardDao.doneThisCard(id, username);
+		this.CompleteGenerateResponse(CodeMapping.C0000.name(), "", null, response);
+	}
 }

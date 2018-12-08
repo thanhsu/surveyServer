@@ -10,7 +10,9 @@ public enum UserNotificationEnum {
 	CASHDEPOSIT("Account cash deposit"),
 	CASHWITHDRAW ("Account cash withdraw"),
 	ANSWERSURVEYPAYOUT("Payout for answer survey"),
-	UNKNOWN("Unknownw");
+	BUYCARD("Buy card"),
+	UNKNOWN("Unknownw"),
+	;
 
 	private String description;
 

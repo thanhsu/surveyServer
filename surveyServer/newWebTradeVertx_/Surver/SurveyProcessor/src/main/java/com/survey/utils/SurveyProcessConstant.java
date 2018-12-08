@@ -17,6 +17,7 @@ import com.survey.internal.action.AddFavouriteSurveyAction;
 import com.survey.internal.action.AnswerSurveyAction;
 import com.survey.internal.action.CancelCashAction;
 import com.survey.internal.action.CardCategoryAction;
+import com.survey.internal.action.CardDataAction;
 import com.survey.internal.action.CashEnquiryAction;
 import com.survey.internal.action.CashManualDeposit;
 import com.survey.internal.action.CashTranserAction;
@@ -138,6 +139,7 @@ public class SurveyProcessConstant {
 		
 		//Card action
 		mvActionMapping.put("cardcategory", new CardCategoryAction());
+		mvActionMapping.put("carddata", new CardDataAction());
 		
 	}
 
