@@ -1,0 +1,52 @@
+{
+	"discoveryaddress": "wtradediscovery",
+	"discoveryname": "myname",
+	"log.path": "./logs/surveyDB",
+	"log.dir": "./logs/surveyDB",
+	"log.SystemSetErr": "true",
+	"log.FileName": "SurveyDB",
+	"log.DayRetain": "365",
+	"log.FileNum": "1000",
+	"log.FileMaxSize": "10485760",
+	"log.Level": "127",
+	"log.ThreadPriority": "4",
+	"log.Reply": "N",
+	"log.SMTPMessageInterval": "300000",
+	"log.SMTPHost": "mail.tx-tech.com",
+	"DBConnectionConfig": {
+		"db_name": "survey",
+		"connection_string": "mongodb://localhost:27017"
+	},
+	"ActionMapping": [
+		"login-com.survey.dbservices.action.UserLogin",
+		"register-com.survey.dbservices.action.RegisterAction",
+		"changepassword-com.survey.dbservices.action.ChangePasswordAction",
+		"resetpassword-com.survey.dbservices.action.ResetPasswordAction",
+		"updateuserinfo-com.survey.dbservices.action.UpdateUserInfo",
+		"userinfo-com.survey.dbservices.action.UserInfoAction",
+		"retrieveconfig-com.survey.dbservices.action.RetrieveConfigAction"
+	],
+	"SurveyHost":"http://locahost:3439",
+	
+	
+	
+	"ServiceInternalProcessorConfig": {
+		"isWorker": true,
+		"instance": 10
+	},
+	"EmailServiceConfig": {
+		"address": "vertx.mail",
+		"hostname": "smtp.gmail.com",
+		"port": 465,
+		"username": "thanhsu604@gmail.com",
+		"password": "62016303ts"
+	},
+	"approvalUrl":"http://127.0.0.1/paypal/approval?token=",
+	"cancelUrl":"http://127.0.0.1/paypal/cancel?token=",
+	"PaypalConfig":{
+		"PaypalClientID":"AbbCG7NNwfl16JP3wZ0N6DxMB6_8B8K208LtMieymitsJI_npiNwv0yWorTX_7AgZBg95rBTIjRzKgxp",
+		"PaypalSecret":"EKgknn9Pd02gmoa56qvVQu7U1q0F67Ag_uI5fy_sbH57hvSi09NCS80p5CIe-E8Kngz3brTvMOvJWt7I",
+		"PaypalHost":"https://api.sandbox.paypal.com",
+		"PaypalMode":"sandbox"
+	}
+}
