@@ -1,5 +1,7 @@
 package com.survey.confirm.actions;
 
+import java.util.Date;
+
 import com.survey.dbservice.dao.CashTransactionDao;
 import com.survey.dbservice.dao.CashWithdrawDao;
 import com.survey.notification.actions.NotifiAccountBalance;
@@ -25,7 +27,10 @@ public class ConfirmTransaction extends BaseConfirmAction {
 		boolean success = msg.getBoolean(FieldName.SUCCESS);
 		double amount = Double.parseDouble(msg.getString(FieldName.VALUE));
 		double fee = Double.parseDouble(msg.getString(FieldName.FEE));
-		long timeStamp = Long.parseLong(msg.getString(FieldName.TIMESTAMP));
+		long timeStamp = new Date().getTime();
+		if(msg.getString(FieldName.TIMESTAMP)!=null) {
+			timeStamp = Long.parseLong(msg.getString(FieldName.TIMESTAMP));
+		}
 
 		if (trantype.equals(ECashTranType.CASHTRANSACTION.name())) {
 			CashTransactionDao lvCashTransaction = new CashTransactionDao();

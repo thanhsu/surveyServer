@@ -39,7 +39,7 @@ public class CashTransactionDao extends SurveyBaseDao {
 				new JsonObject().put(FieldName.SETTLESTATUS, settleStatus).put(FieldName.SETTLESTIME, settleTime).put(FieldName.AMOUNT, amount).put(FieldName.FEE, fee),
 				new UpdateOptions(false), handler -> {
 					if (handler.succeeded()) {
-						lvFuture.complete(null);
+						lvFuture.complete(new JsonObject());
 					} else {
 						lvFuture.fail(handler.cause().getMessage());
 					}

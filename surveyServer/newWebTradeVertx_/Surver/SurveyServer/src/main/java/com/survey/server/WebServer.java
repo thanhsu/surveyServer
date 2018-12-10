@@ -118,6 +118,7 @@ public class WebServer extends MicroServiceVerticle {
 		});
 		router.route("/api/register").handler(this::handlerRegister);
 		router.route("/api/login").handler(this::handlerLogin);
+		router.post("/m/login").handler(this::handlerLogin);
 
 		router.route("/api/survey/:action").handler(this::handlerSurveyAction);
 		router.get("/api/activeuser").handler(this::handlerActiveAccount);
@@ -128,6 +129,9 @@ public class WebServer extends MicroServiceVerticle {
 		router.route("/api/image/:action").handler(this::handlerSurveyImage);
 
 		router.route("/survey/:id").handler(this::handlerGetSurvey);
+		
+		router.route("/m/logout").handler(this::handlerLogout);
+		router.post("/api/logout").handler(this::handlerLogout);
 		
 		router.route("/hero/*").handler(pRoutingContext -> {
 			responseHomeIndex(pRoutingContext);
@@ -263,6 +267,14 @@ public class WebServer extends MicroServiceVerticle {
 					}
 				});
 
+	}
+	
+	private void handlerLogout(RoutingContext rtx) {
+		if(rtx.session()!=null) {
+			rtx.session().destroy();
+			rtx.session().regenerateId();
+		}
+		doResponseNoRenewCookie(rtx, Json.encode(MessageDefault.SessionTimeOut()));
 	}
 
 	private void handlerSurveyAction(RoutingContext pvRtx) {

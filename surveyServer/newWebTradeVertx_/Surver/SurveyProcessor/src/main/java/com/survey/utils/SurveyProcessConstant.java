@@ -79,7 +79,7 @@ public class SurveyProcessConstant {
 		confirmActionMapping.put("survey_deposit", new ConfirmSurveyDeposit());
 		confirmActionMapping.put("survey_withdraw", new ConfirmSurveyWithdraw());
 		confirmActionMapping.put("survey_answer", new ConfirmSurveyAnswer());
-		confirmActionMapping.put("cashtransfer", new ConfirmTransaction());
+		confirmActionMapping.put("transaction", new ConfirmTransaction());
 		
 	}
 

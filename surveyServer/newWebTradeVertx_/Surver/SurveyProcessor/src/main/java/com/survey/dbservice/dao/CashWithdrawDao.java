@@ -23,7 +23,7 @@ public class CashWithdrawDao extends SurveyBaseDao {
 		Date lvNow = new Date();
 		JsonObject deposit = new JsonObject();
 		deposit.put(FieldName.USERID, targetUserID).put(FieldName.TOKEN, privateToken).put(FieldName.POINT, amount)
-				.put(FieldName.STATE, "A").put(FieldName.SETTLESTATUS, "U").put(FieldName.INPUTTIME, lvNow.getTime())
+				.put(FieldName.STATE, "A").put(FieldName.SETTLESTATUS, "P").put(FieldName.INPUTTIME, lvNow.getTime())
 				.put(FieldName.EXCHANGERATE, exchagerate).put(FieldName.CCY, ccy);
 		return this.saveDocumentReturnID(deposit);
 	}
@@ -40,9 +40,12 @@ public class CashWithdrawDao extends SurveyBaseDao {
 		return this.saveDocumentReturnID(deposit);
 	}
 
-	public Future<JsonObject> retrieveAllWithdraw(long fromTime, long toTime, String username) {
+	public Future<JsonObject> retrieveAllWithdraw(long fromTime, long toTime, String username, String settleStatus) {
 		JsonObject query = new JsonObject().put(FieldName.USERNAME, username).put(FieldName.INPUTTIME,
 				new JsonObject().put("$lt", toTime).put("$gt", fromTime));
+		if(!settleStatus.equals("")) {
+			query.put(FieldName.SETTLESTATUS, settleStatus);
+		}
 		this.queryDocument(query, handler -> {
 			this.CompleteGenerateResponse(CodeMapping.C0000.toString(), "", handler.result());
 		});

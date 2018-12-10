@@ -20,18 +20,37 @@ public class CashEnquiryAction extends InternalSurveyBaseAction {
 	public void doProccess() {
 		String userid = getMessageBody().getString(FieldName.USERID);
 		String username = getMessageBody().getString(FieldName.USERNAME);
+		String dw = getMessageBody().getString(FieldName.DW) == null ? "ALL" : getMessageBody().getString(FieldName.DW);
+		String settleStatus = getMessageBody().getString(FieldName.SETTLESTATUS) == null ? ""
+				: getMessageBody().getString(FieldName.SETTLESTATUS);
 		CashDepositDao lvCashDepositDao = new CashDepositDao();
-		
+
 		Date from;
 		try {
-			from = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss").parse(getMessageBody().getString(FieldName.FROMDATE) + " 00:00:00");
-			Date to = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss").parse(getMessageBody().getString(FieldName.TODATE) + " 23:59:59");
-			Future<JsonObject> lvListCashDeposit = lvCashDepositDao.retrieveAllDeposit(from.getTime(), to.getTime(),
-					username);
+			from = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss")
+					.parse(getMessageBody().getString(FieldName.FROMDATE) + " 00:00:00");
+			Date to = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss")
+					.parse(getMessageBody().getString(FieldName.TODATE) + " 23:59:59");
+			Future<JsonObject> lvListCashDeposit = Future.future();
+			if (dw.equals("ALL") || dw.equals("D")) {
+				lvCashDepositDao.retrieveAllDeposit(from.getTime(), to.getTime(), username, settleStatus)
+						.setHandler(handler -> {
+							lvListCashDeposit.complete(handler.result());
+						});
+			} else {
+				lvListCashDeposit.complete(new JsonObject());
+			}
+
 			CashWithdrawDao lvCashWithdrawDao = new CashWithdrawDao();
-			Future<JsonObject> lvCashWithDraw = lvCashWithdrawDao.retrieveAllWithdraw(from.getTime(), to.getTime(),
-					username);
-			
+			Future<JsonObject> lvCashWithDraw = Future.future();
+			if (dw.equals("ALL") || dw.equals("W")) {
+				lvCashWithdrawDao.retrieveAllWithdraw(from.getTime(), to.getTime(), username, settleStatus)
+						.setHandler(handler -> {
+							lvCashWithDraw.complete(handler.result());
+						});
+			} else {
+				lvCashWithDraw.complete(new JsonObject());
+			}
 			CompositeFuture lvCompositeFuture = CompositeFuture.all(lvCashWithDraw, lvListCashDeposit);
 			lvCompositeFuture.setHandler(handler -> {
 				if (handler.succeeded()) {
