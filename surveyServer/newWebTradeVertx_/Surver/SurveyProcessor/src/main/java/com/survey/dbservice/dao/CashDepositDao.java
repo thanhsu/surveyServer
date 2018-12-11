@@ -16,11 +16,11 @@ public class CashDepositDao extends SurveyBaseDao {
 		setCollectionName(DepositCollectionName);
 	}
 
-	public Future<String> storeNewDepositRequest(String targetUsername, String privateToken, String method,
+	public Future<String> storeNewDepositRequest(String targetUserID,String targetUsername, String privateToken, String method,
 			double amount, String ccy, String remark, boolean isApproval, String exchagerate) {
 		Date lvNow = new Date();
 		JsonObject deposit = new JsonObject();
-		deposit.put(FieldName.USERNAME, targetUsername).put(FieldName.TOKEN, privateToken).put(FieldName.AMOUNT, amount)
+		deposit.put(FieldName.USERNAME, targetUsername).put(FieldName.USERID, targetUserID).put(FieldName.TOKEN, privateToken).put(FieldName.AMOUNT, amount)
 				.put(FieldName.STATE, "A").put(FieldName.SETTLESTATUS, "P").put(FieldName.INPUTTIME, lvNow.getTime())
 				.put(FieldName.EXCHANGERATE, exchagerate).put(FieldName.CCY, ccy).put(FieldName.TYPE, ECashDepositType.CLIENTCASH);
 		return this.saveDocumentReturnID(deposit);

@@ -146,5 +146,5 @@ public class FieldName {
 	public static final String ANSWERDATA="answerdata";
 	public static final String SERIESID="seriesid";
 	public static final String TRANTYPE="trantype";
-
+	public static final String DEPOSITDATA="depositdata";
 }

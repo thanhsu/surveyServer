@@ -24,6 +24,7 @@ public class DepositAction extends InternalSurveyBaseAction {
 	public void doProccess() {
 		CashDepositDao lvCashDepositDao = new CashDepositDao();
 		String userid = getMessageBody().getString(FieldName.USERID);
+		String username = getMessageBody().getString(FieldName.USERNAME);
 		if(userid==null) {
 			this.response.complete(MessageDefault.SessionTimeOut());
 		}
@@ -33,7 +34,7 @@ public class DepositAction extends InternalSurveyBaseAction {
 				String exchangeRate = point.result().getString(FieldName.VALUE);
 				String privateToken = RSAEncrypt.getIntance().encrypt(userid);
 				lvCashDepositDao
-						.storeNewDepositRequest(userid, privateToken, "",
+						.storeNewDepositRequest(userid,username, privateToken, "",
 								getMessageBody().getDouble(FieldName.AMOUNT), getMessageBody().getString(FieldName.CCY),
 								getMessageBody().getString(FieldName.REMARK), false, exchangeRate)
 						.setHandler(handler -> {

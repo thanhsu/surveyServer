@@ -35,7 +35,7 @@ public class CashManualDeposit extends InternalSurveyBaseAction {
 							if(lstBank.succeeded()&&lstBank.result()!=null) {
 								if(!lstBank.result().isEmpty()) {
 									JsonObject messageResponse = new JsonObject();
-									
+									messageResponse.put(FieldName.DEPOSITDATA, handler.result().get(0));
 									messageResponse.put(FieldName.LISTBANK, lstBank.result());
 									messageResponse.put(FieldName.REGEXTRANSFERREMARK, CashManualUtils.genDepositRegex(username, transId));
 									this.CompleteGenerateResponse(CodeMapping.C0000.name(), "Oke", messageResponse, response);
