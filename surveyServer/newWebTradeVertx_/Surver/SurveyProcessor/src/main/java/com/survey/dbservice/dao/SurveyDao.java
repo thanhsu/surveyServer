@@ -383,7 +383,7 @@ public class SurveyDao extends SurveyBaseDao {
 							} else if (surveyData.getString(FieldName.STATUS).equals("S")) {
 								// TODO
 								SurveyPushlishDao lvSurveyPushlishDao = new SurveyPushlishDao();
-								lvSurveyPushlishDao.newPushlishAction(surveyID, limitResp, pointPerOne, initialFund,
+								lvSurveyPushlishDao.newPushlishAction(username,surveyID, limitResp, pointPerOne, initialFund,
 										noti, limitFund).setHandler(push -> {
 											if (push.succeeded()) {
 												ProxyRePushlish lvProxyRePushlish = new ProxyRePushlish();
@@ -423,7 +423,7 @@ public class SurveyDao extends SurveyBaseDao {
 							} else {
 								// Tao moi thong tin pushlish
 								SurveyPushlishDao lvSurveyPushlishDao = new SurveyPushlishDao();
-								lvSurveyPushlishDao.newPushlishAction(surveyID, limitResp, pointPerOne, initialFund,
+								lvSurveyPushlishDao.newPushlishAction(username,surveyID, limitResp, pointPerOne, initialFund,
 										noti, limitFund).setHandler(push -> {
 											if (push.succeeded()) {
 												ProxyCreateSurvey lvProxyCreateSurvey = new ProxyCreateSurvey(surveyID,

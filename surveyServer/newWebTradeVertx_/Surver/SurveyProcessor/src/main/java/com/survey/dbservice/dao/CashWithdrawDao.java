@@ -28,6 +28,15 @@ public class CashWithdrawDao extends SurveyBaseDao {
 		return this.saveDocumentReturnID(deposit);
 	}
 
+	public Future<String> storeNewSurveyPushlishRequest(String username, double amount, String ccy) {
+		Date lvNow = new Date();
+		JsonObject deposit = new JsonObject();
+		deposit.put(FieldName.USERNAME, username).put(FieldName.POINT, amount).put(FieldName.STATE, "A")
+				.put(FieldName.SETTLESTATUS, "P").put(FieldName.INPUTTIME, lvNow.getTime()).put(FieldName.CCY, ccy);
+		deposit.put(FieldName.TYPE, ECashWithdrawType.SURVEYPUSHLISH.name());
+		return this.saveDocumentReturnID(deposit);
+	}
+
 	public Future<String> storeNewWithdrawBuyCard(double amount, String ccy, String remark, double exchagerate,
 			String cardID) {
 		Date lvNow = new Date();
@@ -43,7 +52,7 @@ public class CashWithdrawDao extends SurveyBaseDao {
 	public Future<JsonObject> retrieveAllWithdraw(long fromTime, long toTime, String username, String settleStatus) {
 		JsonObject query = new JsonObject().put(FieldName.USERNAME, username).put(FieldName.INPUTTIME,
 				new JsonObject().put("$lt", toTime).put("$gt", fromTime));
-		if(!settleStatus.equals("")) {
+		if (!settleStatus.equals("")) {
 			query.put(FieldName.SETTLESTATUS, settleStatus);
 		}
 		this.queryDocument(query, handler -> {
@@ -82,7 +91,7 @@ public class CashWithdrawDao extends SurveyBaseDao {
 
 	public Future<String> createSurveyCashDeposit(String pSurveyID, String username, String pAmount, String remark) {
 		Future<String> lvResult = Future.future();
-		
+
 		SurveyDao lvSurveyDao = new SurveyDao();
 		lvSurveyDao.retrieveSurvey(new JsonObject().put(FieldName._ID, pSurveyID), h -> {
 			if (h.succeeded() && h.result() != null) {
@@ -100,6 +109,7 @@ public class CashWithdrawDao extends SurveyBaseDao {
 						js.put(FieldName.STATE, "A");
 						js.put(FieldName.SETTLESTATUS, "P");
 						js.put(FieldName.REMARK, remark);
+						js.put(FieldName.INPUTTIME, new Date().getTime());
 						this.saveDocumentReturnID(js, lvResult);
 					}
 				}

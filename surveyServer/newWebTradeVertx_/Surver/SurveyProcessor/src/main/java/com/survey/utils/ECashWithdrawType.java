@@ -5,6 +5,7 @@ public enum ECashWithdrawType {
 	TRANSFER,
 	CLIENTCASH,
 	FEE,
-	BUYCARD
+	BUYCARD,
+	SURVEYPUSHLISH
 	;
 }

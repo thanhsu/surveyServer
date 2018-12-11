@@ -1,5 +1,6 @@
 package com.survey.confirm.actions;
 
+import com.survey.dbservice.dao.CashWithdrawDao;
 import com.survey.dbservice.dao.SurveyDao;
 import com.survey.dbservice.dao.SurveyPushlishDao;
 import com.survey.notification.actions.NotifiSurveyPushlished;
@@ -21,6 +22,10 @@ public class ConfirmPublishSurveyResult extends BaseConfirmAction {
 		lvSurveyPushlishDao.retrievePushlishByID(pushlishID).setHandler(h -> {
 			if (h.succeeded() && h.result() != null) {
 				String lvSurveyID = h.result().getString(FieldName.SURVEYID);
+				String tranID = h.result().getString(FieldName.TRANID);
+				
+				CashWithdrawDao lvCashWithdrawDao = new CashWithdrawDao();
+				lvCashWithdrawDao.updateSettlesStatus(tranID, success?"S":"U", "", "");
 				SurveyDao lvDao = new SurveyDao();
 				if (success) {
 					data.put(FieldName.STATUS, "N");
