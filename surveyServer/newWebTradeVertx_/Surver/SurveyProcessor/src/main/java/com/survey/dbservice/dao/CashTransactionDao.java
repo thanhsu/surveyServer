@@ -53,6 +53,6 @@ public class CashTransactionDao extends SurveyBaseDao {
 	}
 	
 	public void retrieveListCashTransferOut (String username, long fromTime, long toTime, Future<JsonArray> resultHandler){
-		this.queryDocumentRunCmd(new JsonObject().put(FieldName.FROMUSER, username).put(FieldName.INPUTTIME,new JsonObject().put("$lt", toTime).put("$gt", fromTime)),new JsonObject(),new JsonObject().put(FieldName.INPUTTIME, 1), resultHandler);
+		this.queryDocumentRunCmd(new JsonObject().put(FieldName.USERNAME, username).put(FieldName.INPUTTIME,new JsonObject().put("$lt", toTime).put("$gt", fromTime)),new JsonObject(),new JsonObject().put(FieldName.INPUTTIME, 1), resultHandler);
 	}
 }
