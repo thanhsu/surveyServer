@@ -393,7 +393,7 @@ public class SurveyDao extends SurveyBaseDao {
 												lvProxyRePushlish.setLimitresponse(limitResp);
 												lvProxyRePushlish.setNotify(noti);
 												lvProxyRePushlish.setPayout(pointPerOne);
-												lvProxyRePushlish.setPushlishID(push.result());
+												lvProxyRePushlish.setPushlishid(push.result());
 												lvProxyRePushlish.setUsername(username);
 												lvProxyRePushlish.sendToProxyServer().setHandler(h2 -> {
 													if (h2.succeeded() && h2.result() != null) {

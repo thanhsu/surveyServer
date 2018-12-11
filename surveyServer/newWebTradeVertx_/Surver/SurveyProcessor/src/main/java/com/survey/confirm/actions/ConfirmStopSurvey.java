@@ -22,16 +22,7 @@ public class ConfirmStopSurvey extends BaseConfirmAction {
 		String surveyID = msg.getString(FieldName.SURVEYID);
 		String transID = msg.getString(FieldName.TRANID);
 		String username = msg.getString(FieldName.USERNAME);
-		double point = 0;
-		try {
-			point = Double.parseDouble(msg.getValue(FieldName.REFUNDPOINT).toString());
-		} catch (Exception e) {
-			// TODO: handle exception
-		}
-		double userBalance = Double.parseDouble(msg.getString(FieldName.USERBALANCE));
-
 		boolean success = msg.getBoolean(FieldName.SUCCESS);
-
 		SurveyDao lvDao = new SurveyDao();
 		JsonObject data = new JsonObject();
 		if (success) {
@@ -42,6 +33,13 @@ public class ConfirmStopSurvey extends BaseConfirmAction {
 					new JsonObject().put(FieldName.STATE, "D"), new UpdateOptions(false), handler -> {
 					});
 		}
+		double point = 0;
+		try {
+			point = Double.parseDouble(msg.getValue(FieldName.REFUNDPOINT).toString());
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+		double userBalance = Double.parseDouble(msg.getString(FieldName.USERBALANCE));
 
 		NotifiSurveyPushlished lvPushlished = new NotifiSurveyPushlished(surveyID);
 		lvPushlished.setLvNotificationEnum(UserNotificationEnum.SURVEYSTOP);

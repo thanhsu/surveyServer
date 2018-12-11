@@ -61,6 +61,7 @@ public class RetrieveSurveyAction extends InternalSurveyBaseAction {
 			break;
 
 		default:
+			this.CompleteGenerateResponse(CodeMapping.C2222.name(), "", null, response);
 			break;
 		}
 	}

@@ -8,7 +8,7 @@ public class ProxyRePushlish extends BaseEtheProxyAction {
 	private boolean notify;
 	private double payout;
 	private double limitresponse;
-	private String pushlishID;
+	private String pushlishid;
 
 	public ProxyRePushlish() {
 		action = "repushlish";
@@ -70,11 +70,12 @@ public class ProxyRePushlish extends BaseEtheProxyAction {
 		this.limitresponse = limitresponse;
 	}
 
-	public String getPushlishID() {
-		return pushlishID;
+	public String getPushlishid() {
+		return pushlishid;
 	}
 
-	public void setPushlishID(String pushlishID) {
-		this.pushlishID = pushlishID;
+	public void setPushlishid(String pushlishid) {
+		this.pushlishid = pushlishid;
 	}
+
 }

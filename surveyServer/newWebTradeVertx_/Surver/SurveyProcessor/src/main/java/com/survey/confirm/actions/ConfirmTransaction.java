@@ -22,13 +22,19 @@ public class ConfirmTransaction extends BaseConfirmAction {
 		String toUser = msg.getString("toUser");
 		String transID = msg.getString(FieldName.TRANID);
 		String trantype = msg.getString(FieldName.TRANTYPE);
-		double fromUserBalance = Double.parseDouble(msg.getString(FieldName.FROMUSERBALANCE));
-		double toUserBalance = Double.parseDouble(msg.getString(FieldName.TOUSERBALANCE));
+
 		boolean success = msg.getBoolean(FieldName.SUCCESS);
-		double amount = Double.parseDouble(msg.getString(FieldName.VALUE));
-		double fee = Double.parseDouble(msg.getString(FieldName.FEE));
+
+		double amount = 0;
+		double fee = 0;
+		if (success) {
+
+			amount = Double.parseDouble(msg.getString(FieldName.VALUE));
+			fee = Double.parseDouble(msg.getString(FieldName.FEE));
+
+		}
 		long timeStamp = new Date().getTime();
-		if(msg.getString(FieldName.TIMESTAMP)!=null) {
+		if (msg.getString(FieldName.TIMESTAMP) != null) {
 			timeStamp = Long.parseLong(msg.getString(FieldName.TIMESTAMP));
 		}
 
@@ -38,11 +44,18 @@ public class ConfirmTransaction extends BaseConfirmAction {
 					.setHandler(handler -> {
 						if (handler.succeeded()) {
 							if (success) {
+								double fromUserBalance = Double.parseDouble(msg.getString(FieldName.FROMUSERBALANCE));
+								double toUserBalance = Double.parseDouble(msg.getString(FieldName.TOUSERBALANCE));
+
+								double pamount = Double.parseDouble(msg.getString(FieldName.VALUE));
+								double pfee = Double.parseDouble(msg.getString(FieldName.FEE));
+
 								UserBalanceUpdateBean lvFromUserBalance = new UserBalanceUpdateBean();
 								lvFromUserBalance.setAgent(toUser);
 								lvFromUserBalance.setDw("W");
 								lvFromUserBalance.setAgenttype("account");
-								lvFromUserBalance.setAmount(amount);
+								lvFromUserBalance.setAmount(pamount);
+
 								lvFromUserBalance.setBalance(fromUserBalance);
 								lvFromUserBalance.setType(ECashWithdrawType.TRANSFER.name());
 								lvFromUserBalance.setUsername(fromUser);
@@ -55,7 +68,7 @@ public class ConfirmTransaction extends BaseConfirmAction {
 								lvtoUserBalance.setAgent(fromUser);
 								lvtoUserBalance.setDw("D");
 								lvtoUserBalance.setAgenttype("account");
-								lvtoUserBalance.setAmount(amount);
+								lvtoUserBalance.setAmount(pamount);
 								lvtoUserBalance.setBalance(toUserBalance);
 								lvtoUserBalance.setType(ECashWithdrawType.TRANSFER.name());
 								lvtoUserBalance.setUsername(toUser);
@@ -76,15 +89,21 @@ public class ConfirmTransaction extends BaseConfirmAction {
 			lvCashWithdrawDao.queryDocument(new JsonObject().put(FieldName._ID, transID), handler -> {
 				if (handler.succeeded()) {
 					if (!handler.result().isEmpty()) {
+						
 						String cardID = handler.result().get(0).getString(FieldName.CARDID);
 						NotifiBuyCard lvNotifiBuyCard = new NotifiBuyCard(cardID, success);
 						lvNotifiBuyCard.generate();
 						if (success) {
+							double fromUserBalance = Double.parseDouble(msg.getString(FieldName.FROMUSERBALANCE));
+							double toUserBalance = Double.parseDouble(msg.getString(FieldName.TOUSERBALANCE));
+
+							double pamount = Double.parseDouble(msg.getString(FieldName.VALUE));
+							double pfee = Double.parseDouble(msg.getString(FieldName.FEE));
 							UserBalanceUpdateBean lvFromUserBalance = new UserBalanceUpdateBean();
 							lvFromUserBalance.setAgent("system");
 							lvFromUserBalance.setDw("W");
 							lvFromUserBalance.setAgenttype("system");
-							lvFromUserBalance.setAmount(amount);
+							lvFromUserBalance.setAmount(pamount);
 							lvFromUserBalance.setBalance(fromUserBalance);
 							lvFromUserBalance.setType(ECashWithdrawType.BUYCARD.name());
 							lvFromUserBalance.setUsername(fromUser);
@@ -92,7 +111,7 @@ public class ConfirmTransaction extends BaseConfirmAction {
 							NotifiAccountBalance lvNotifiAccountBalance = new NotifiAccountBalance(lvFromUserBalance);
 							lvNotifiAccountBalance.generate();
 						}
-						
+
 					}
 				}
 			});
