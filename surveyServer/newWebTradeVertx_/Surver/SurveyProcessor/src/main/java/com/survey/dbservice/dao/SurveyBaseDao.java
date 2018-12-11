@@ -49,7 +49,8 @@ public abstract class SurveyBaseDao {
 		JsonArray pipeline = new JsonArray();
 		pipeline.add(new JsonObject().put("$match", query));
 		if (project != null) {
-			pipeline.add(new JsonObject().put("$project", project));
+			if (!project.isEmpty())
+				pipeline.add(new JsonObject().put("$project", project));
 		}
 		if (!sort.isEmpty()) {
 			pipeline.add(new JsonObject().put("$sort", sort));
@@ -131,7 +132,7 @@ public abstract class SurveyBaseDao {
 			}
 		});
 	}
-	
+
 	public void saveDocument(JsonObject data) {
 		BaseDaoConnection.getInstance().getMongoClient().save(CollectionName, data, handler -> {
 			mvFutureResponse.complete();

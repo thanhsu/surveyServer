@@ -41,7 +41,8 @@ public class CashTransferEnquiryAction extends InternalSurveyBaseAction {
 		CompositeFuture lvCompositeFuture = CompositeFuture.all(listCashTransferIn, listCashTransferOut);
 
 		lvCashTransactionDao.retrieveListCashTransferIn(username, from.getTime(), to.getTime(), listCashTransferIn);
-		lvCashTransactionDao.retrieveListCashTransferOut(username, from.getTime(), to.getTime(), listCashTransferOut);
+		CashTransactionDao lvCashTransactionDao2 = new CashTransactionDao();
+		lvCashTransactionDao2.retrieveListCashTransferOut(username, from.getTime(), to.getTime(), listCashTransferOut);
 
 		lvCompositeFuture.setHandler(arg0 -> {
 			JsonObject data = new JsonObject();
