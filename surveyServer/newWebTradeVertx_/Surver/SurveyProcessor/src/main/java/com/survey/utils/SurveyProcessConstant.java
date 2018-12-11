@@ -75,6 +75,7 @@ public class SurveyProcessConstant {
 	public void initConfirmAction() {
 		confirmActionMapping.put("create_account", new ConfirmCreateUser());
 		confirmActionMapping.put("pushlish_survey", new ConfirmPublishSurveyResult());
+		confirmActionMapping.put("repushlish_survey", new ConfirmPublishSurveyResult());
 		confirmActionMapping.put("stop_survey", new ConfirmStopSurvey());
 		confirmActionMapping.put("survey_deposit", new ConfirmSurveyDeposit());
 		confirmActionMapping.put("survey_withdraw", new ConfirmSurveyWithdraw());

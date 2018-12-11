@@ -44,6 +44,23 @@ public class SurveyPushlishDao extends SurveyBaseDao {
 				});
 		return lvResult;
 	}
+	
+	public Future<JsonObject> retrievePushlishByID(String id) {
+		Future<JsonObject> lvResult = Future.future();
+		BaseDaoConnection.getInstance().getMongoClient().findWithOptions(getCollectionName(),
+				new JsonObject().put(FieldName._ID, id), new FindOptions(), resultHandler -> {
+					if (resultHandler.succeeded() && resultHandler.result() != null) {
+						if (resultHandler.result().isEmpty()) {
+							lvResult.complete(null);
+						} else {
+							lvResult.complete(resultHandler.result().get(0));
+						}
+					} else {
+						lvResult.complete(null);
+					}
+				});
+		return lvResult;
+	}
 
 	public Future<List<JsonObject>> retrieveSearchPushlishSuvey(JsonObject searchValue) {
 		Future<List<JsonObject>> lvResult = Future.future();
