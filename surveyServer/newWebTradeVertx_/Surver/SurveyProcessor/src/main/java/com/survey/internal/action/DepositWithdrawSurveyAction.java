@@ -98,7 +98,7 @@ public class DepositWithdrawSurveyAction extends InternalSurveyBaseAction {
 					double surveyBalance = Double
 							.parseDouble(handler.result().getJsonObject(FieldName.DATA).getString("balance"));
 					double lvTmpAmout = Double.parseDouble(amount);
-					boolean isStop = true;
+					
 					if (lvTmpAmout > surveyBalance) {
 						this.CompleteGenerateResponse(CodeMapping.S0007.toString(), CodeMapping.S0007.value(),
 								handler.result().getJsonObject(FieldName.DATA), response);
@@ -121,10 +121,6 @@ public class DepositWithdrawSurveyAction extends InternalSurveyBaseAction {
 							lvResp2.setHandler(handler1 -> {
 								// TODO if error
 								// If success
-								if (isStop) {
-									SurveyDao lvSurveyDao = new SurveyDao();
-									lvSurveyDao.closesurvey(username, surveyID, true, remark);
-								}
 								ProxyLogDao lvDao = new ProxyLogDao();
 								lvDao.storeNewRequest("withdraw",
 										new JsonObject().put(FieldName.ACTION, "withdraw")

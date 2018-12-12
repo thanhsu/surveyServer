@@ -47,9 +47,9 @@ public class PaymentAction extends InternalSurveyBaseAction {
 									JsonObject lvRes = res.result();
 									// Update to Awaitting settle
 									// Store cash tracsaction
-									CashTransactionDao lvCashTransactionDao = new CashTransactionDao();
+								/*	CashTransactionDao lvCashTransactionDao = new CashTransactionDao();
 									lvCashTransactionDao.newTransaction(username, trandID, "D",
-											lvRes.getJsonObject("data"), "P");
+											lvRes.getJsonObject("data"), "P");*/
 									this.CompleteGenerateResponse(CodeMapping.C0000.name(), "OK", lvRes, response);
 								} else {
 									this.response.complete(MessageDefault.RequestFailed(res.cause().getMessage()));
@@ -75,8 +75,10 @@ public class PaymentAction extends InternalSurveyBaseAction {
 					if (handler.succeeded() && handler.result() != null) {
 						if (handler.result().get(0).getString(FieldName.USERID).equals(userID)) {
 							message.mergeIn(handler.result().get(0));
-							double amount = message.getDouble(FieldName.AMOUNT);
+							double amount = message.getDouble(FieldName.POINT);
 							float rate = message.getFloat(FieldName.EXCHANGERATE);
+							//check ccy va ti gia de chuyen qua USD
+							message.put(FieldName.AMOUNT,amount*rate);
 							Utils.autoApprovelCashWithdraw(message.getString(FieldName.METHOD), amount * rate)
 									.setHandler(check -> {
 										if (check.succeeded()) {
@@ -96,9 +98,9 @@ public class PaymentAction extends InternalSurveyBaseAction {
 																message.getString(FieldName._ID), "P",
 																message.getString(FieldName.IPADDRESS),
 																message.getString(FieldName.MACADDRESS));
-														CashTransactionDao lvCashTransactionDao = new CashTransactionDao();
+														/*CashTransactionDao lvCashTransactionDao = new CashTransactionDao();
 														lvCashTransactionDao.newTransaction(username, trandID, "D",
-																new JsonObject(), "U");
+																new JsonObject(), "U");*/
 														CashWithdrawDao lvCashWithdrawDao1 = new CashWithdrawDao();
 														lvCashWithdrawDao1.queryDocument(
 																new JsonObject().put(FieldName._ID, trandID),
@@ -108,9 +110,9 @@ public class PaymentAction extends InternalSurveyBaseAction {
 													}
 												} else {
 													// Send to paypal success
-													// store cash transaction with state = P
+													// store cash transaction with state = U
 													lvCashWithdrawDao.updateSettlesStatus(
-															message.getString(FieldName._ID), "P",
+															message.getString(FieldName._ID), "U",
 															message.getString(FieldName.IPADDRESS),
 															message.getString(FieldName.MACADDRESS));
 													CashTransactionDao lvCashTransactionDao = new CashTransactionDao();

@@ -19,7 +19,7 @@ public class CashWithdrawDao extends SurveyBaseDao {
 	}
 
 	public Future<String> storeNewWithdrawRequest(String targetUserID, String privateToken, String method,
-			double amount, String ccy, String remark, boolean isApproval, String exchagerate) {
+			double amount, String ccy, String remark, boolean isApproval, double exchagerate) {
 		Date lvNow = new Date();
 		JsonObject deposit = new JsonObject();
 		deposit.put(FieldName.USERID, targetUserID).put(FieldName.TOKEN, privateToken).put(FieldName.POINT, amount)
