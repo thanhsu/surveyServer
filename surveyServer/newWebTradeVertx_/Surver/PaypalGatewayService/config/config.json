@@ -41,11 +41,11 @@
 		"username": "thanhsu604@gmail.com",
 		"password": "62016303ts"
 	},
-	"approvalUrl":"http://127.0.0.1/paypal/approval?token=",
-	"cancelUrl":"http://127.0.0.1/paypal/cancel?token=",
+	"approvalUrl":"http://127.0.0.1:5050/paypal/approval?token=",
+	"cancelUrl":"http://127.0.0.1:5050/paypal/cancel?token=",
 	"PaypalConfig":{
-		"PaypalClientID":"AbbCG7NNwfl16JP3wZ0N6DxMB6_8B8K208LtMieymitsJI_npiNwv0yWorTX_7AgZBg95rBTIjRzKgxp",
-		"PaypalSecret":"EKgknn9Pd02gmoa56qvVQu7U1q0F67Ag_uI5fy_sbH57hvSi09NCS80p5CIe-E8Kngz3brTvMOvJWt7I",
+		"PaypalClientID":"AeiHb27zU1XL2zycr2iDaaVEyxZxSTtZOOymWLzd59QbEIgcv995EVVTeohTeNcR73rMzI_iDZBExx5Y",
+		"PaypalSecret":"EEeiBHo0hYDbJMAZ0KWzFKkCZu1KNkwVkEyFq3R9MoA8Fq-qMjOSAaswKu1RJyOeE7okf4dCU3EVk89y",
 		"PaypalHost":"https://api.sandbox.paypal.com",
 		"PaypalMode":"sandbox"
 	}

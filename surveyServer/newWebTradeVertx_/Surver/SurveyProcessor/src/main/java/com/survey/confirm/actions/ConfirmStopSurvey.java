@@ -25,14 +25,6 @@ public class ConfirmStopSurvey extends BaseConfirmAction {
 		boolean success = msg.getBoolean(FieldName.SUCCESS);
 		SurveyDao lvDao = new SurveyDao();
 		JsonObject data = new JsonObject();
-		if (success) {
-			data.put(FieldName.STATUS, "S");
-			lvDao.updateSurveyData(surveyID, data);
-			SurveyPushlishDao lvSurveyPushlishDao = new SurveyPushlishDao();
-			lvSurveyPushlishDao.updateDocument(new JsonObject().put(FieldName.SURVEYID, surveyID),
-					new JsonObject().put(FieldName.STATE, "D"), new UpdateOptions(false), handler -> {
-					});
-		}
 		double point = 0;
 		try {
 			point = Double.parseDouble(msg.getValue(FieldName.REFUNDPOINT).toString());
@@ -40,13 +32,23 @@ public class ConfirmStopSurvey extends BaseConfirmAction {
 			// TODO: handle exception
 		}
 		double userBalance = Double.parseDouble(msg.getString(FieldName.USERBALANCE));
-
-		NotifiSurveyPushlished lvPushlished = new NotifiSurveyPushlished(surveyID);
-		lvPushlished.setLvNotificationEnum(UserNotificationEnum.SURVEYSTOP);
-		lvPushlished.setSurveybalance(msg.getValue(FieldName.SURVEYBALANCE).toString());
-		lvPushlished.setPrivate(true);
-		lvPushlished.setPublic(false);
-		lvPushlished.generate();
+		if (success) {
+			data.put(FieldName.STATUS, "S");
+			lvDao.updateSurveyData(surveyID, data);
+			lvDao.getMvFutureResponse().setHandler(handler->{
+				NotifiSurveyPushlished lvPushlished = new NotifiSurveyPushlished(surveyID);
+				lvPushlished.setLvNotificationEnum(UserNotificationEnum.SURVEYSTOP);
+				lvPushlished.setSurveybalance(msg.getValue(FieldName.SURVEYBALANCE).toString());
+				lvPushlished.setPrivate(true);
+				lvPushlished.setPublic(false);
+				lvPushlished.generate();
+			});
+			SurveyPushlishDao lvSurveyPushlishDao = new SurveyPushlishDao();
+			lvSurveyPushlishDao.updateDocument(new JsonObject().put(FieldName.SURVEYID, surveyID),
+					new JsonObject().put(FieldName.STATE, "D"), new UpdateOptions(false), handler -> {
+					});
+		}
+		
 
 		Log.println("Received invalid pushlishID. Message: " + Json.encode(msg), Log.ACCESS_LOG);
 

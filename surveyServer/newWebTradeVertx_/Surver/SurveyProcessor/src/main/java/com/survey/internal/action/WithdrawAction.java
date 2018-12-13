@@ -31,6 +31,11 @@ public class WithdrawAction extends InternalSurveyBaseAction {
 
 		lvGetAccountBalance.setHandler(balance -> {
 			if (balance.succeeded()) {
+				if(!balance.result().getString(FieldName.CODE).equals("P0000")) {
+					this.CompleteGenerateResponse(CodeMapping.W1111.toString(), CodeMapping.W1111.value(),
+							balance.result(), response);
+					return;
+				}
 				double etheAmount = Double
 						.parseDouble(balance.result().getJsonObject(FieldName.DATA).getValue("balance").toString());
 				if (Utils.checkWithdraw(amount, etheAmount)) {

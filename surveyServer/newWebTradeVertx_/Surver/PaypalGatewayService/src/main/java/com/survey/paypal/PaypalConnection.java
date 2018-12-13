@@ -159,8 +159,8 @@ public class PaypalConnection {
 		return lvRS;
 	}
 
-	public Future<JsonObject> createPayout(String tranID, String ccy, String amount,
-			String recipientType, String reciver, String note) {
+	public Future<JsonObject> createPayout(String tranID, String ccy, String amount, String recipientType,
+			String reciver, String note) {
 		Future<JsonObject> lvRS = Future.future();
 		Payout payout = new Payout();
 
@@ -195,6 +195,12 @@ public class PaypalConnection {
 			System.out.println("Payout Batch With ID: " + batch.getBatchHeader().getPayoutBatchId());
 			String request = Payout.getLastRequest();
 			String response = Payout.getLastResponse();
+
+			System.out.println("Request: " + request);
+			System.out.println("Response: " + response);
+			JsonObject requst = new JsonObject(request);
+			JsonObject responseMessage = new JsonObject(response);
+
 			lvRS.complete(new JsonObject().put("request", request).put("response", response).put("tranID", tranID));
 		} catch (PayPalRESTException e) {
 			lvRS.fail(e.getMessage());

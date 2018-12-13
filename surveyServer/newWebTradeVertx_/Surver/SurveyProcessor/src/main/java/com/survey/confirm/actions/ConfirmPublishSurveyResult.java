@@ -25,7 +25,7 @@ public class ConfirmPublishSurveyResult extends BaseConfirmAction {
 				String tranID = h.result().getString(FieldName.TRANID);
 				
 				CashWithdrawDao lvCashWithdrawDao = new CashWithdrawDao();
-				lvCashWithdrawDao.updateSettlesStatus(tranID, success?"S":"U", "", "");
+				lvCashWithdrawDao.updateSettlesStatus(tranID, success?"S":"U", "", "","");
 				SurveyDao lvDao = new SurveyDao();
 				if (success) {
 					data.put(FieldName.STATUS, "N");
@@ -34,17 +34,20 @@ public class ConfirmPublishSurveyResult extends BaseConfirmAction {
 					data.put(FieldName.PUSHLISHREJECTCAUSE, msg.getString(FieldName.MESSAGE));
 				}
 				lvDao.updateSurveyData(lvSurveyID, data);
-				if (success) {
-					NotifiSurveyPushlished lvPushlished = new NotifiSurveyPushlished(lvSurveyID);
-					lvPushlished.setPrivate(true);
-					lvPushlished.setPublic(false);
-					lvPushlished.generate();
-				} else {
-					NotifiSurveyPushlished lvPushlished = new NotifiSurveyPushlished(lvSurveyID);
-					lvPushlished.setPrivate(true);
-					lvPushlished.setPublic(false);
-					lvPushlished.generate();
-				}
+				lvDao.getMvFutureResponse().setHandler(handler->{
+					if (success) {
+						NotifiSurveyPushlished lvPushlished = new NotifiSurveyPushlished(lvSurveyID);
+						lvPushlished.setPrivate(true);
+						lvPushlished.setPublic(false);
+						lvPushlished.generate();
+					} else {
+						NotifiSurveyPushlished lvPushlished = new NotifiSurveyPushlished(lvSurveyID);
+						lvPushlished.setPrivate(true);
+						lvPushlished.setPublic(false);
+						lvPushlished.generate();
+					}
+				});
+				
 			} else {
 				Log.println("Received invalid pushlishID. Message: " + Json.encode(msg), Log.ACCESS_LOG);
 			}

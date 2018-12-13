@@ -29,7 +29,7 @@ public class ServiceInit extends MicroServiceVerticle {
 		super.start(startFuture);
 		mvEventBus.consumer((EventBusDiscoveryConst.PAYPALGATEWAYDISCOVERY.value()), r -> {
 			JsonObject request = (JsonObject) r.body();
-			String action = request.getString("DW");
+			String action = request.getString(FieldName.DW);
 			JsonObject value = request;
 			if (action.equals("deposit")) {
 				depositHandler(value).setHandler(handler -> {
@@ -86,6 +86,7 @@ public class ServiceInit extends MicroServiceVerticle {
 		double amount = msg.getDouble(FieldName.AMOUNT);
 		String tranID = msg.getString(FieldName.TRANID);
 		String ccy = msg.getString(FieldName.CCY);
+		ccy = ccy.equals("")?"USD":ccy;
 		String remark = msg.getString(FieldName.REMARK);
 		String userType = msg.getString(FieldName.PAYPALIDTYPE);
 		String tagetUser = msg.getString(FieldName.TARGETPAYPALID);

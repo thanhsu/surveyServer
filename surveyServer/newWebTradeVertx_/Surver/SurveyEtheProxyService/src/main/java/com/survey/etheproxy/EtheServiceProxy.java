@@ -13,6 +13,7 @@ import io.vertx.core.Context;
 import io.vertx.core.Future;
 import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
+import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.client.HttpRequest;
@@ -24,8 +25,8 @@ public class EtheServiceProxy extends MicroServiceVerticle {
 	public boolean isSSL;
 	public static HashMap<String, String> actionMapping = new HashMap<>();
 	public static HashMap<String, String> methodActionMapping = new HashMap<>();
-	private String clientID="webServer";
-	
+	private String clientID = "webServer";
+
 	@Override
 	public void init(Vertx vertx, Context context) {
 		super.init(vertx, context);
@@ -38,7 +39,7 @@ public class EtheServiceProxy extends MicroServiceVerticle {
 		etheIP = config().getString("EtheServerIP");
 		ethePort = config().getInteger("EtheServerPort");
 		isSSL = config().getBoolean("EtheServerIsSSL");
-		clientID =  config().getString("EtheClientID")==null?"webServer": config().getString("EtheClientID");
+		clientID = config().getString("EtheClientID") == null ? "webServer" : config().getString("EtheClientID");
 	}
 
 	@Override
@@ -67,6 +68,7 @@ public class EtheServiceProxy extends MicroServiceVerticle {
 					}
 					httpRequest.headers().add("clientid", clientID);
 					httpRequest.timeout(100000);
+
 					httpRequest.sendJsonObject(body, handler -> {
 						if (handler.succeeded()) {
 							try {
@@ -83,7 +85,9 @@ public class EtheServiceProxy extends MicroServiceVerticle {
 									handler.cause().getMessage()));
 							future.fail(handler.cause().getMessage());
 						}
+					//	webClient.close();
 					});
+					System.out.println("Send message:" + Json.encode(body));
 				} else {
 					if (isSSL) {
 						httpRequest = webClient.getAbs("https://" + etheIP + ":" + ethePort + "/" + uri);
@@ -98,12 +102,13 @@ public class EtheServiceProxy extends MicroServiceVerticle {
 						} else {
 							future.fail(handler.cause());
 						}
-
+					//	webClient.close();
 					});
 				}
 			}).setHandler(ar -> {
 				try {
-					webClient.close();
+					if (webClient != null)
+						webClient.close();
 				} catch (Exception e) {
 				}
 			});

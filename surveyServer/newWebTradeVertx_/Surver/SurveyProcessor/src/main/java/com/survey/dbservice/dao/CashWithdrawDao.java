@@ -61,10 +61,10 @@ public class CashWithdrawDao extends SurveyBaseDao {
 		return mvFutureResponse;
 	}
 
-	public void updateSettlesStatus(String id, String settleStatus, String ip, String macaddress) {
+	public void updateSettlesStatus(String id, String settleStatus, String ip, String macaddress, String cause) {
 		this.updateDocument(
 				new JsonObject().put(FieldName._ID, id), new JsonObject().put(FieldName.SETTLESTATUS, settleStatus)
-						.put(FieldName.IPADDRESS, ip).put(FieldName.MACADDRESS, macaddress),
+						.put(FieldName.IPADDRESS, ip).put(FieldName.MACADDRESS, macaddress).put(FieldName.REJECTCAUSE, cause),
 				new UpdateOptions(false), handler -> {
 
 				});

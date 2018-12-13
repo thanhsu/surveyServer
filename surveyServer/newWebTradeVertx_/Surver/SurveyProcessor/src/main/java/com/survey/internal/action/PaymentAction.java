@@ -20,6 +20,7 @@ import com.survey.utils.Utils;
 import com.survey.utils.VertxServiceCenter;
 
 import io.vertx.core.Future;
+import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonObject;
 
 public class PaymentAction extends InternalSurveyBaseAction {
@@ -47,9 +48,11 @@ public class PaymentAction extends InternalSurveyBaseAction {
 									JsonObject lvRes = res.result();
 									// Update to Awaitting settle
 									// Store cash tracsaction
-								/*	CashTransactionDao lvCashTransactionDao = new CashTransactionDao();
-									lvCashTransactionDao.newTransaction(username, trandID, "D",
-											lvRes.getJsonObject("data"), "P");*/
+									/*
+									 * CashTransactionDao lvCashTransactionDao = new CashTransactionDao();
+									 * lvCashTransactionDao.newTransaction(username, trandID, "D",
+									 * lvRes.getJsonObject("data"), "P");
+									 */
 									this.CompleteGenerateResponse(CodeMapping.C0000.name(), "OK", lvRes, response);
 								} else {
 									this.response.complete(MessageDefault.RequestFailed(res.cause().getMessage()));
@@ -77,8 +80,8 @@ public class PaymentAction extends InternalSurveyBaseAction {
 							message.mergeIn(handler.result().get(0));
 							double amount = message.getDouble(FieldName.POINT);
 							float rate = message.getFloat(FieldName.EXCHANGERATE);
-							//check ccy va ti gia de chuyen qua USD
-							message.put(FieldName.AMOUNT,amount*rate);
+							// check ccy va ti gia de chuyen qua USD
+							message.put(FieldName.AMOUNT, amount * rate);
 							Utils.autoApprovelCashWithdraw(message.getString(FieldName.METHOD), amount * rate)
 									.setHandler(check -> {
 										if (check.succeeded()) {
@@ -90,17 +93,31 @@ public class PaymentAction extends InternalSurveyBaseAction {
 												if (sendToPaypal.succeeded()) {
 													if (sendToPaypal.result().getBoolean("success")) {
 														// Send to paypal success
-														System.out.println("Send by paypal success");
+														lvCashWithdrawDao.updateSettlesStatus(
+																message.getString(FieldName._ID), "P",
+																message.getString(FieldName.IPADDRESS),
+																message.getString(FieldName.MACADDRESS), "");
+														CashWithdrawDao lvCashWithdrawDao1 = new CashWithdrawDao();
+														lvCashWithdrawDao1.queryDocument(
+																new JsonObject().put(FieldName._ID, trandID),
+																newwithdraw -> {
+																	response.complete(newwithdraw.result().get(0));
+																});
 													} else {
 														// Send to paypal fail
 														// store cash transaction with state = P
 														lvCashWithdrawDao.updateSettlesStatus(
-																message.getString(FieldName._ID), "P",
+																message.getString(FieldName._ID), "U",
 																message.getString(FieldName.IPADDRESS),
-																message.getString(FieldName.MACADDRESS));
-														/*CashTransactionDao lvCashTransactionDao = new CashTransactionDao();
-														lvCashTransactionDao.newTransaction(username, trandID, "D",
-																new JsonObject(), "U");*/
+																message.getString(FieldName.MACADDRESS),
+																sendToPaypal.result().getString("cause"));
+
+														/*
+														 * CashTransactionDao lvCashTransactionDao = new
+														 * CashTransactionDao();
+														 * lvCashTransactionDao.newTransaction(username, trandID, "D",
+														 * new JsonObject(), "U");
+														 */
 														CashWithdrawDao lvCashWithdrawDao1 = new CashWithdrawDao();
 														lvCashWithdrawDao1.queryDocument(
 																new JsonObject().put(FieldName._ID, trandID),
@@ -114,7 +131,8 @@ public class PaymentAction extends InternalSurveyBaseAction {
 													lvCashWithdrawDao.updateSettlesStatus(
 															message.getString(FieldName._ID), "U",
 															message.getString(FieldName.IPADDRESS),
-															message.getString(FieldName.MACADDRESS));
+															message.getString(FieldName.MACADDRESS),
+															sendToPaypal.cause().getMessage());
 													CashTransactionDao lvCashTransactionDao = new CashTransactionDao();
 													lvCashTransactionDao.newTransaction(username, trandID, "D",
 															new JsonObject(), "U");
@@ -130,10 +148,8 @@ public class PaymentAction extends InternalSurveyBaseAction {
 											// store cash transaction with state = P
 											lvCashWithdrawDao.updateSettlesStatus(message.getString(FieldName._ID), "P",
 													message.getString(FieldName.IPADDRESS),
-													message.getString(FieldName.MACADDRESS));
-											CashTransactionDao lvCashTransactionDao = new CashTransactionDao();
-											lvCashTransactionDao.newTransaction(username, trandID, "D",
-													new JsonObject(), "U");
+													message.getString(FieldName.MACADDRESS), "Peding Approval");
+
 											CashWithdrawDao lvCashWithdrawDao1 = new CashWithdrawDao();
 											lvCashWithdrawDao1.queryDocument(
 													new JsonObject().put(FieldName._ID, trandID), newwithdraw -> {
