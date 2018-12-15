@@ -22,7 +22,6 @@ public class Utils {
 	public static Future<String> autoApprovelCashWithdraw(String paymentmethod, double amount) {
 		Future<String> future = Future.future();
 		try {
-
 			UtilsDao lvDao = new UtilsDao();
 			lvDao.retrieveCashMethodDetail(paymentmethod).setHandler(handler -> {
 				if (handler.succeeded()) {

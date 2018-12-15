@@ -6,6 +6,7 @@ import com.survey.utils.ECashDepositType;
 import com.survey.utils.FieldName;
 
 import io.vertx.core.Future;
+import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.mongo.UpdateOptions;
 
@@ -26,8 +27,10 @@ public class CashDepositDao extends SurveyBaseDao {
 		return this.saveDocumentReturnID(deposit);
 	}
 
-	public Future<JsonObject> retrieveAllDeposit(long fromTime, long toTime, String username, String settle) {
-		JsonObject query = new JsonObject().put(FieldName.USERNAME, username).put(FieldName.INPUTTIME,
+	public Future<JsonObject> retrieveAllDeposit(long fromTime, long toTime, String username,String userid, String settle) {
+		JsonArray jar = new JsonArray().add(new JsonObject().put(FieldName.USERNAME, username))
+				.add(new JsonObject().put(FieldName.USERID, userid));
+		JsonObject query = new JsonObject().put("$or", jar).put(FieldName.INPUTTIME,
 				new JsonObject().put("$lt", toTime).put("$gt", fromTime));
 		if(!settle.equals("")) {
 			query.put(FieldName.SETTLESTATUS, settle);
@@ -38,8 +41,8 @@ public class CashDepositDao extends SurveyBaseDao {
 		return mvFutureResponse;
 	}
 
-	public void updateSettlesStatus(String id, String settleStatus, String cause) {
-		this.updateDocument(new JsonObject().put(FieldName._ID, id), new JsonObject().put(FieldName.SETTLESTATUS, settleStatus).put(FieldName.REJECTCAUSE, cause), new UpdateOptions(false), handler->{});
+	public void updateSettlesStatus(String id, String settleStatus, String cause, double settleAmount) {
+		this.updateDocument(new JsonObject().put(FieldName._ID, id), new JsonObject().put(FieldName.SETTLESTATUS, settleStatus).put(FieldName.SETTLEAMOUNT, settleAmount).put(FieldName.REJECTCAUSE, cause), new UpdateOptions(false), handler->{});
 	}
 
 	public void cancelDeposit(String depositID, String userID) {

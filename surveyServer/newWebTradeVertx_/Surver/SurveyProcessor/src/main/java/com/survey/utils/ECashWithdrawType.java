@@ -1,11 +1,11 @@
 package com.survey.utils;
 
 public enum ECashWithdrawType {
-	SURVEYDEPOSIT,
+	SURVEYDEPOSIT, 
 	TRANSFER,
-	CLIENTCASH,
+	CLIENTCASH, 
 	FEE,
 	BUYCARD,
-	SURVEYPUSHLISH
-	;
+	SURVEYPUSHLISH,
+	CASHHOLD;
 }

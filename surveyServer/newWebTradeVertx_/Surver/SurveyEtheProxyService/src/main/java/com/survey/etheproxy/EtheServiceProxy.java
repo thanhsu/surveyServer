@@ -95,7 +95,7 @@ public class EtheServiceProxy extends MicroServiceVerticle {
 						httpRequest = webClient.get(ethePort, etheIP, uri);
 					}
 					httpRequest.headers().add("clientid", "web_server");
-					httpRequest.sendJsonObject(body, handler -> {
+					httpRequest.send( handler -> {
 						if (handler.succeeded()) {
 							h.reply(handler.result().bodyAsJsonObject());
 							future.complete(handler.result().bodyAsBuffer());

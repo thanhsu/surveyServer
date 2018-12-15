@@ -4,12 +4,14 @@ import java.util.HashMap;
 import java.util.Map;
 import com.survey.confirm.actions.BaseConfirmAction;
 import com.survey.confirm.actions.ConfirmCreateUser;
+import com.survey.confirm.actions.ConfirmPaypalPayment;
 import com.survey.confirm.actions.ConfirmPublishSurveyResult;
 import com.survey.confirm.actions.ConfirmStopSurvey;
 import com.survey.confirm.actions.ConfirmSurveyAnswer;
 import com.survey.confirm.actions.ConfirmSurveyDeposit;
 import com.survey.confirm.actions.ConfirmSurveyWithdraw;
 import com.survey.confirm.actions.ConfirmTransaction;
+import com.survey.confirm.actions.ConfirmTransactionHold;
 import com.survey.dbservice.dao.CreateNewBank;
 import com.survey.internal.action.AccountBalanceProxyAction;
 import com.survey.internal.action.ActiveUserAction;
@@ -61,7 +63,6 @@ public class SurveyProcessConstant {
 	private static SurveyProcessConstant instance;
 	public static HashMap<String, BaseConfirmAction> confirmActionMapping = new HashMap<>();
 	public static Map<String, InternalSurveyBaseAction> mvActionMapping = new HashMap<>();
-	
 
 	public static synchronized SurveyProcessConstant getInstance() {
 		if (instance == null) {
@@ -81,7 +82,8 @@ public class SurveyProcessConstant {
 		confirmActionMapping.put("survey_withdraw", new ConfirmSurveyWithdraw());
 		confirmActionMapping.put("survey_answer", new ConfirmSurveyAnswer());
 		confirmActionMapping.put("transaction", new ConfirmTransaction());
-		
+		confirmActionMapping.put("paypalconfirm", new ConfirmPaypalPayment());
+		confirmActionMapping.put("transaction_hold", new ConfirmTransactionHold());
 	}
 
 	private void initActionMapping() {
@@ -94,7 +96,7 @@ public class SurveyProcessConstant {
 		mvActionMapping.put("userinfo", new RetrieveUserinfoAction());
 		mvActionMapping.put("updateuserinfo", new UpdateUserInfoAction());
 		mvActionMapping.put("verifypin", new VerifyPINAction());
-		mvActionMapping.put("newpin",new RenewPINAction());
+		mvActionMapping.put("newpin", new RenewPINAction());
 
 		// 2
 		mvActionMapping.put("retrieveconfig", new RetrieveConfigAction());
@@ -109,8 +111,8 @@ public class SurveyProcessConstant {
 		mvActionMapping.put("cancelcash", new CancelCashAction());
 		mvActionMapping.put("payment", new PaymentAction());
 		mvActionMapping.put("manualdeposit", new CashManualDeposit());
-		
-		//-- Cash transfer
+
+		// -- Cash transfer
 		mvActionMapping.put("cashtransfer", new CashTranserAction());
 		mvActionMapping.put("verifyuser", new RetrieveAccountBaseInfo());
 		mvActionMapping.put("cashtransferenquiry", new CashTransferEnquiryAction());
@@ -128,20 +130,19 @@ public class SurveyProcessConstant {
 		mvActionMapping.put("deletesurvey", new DeleteSurveyAction());
 		mvActionMapping.put("restoresurvey", new RestoreSurveyAction());
 		mvActionMapping.put("addfavouritesurvey", new AddFavouriteSurveyAction());
-		mvActionMapping.put("removefavouritesurvey",new RemoveFavouriteSurveyAction());
+		mvActionMapping.put("removefavouritesurvey", new RemoveFavouriteSurveyAction());
 		mvActionMapping.put("retrievesurveyresponse", new RetrieveSurveyAnsweredAction());
 		mvActionMapping.put("surveybalance", new RetrieveSurveyBalanceAction());
 		mvActionMapping.put("surveydw", new DepositWithdrawSurveyAction());
 		mvActionMapping.put("stopsurvey", new StopPushlishAction());
-		//5
-		mvActionMapping.put("addbank",new CreateNewBank());
+		// 5
+		mvActionMapping.put("addbank", new CreateNewBank());
 		mvActionMapping.put("retrieveusernotification", new RetrieveUserNotificationAction());
-		
-		
-		//Card action
+
+		// Card action
 		mvActionMapping.put("cardcategory", new CardCategoryAction());
 		mvActionMapping.put("carddata", new CardDataAction());
-		
+
 	}
 
 	public InternalSurveyBaseAction getInternalAction(String p) {

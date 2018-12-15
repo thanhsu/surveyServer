@@ -31,7 +31,8 @@
 		"post,surveytransactionlist,survey/transaction/get",
 		"post,cashtranser,transaction/transfer",
 		"post,transactionhistory,transaction/history",
-		"post,repushlish,survey/repushlish"
+		"post,repushlish,survey/repushlish",
+		"post,hole,transaction/hold"
 	],
 	"EtheServerIP": "35.201.171.178",
 	"EtheServerPort": 9000,

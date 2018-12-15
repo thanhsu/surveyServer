@@ -20,6 +20,7 @@ import com.paypal.api.payments.RedirectUrls;
 import com.paypal.api.payments.Transaction;
 import com.paypal.base.rest.APIContext;
 import com.paypal.base.rest.PayPalRESTException;
+import com.survey.paypal.utils.ConfirmPaypalPayment;
 import com.survey.paypal.utils.PaypalPaymentBean;
 import com.survey.paypal.utils.TransactionDetailBean;
 
@@ -188,7 +189,8 @@ public class PaypalConnection {
 			// (that ensures idempotency). The SDK generates
 			// a request id if you do not pass one explicitly.
 			APIContext apiContext = new APIContext(clientID, secret, mode);
-
+			String accsessToken = apiContext.fetchAccessToken();
+			ConfirmPaypalPayment.token = accsessToken;
 			// ###Create Batch Payout
 			batch = payout.create(apiContext, new HashMap<String, String>());
 
@@ -200,8 +202,8 @@ public class PaypalConnection {
 			System.out.println("Response: " + response);
 			JsonObject requst = new JsonObject(request);
 			JsonObject responseMessage = new JsonObject(response);
-
-			lvRS.complete(new JsonObject().put("request", request).put("response", response).put("tranID", tranID));
+			lvRS.complete(new JsonObject().put("request", requst).put("response", responseMessage).put("tranID", tranID));
+			ConfirmPaypalPayment.addTranMappingLink(tranID, responseMessage);
 		} catch (PayPalRESTException e) {
 			lvRS.fail(e.getMessage());
 		}
@@ -223,6 +225,14 @@ public class PaypalConnection {
 			System.err.println(e.getDetails());
 		}
 		return lvRS;
+	}
+
+	public String getSecret() {
+		return secret;
+	}
+
+	public void setSecret(String secret) {
+		this.secret = secret;
 	}
 
 }

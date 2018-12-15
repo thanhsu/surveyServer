@@ -33,7 +33,7 @@ public class CashEnquiryAction extends InternalSurveyBaseAction {
 					.parse(getMessageBody().getString(FieldName.TODATE) + " 23:59:59");
 			Future<JsonObject> lvListCashDeposit = Future.future();
 			if (dw.equals("ALL") || dw.equals("D")) {
-				lvCashDepositDao.retrieveAllDeposit(from.getTime(), to.getTime(), username, settleStatus)
+				lvCashDepositDao.retrieveAllDeposit(from.getTime(), to.getTime(), username, userid, settleStatus)
 						.setHandler(handler -> {
 							lvListCashDeposit.complete(handler.result());
 						});
@@ -44,7 +44,7 @@ public class CashEnquiryAction extends InternalSurveyBaseAction {
 			CashWithdrawDao lvCashWithdrawDao = new CashWithdrawDao();
 			Future<JsonObject> lvCashWithDraw = Future.future();
 			if (dw.equals("ALL") || dw.equals("W")) {
-				lvCashWithdrawDao.retrieveAllWithdraw(from.getTime(), to.getTime(), username, settleStatus)
+				lvCashWithdrawDao.retrieveAllWithdraw(from.getTime(), to.getTime(), username, userid, settleStatus)
 						.setHandler(handler -> {
 							lvCashWithDraw.complete(handler.result());
 						});

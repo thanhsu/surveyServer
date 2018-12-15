@@ -47,12 +47,14 @@ public class FieldName {
 	public static final String MACADDRESS = "macaddress";
 	public static final String IPADDRESS = "ipaddress";
 	public static final String SETTLESTATUS = "settlestatus";
+	public static final String SETTLEAMOUNT = "settleamount";
 	public static final String SETTLESTIME = "settlestime";
 	public static final String SETTINGID = "settingid";
 	public static final String SETTING = "setting";
 	public static final String RULE = "rule";
 	public static final String THEMEID = "themeid";
 	public static final String THEME = "theme";
+	public static final String LINK="link";
 
 	public static final String LISTALLOWUSER = "allowUser";
 	public static final String ENDTIME = "endtime";
@@ -148,4 +150,5 @@ public class FieldName {
 	public static final String TRANTYPE="trantype";
 	public static final String DEPOSITDATA="depositdata";
 	public static final String TEMPAMOUNT="tempamount";
+	public static final String PAYMENTDETAIL="paymentdetail";
 }

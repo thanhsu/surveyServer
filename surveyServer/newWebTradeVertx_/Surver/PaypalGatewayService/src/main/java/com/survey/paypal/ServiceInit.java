@@ -1,7 +1,9 @@
 package com.survey.paypal;
 
 import com.survey.constant.EventBusDiscoveryConst;
+import com.survey.paypal.utils.ConfirmPaypalPayment;
 import com.survey.utils.FieldName;
+import com.survey.utils.VertxServiceCenter;
 import com.survey.utils.controller.MicroServiceVerticle;
 
 import io.vertx.core.Context;
@@ -22,6 +24,8 @@ public class ServiceInit extends MicroServiceVerticle {
 		approvalURL = config().getString("approvalUrl");
 		cancelURL = config().getString("cancelUrl");
 		PaypalConnection.getInstance().init(config().getJsonObject("PaypalConfig"), vertx);
+		VertxServiceCenter.getInstance().init(vertx, config().getString("discoveryaddress"), config().getString("discoveryname"));
+		new ConfirmPaypalPayment();
 	}
 
 	@Override

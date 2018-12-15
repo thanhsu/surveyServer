@@ -8,6 +8,7 @@ import com.survey.utils.ECashWithdrawType;
 import com.survey.utils.FieldName;
 
 import io.vertx.core.Future;
+import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.mongo.UpdateOptions;
 
@@ -37,6 +38,16 @@ public class CashWithdrawDao extends SurveyBaseDao {
 		return this.saveDocumentReturnID(deposit);
 	}
 
+	public Future<Void> updateWithdrawPayment(String disKey, String id, JsonObject paymentDetail) {
+		Future<Void> re = Future.future();
+		this.updateDocument(new JsonObject().put(FieldName._ID, id),
+				new JsonObject().put(FieldName.DISCOVERYKEY, disKey).put(FieldName.STATUS, "P"),
+				new UpdateOptions(false), handler -> {
+					re.complete();
+				});
+		return re;
+	}
+
 	public Future<String> storeNewWithdrawBuyCard(double amount, String ccy, String remark, double exchagerate,
 			String cardID) {
 		Date lvNow = new Date();
@@ -49,8 +60,11 @@ public class CashWithdrawDao extends SurveyBaseDao {
 		return this.saveDocumentReturnID(deposit);
 	}
 
-	public Future<JsonObject> retrieveAllWithdraw(long fromTime, long toTime, String username, String settleStatus) {
-		JsonObject query = new JsonObject().put(FieldName.USERNAME, username).put(FieldName.INPUTTIME,
+	public Future<JsonObject> retrieveAllWithdraw(long fromTime, long toTime, String username, String userid,
+			String settleStatus) {
+		JsonArray jar = new JsonArray().add(new JsonObject().put(FieldName.USERNAME, username))
+				.add(new JsonObject().put(FieldName.USERID, userid));
+		JsonObject query = new JsonObject().put("$or", jar).put(FieldName.INPUTTIME,
 				new JsonObject().put("$lt", toTime).put("$gt", fromTime));
 		if (!settleStatus.equals("")) {
 			query.put(FieldName.SETTLESTATUS, settleStatus);
@@ -62,9 +76,19 @@ public class CashWithdrawDao extends SurveyBaseDao {
 	}
 
 	public void updateSettlesStatus(String id, String settleStatus, String ip, String macaddress, String cause) {
-		this.updateDocument(
-				new JsonObject().put(FieldName._ID, id), new JsonObject().put(FieldName.SETTLESTATUS, settleStatus)
-						.put(FieldName.IPADDRESS, ip).put(FieldName.MACADDRESS, macaddress).put(FieldName.REJECTCAUSE, cause),
+		this.updateDocument(new JsonObject().put(FieldName._ID, id),
+				new JsonObject().put(FieldName.SETTLESTATUS, settleStatus).put(FieldName.IPADDRESS, ip)
+						.put(FieldName.MACADDRESS, macaddress).put(FieldName.REJECTCAUSE, cause),
+				new UpdateOptions(false), handler -> {
+					this.mvFutureResponse.complete();
+				});
+	}
+
+	public void updateSettlesStatusPend(String id, String settleStatus, String ip, String macaddress,
+			String confirmLink) {
+		this.updateDocument(new JsonObject().put(FieldName._ID, id),
+				new JsonObject().put(FieldName.SETTLESTATUS, settleStatus).put(FieldName.IPADDRESS, ip)
+						.put(FieldName.MACADDRESS, macaddress).put(FieldName.LINK, confirmLink),
 				new UpdateOptions(false), handler -> {
 
 				});
