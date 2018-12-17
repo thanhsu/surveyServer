@@ -25,7 +25,7 @@ public class CashWithdrawDao extends SurveyBaseDao {
 		JsonObject deposit = new JsonObject();
 		deposit.put(FieldName.USERID, targetUserID).put(FieldName.TOKEN, privateToken).put(FieldName.POINT, amount)
 				.put(FieldName.STATE, "A").put(FieldName.SETTLESTATUS, "P").put(FieldName.INPUTTIME, lvNow.getTime())
-				.put(FieldName.EXCHANGERATE, exchagerate).put(FieldName.CCY, ccy);
+				.put(FieldName.EXCHANGERATE, exchagerate).put(FieldName.TYPE, ECashWithdrawType.CLIENTCASH).put(FieldName.CCY, ccy);
 		return this.saveDocumentReturnID(deposit);
 	}
 
@@ -41,7 +41,7 @@ public class CashWithdrawDao extends SurveyBaseDao {
 	public Future<Void> updateWithdrawPayment(String disKey, String id, JsonObject paymentDetail) {
 		Future<Void> re = Future.future();
 		this.updateDocument(new JsonObject().put(FieldName._ID, id),
-				new JsonObject().put(FieldName.DISCOVERYKEY, disKey).put(FieldName.STATUS, "P"),
+				new JsonObject().put(FieldName.DISCOVERYKEY, disKey).put(FieldName.STATUS, "P").put(FieldName.PAYMENTDETAIL, paymentDetail),
 				new UpdateOptions(false), handler -> {
 					re.complete();
 				});
@@ -78,7 +78,7 @@ public class CashWithdrawDao extends SurveyBaseDao {
 	public void updateSettlesStatus(String id, String settleStatus, String ip, String macaddress, String cause) {
 		this.updateDocument(new JsonObject().put(FieldName._ID, id),
 				new JsonObject().put(FieldName.SETTLESTATUS, settleStatus).put(FieldName.IPADDRESS, ip)
-						.put(FieldName.MACADDRESS, macaddress).put(FieldName.REJECTCAUSE, cause),
+						.put(FieldName.MACADDRESS, macaddress).put(FieldName.REJECTCAUSE, cause).put(FieldName.SETTLESTIME, new Date().getTime()),
 				new UpdateOptions(false), handler -> {
 					this.mvFutureResponse.complete();
 				});

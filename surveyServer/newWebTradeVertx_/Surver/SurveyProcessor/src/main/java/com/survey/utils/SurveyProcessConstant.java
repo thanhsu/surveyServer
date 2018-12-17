@@ -20,6 +20,7 @@ import com.survey.internal.action.AnswerSurveyAction;
 import com.survey.internal.action.CancelCashAction;
 import com.survey.internal.action.CardCategoryAction;
 import com.survey.internal.action.CardDataAction;
+import com.survey.internal.action.CashDWDetailAction;
 import com.survey.internal.action.CashEnquiryAction;
 import com.survey.internal.action.CashManualDeposit;
 import com.survey.internal.action.CashTranserAction;
@@ -111,7 +112,7 @@ public class SurveyProcessConstant {
 		mvActionMapping.put("cancelcash", new CancelCashAction());
 		mvActionMapping.put("payment", new PaymentAction());
 		mvActionMapping.put("manualdeposit", new CashManualDeposit());
-
+		mvActionMapping.put("dwdetail", new CashDWDetailAction());
 		// -- Cash transfer
 		mvActionMapping.put("cashtransfer", new CashTranserAction());
 		mvActionMapping.put("verifyuser", new RetrieveAccountBaseInfo());

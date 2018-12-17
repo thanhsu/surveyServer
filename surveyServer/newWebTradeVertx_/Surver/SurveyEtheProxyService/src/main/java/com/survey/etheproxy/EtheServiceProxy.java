@@ -49,6 +49,10 @@ public class EtheServiceProxy extends MicroServiceVerticle {
 		vertx.eventBus().<JsonObject>consumer(EventBusDiscoveryConst.ETHEREUMPROXYDISCOVERY.value(), h -> {
 			String actionName = h.body().getString(FieldName.ACTION);
 			String method = methodActionMapping.get(actionName);
+			if (method == null) {
+				h.reply(new JsonObject().put(FieldName.CODE, "P1111").put(FieldName.MESSAGE, "Action not found"));
+				return;
+			}
 			String uri = actionMapping.get(actionName);
 			JsonObject body = h.body().getJsonObject(FieldName.DATA);
 			WebClient webClient = WebClient.create(vertx);
@@ -85,7 +89,7 @@ public class EtheServiceProxy extends MicroServiceVerticle {
 									handler.cause().getMessage()));
 							future.fail(handler.cause().getMessage());
 						}
-					//	webClient.close();
+						// webClient.close();
 					});
 					System.out.println("Send message:" + Json.encode(body));
 				} else {
@@ -95,14 +99,14 @@ public class EtheServiceProxy extends MicroServiceVerticle {
 						httpRequest = webClient.get(ethePort, etheIP, uri);
 					}
 					httpRequest.headers().add("clientid", "web_server");
-					httpRequest.send( handler -> {
+					httpRequest.send(handler -> {
 						if (handler.succeeded()) {
 							h.reply(handler.result().bodyAsJsonObject());
 							future.complete(handler.result().bodyAsBuffer());
 						} else {
 							future.fail(handler.cause());
 						}
-					//	webClient.close();
+						// webClient.close();
 					});
 				}
 			}).setHandler(ar -> {

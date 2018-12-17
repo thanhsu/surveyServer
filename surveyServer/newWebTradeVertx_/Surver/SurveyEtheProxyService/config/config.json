@@ -32,7 +32,7 @@
 		"post,cashtranser,transaction/transfer",
 		"post,transactionhistory,transaction/history",
 		"post,repushlish,survey/repushlish",
-		"post,hole,transaction/hold"
+		"post,hold,transaction/hold"
 	],
 	"EtheServerIP": "35.201.171.178",
 	"EtheServerPort": 9000,

@@ -151,4 +151,5 @@ public class FieldName {
 	public static final String DEPOSITDATA="depositdata";
 	public static final String TEMPAMOUNT="tempamount";
 	public static final String PAYMENTDETAIL="paymentdetail";
+	public static final String CARDDETAIL="carddetail";
 }

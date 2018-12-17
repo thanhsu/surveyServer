@@ -43,7 +43,7 @@ public class ConfirmTransaction extends BaseConfirmAction {
 
 		if (trantype.equals(ECashTranType.CASHTRANSACTION.name())) {
 			CashTransactionDao lvCashTransaction = new CashTransactionDao();
-			lvCashTransaction.updateCashTransferStatus(transID, success ? "S" : "U", timeStamp, amount, fee)
+			lvCashTransaction.updateCashTransferStatusCard(transID, success ? "S" : "U", timeStamp, amount, fee)
 					.setHandler(handler -> {
 						if (handler.succeeded()) {
 							if (success) {

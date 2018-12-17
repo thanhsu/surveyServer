@@ -8,7 +8,7 @@ public class MessageDefault {
 	}
 
 	public static JsonObject ActionNotFound() {
-		return new JsonObject().put(FieldName.CODE, CodeMapping.C2222.toString());
+		return new JsonObject().put(FieldName.CODE, CodeMapping.C2222.toString()).put(FieldName.MESSAGE,"Action not found");
 	}
 
 	public static JsonObject ParamError() {

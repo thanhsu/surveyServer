@@ -129,10 +129,10 @@ public class WebServer extends MicroServiceVerticle {
 		router.route("/api/image/:action").handler(this::handlerSurveyImage);
 
 		router.route("/survey/:id").handler(this::handlerGetSurvey);
-		
+
 		router.route("/m/logout").handler(this::handlerLogout);
 		router.post("/api/logout").handler(this::handlerLogout);
-		
+
 		router.route("/hero/*").handler(pRoutingContext -> {
 			responseHomeIndex(pRoutingContext);
 		});
@@ -215,7 +215,7 @@ public class WebServer extends MicroServiceVerticle {
 			lvBuilder.resource(PushManager.class).httpServer(this.mvHttpServer).url("/push/:module/:action/:clientID")
 					.webroot("webroot").initParam(ApplicationConfig.WEBSOCKET_CONTENT_TYPE, "application/json")
 					.vertx(this.vertx).build();
-			
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -268,9 +268,9 @@ public class WebServer extends MicroServiceVerticle {
 				});
 
 	}
-	
+
 	private void handlerLogout(RoutingContext rtx) {
-		if(rtx.session()!=null) {
+		if (rtx.session() != null) {
 			rtx.session().destroy();
 			rtx.session().regenerateId();
 		}
@@ -395,7 +395,14 @@ public class WebServer extends MicroServiceVerticle {
 		if (rtx.session().data() != null) {
 			tmp.put("logindata", (JsonObject) rtx.session().get("logindata"));
 		}
-		String lvSurveyId = rtx.pathParam("id");
+		String input = rtx.pathParam("id");
+		String[] id = input.split("-");
+		if (id == null) {
+			rtx.reroute("/");
+			return;
+		}
+		String lvSurveyId = id[id.length - 1];
+
 		JsonObject messageBody = new JsonObject().put(FieldName.ACTION, "retrievesurveybaseinfo")
 				.put(FieldName.SURVEYID, lvSurveyId);
 		discovery.getRecord(
@@ -415,6 +422,11 @@ public class WebServer extends MicroServiceVerticle {
 										try {
 											Document doc = Jsoup.parse(bf.toString(), "UTF-8");
 											doc.head().getElementsByTag("title").html(surveyTitle);
+											String ggHtml = "<meta charset=\"utf-8\">\r\n"
+													+ "    <meta name=\"Description\" CONTENT=\""+surveyTitle+"\">\r\n"
+													+ "    <meta name=\"google-site-verification\" content=\"UgBZWyHadggxerdmIv2ADcJv78UWnY0E9LK6YjlbkVw\"/>"
+													+ "    <meta name=\"robots\" content=\"noindex,nofollow\">";
+											doc.head().append(ggHtml);
 											doc.head().append(config);
 											z = Buffer.buffer(doc.html());
 										} catch (Exception e) {

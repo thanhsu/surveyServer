@@ -1,5 +1,6 @@
 package com.survey.confirm.actions;
 import com.survey.dbservice.dao.CashWithdrawDao;
+import com.survey.etheaction.ProxyCashWithdrawWithSystem;
 import com.survey.notification.actions.NotifiCashWithdraw;
 import com.survey.utils.FieldName;
 import com.survey.utils.VertxServiceCenter;
@@ -29,7 +30,7 @@ public class ConfirmTransactionHold extends BaseConfirmAction {
 					if (!handler.result().isEmpty()) {
 						String discoveryKey = handler.result().getString(FieldName.DISCOVERYKEY);
 						JsonObject message = handler.result().getJsonObject(FieldName.PAYMENTDETAIL);
-
+						message.put(FieldName.DW, "withdraw");
 						Future<JsonObject> lvFuture = Future.future();
 						VertxServiceCenter.getInstance().sendNewMessage(discoveryKey, message, lvFuture);
 						lvFuture.setHandler(sendToPaypal -> {
@@ -57,6 +58,8 @@ public class ConfirmTransactionHold extends BaseConfirmAction {
 											NotifiCashWithdraw lvNotifiCashWithdraw = new NotifiCashWithdraw(transID);
 											lvNotifiCashWithdraw.generate();
 										});
+										
+										sendMessageRefund(transID,username);
 									}
 
 								} else {
@@ -70,6 +73,7 @@ public class ConfirmTransactionHold extends BaseConfirmAction {
 										NotifiCashWithdraw lvNotifiCashWithdraw = new NotifiCashWithdraw(transID);
 										lvNotifiCashWithdraw.generate();
 									});
+									sendMessageRefund(transID,username);
 								}
 
 								//
@@ -83,6 +87,7 @@ public class ConfirmTransactionHold extends BaseConfirmAction {
 									NotifiCashWithdraw lvNotifiCashWithdraw = new NotifiCashWithdraw(transID);
 									lvNotifiCashWithdraw.generate();
 								});
+								sendMessageRefund(transID,username);
 							}
 						});
 					}
@@ -92,5 +97,11 @@ public class ConfirmTransactionHold extends BaseConfirmAction {
 
 		}
 	}
-
+	private void sendMessageRefund(String tranID, String uusername) {
+		ProxyCashWithdrawWithSystem lvProxyCashWithdrawWithSystem = new ProxyCashWithdrawWithSystem();
+		lvProxyCashWithdrawWithSystem.setTransid(tranID);
+		lvProxyCashWithdrawWithSystem.setFromuser(uusername);
+		lvProxyCashWithdrawWithSystem.setTransferSuccess(false);
+		lvProxyCashWithdrawWithSystem.sendToProxyServer();
+	}
 }
