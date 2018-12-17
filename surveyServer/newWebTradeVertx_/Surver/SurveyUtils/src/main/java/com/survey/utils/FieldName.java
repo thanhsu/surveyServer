@@ -152,4 +152,5 @@ public class FieldName {
 	public static final String TEMPAMOUNT="tempamount";
 	public static final String PAYMENTDETAIL="paymentdetail";
 	public static final String CARDDETAIL="carddetail";
+	public static final String BACKGROUND_IMAGE="background_image";
 }

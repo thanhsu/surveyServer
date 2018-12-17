@@ -42,7 +42,9 @@ public class CashDepositDao extends SurveyBaseDao {
 	}
 
 	public void updateSettlesStatus(String id, String settleStatus, String cause, double settleAmount) {
-		this.updateDocument(new JsonObject().put(FieldName._ID, id), new JsonObject().put(FieldName.SETTLESTATUS, settleStatus).put(FieldName.SETTLEAMOUNT, settleAmount).put(FieldName.REJECTCAUSE, cause), new UpdateOptions(false), handler->{});
+		this.updateDocument(new JsonObject().put(FieldName._ID, id), new JsonObject().put(FieldName.SETTLESTATUS, settleStatus).put(FieldName.SETTLEAMOUNT, settleAmount).put(FieldName.REJECTCAUSE, cause), new UpdateOptions(false), handler->{
+			this.getMvFutureResponse().complete();
+		});
 	}
 
 	public void cancelDeposit(String depositID, String userID) {

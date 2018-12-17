@@ -80,6 +80,9 @@ public class ConfirmPaypalPayment {
 					JsonObject message = h.result().bodyAsJsonObject();
 
 					JsonObject batStatus = message.getJsonObject("batch_header");
+					if(batStatus==null) {	
+						return;
+					}
 					System.out.println("Check status trans: " + h.result().bodyAsString());
 					if (!batStatus.getString("batch_status").equalsIgnoreCase("PROCESSING")) {
 						JsonObject item = message.getJsonArray("items").getJsonObject(0);

@@ -43,7 +43,7 @@ public class ConfirmTransaction extends BaseConfirmAction {
 
 		if (trantype.equals(ECashTranType.CASHTRANSACTION.name())) {
 			CashTransactionDao lvCashTransaction = new CashTransactionDao();
-			lvCashTransaction.updateCashTransferStatusCard(transID, success ? "S" : "U", timeStamp, amount, fee)
+			lvCashTransaction.updateCashTransferStatus(transID, success ? "S" : "U", timeStamp, amount, fee)
 					.setHandler(handler -> {
 						if (handler.succeeded()) {
 							if (success) {
@@ -94,15 +94,15 @@ public class ConfirmTransaction extends BaseConfirmAction {
 			lvtoUserBalance.setMessage("Cash transfer from " + fromUser);
 			NotifiAccountBalance lvToNotifiAccountBalance = new NotifiAccountBalance(lvtoUserBalance);
 			lvToNotifiAccountBalance.generate();
-			
+
 			CashDepositDao lvCashDepositDao = new CashDepositDao();
 			String cause = success ? "" : msg.getString(FieldName.MESSAGE);
 			lvCashDepositDao.updateSettlesStatus(transID, success ? "S" : "U", cause, pamount);
-			lvCashDepositDao.getMvFutureResponse().setHandler(handler->{
+			lvCashDepositDao.getMvFutureResponse().setHandler(handler -> {
 				NotifiCashDeposit lvNotifiCashDeposit = new NotifiCashDeposit(transID);
 				lvNotifiCashDeposit.generate();
 			});
-			
+
 		} else if (trantype.equals(ECashTranType.CASHWITHDRAW.name())) {
 			// Check confirm cash withdraw only update account status
 			CashWithdrawDao lvCashWithdrawDao = new CashWithdrawDao();
@@ -112,7 +112,7 @@ public class ConfirmTransaction extends BaseConfirmAction {
 					lvCashWithdrawDao.updateDocument(new JsonObject().put(FieldName._ID, transID),
 							new JsonObject().put(FieldName.SETTLEAMOUNT, pamount), new UpdateOptions(false),
 							handler1 -> {
-								
+
 							});
 					double fromUserBalance = Double.parseDouble(msg.getString(FieldName.FROMUSERBALANCE));
 					UserBalanceUpdateBean lvFromUserBalance = new UserBalanceUpdateBean();
@@ -134,32 +134,38 @@ public class ConfirmTransaction extends BaseConfirmAction {
 		} else if (trantype.equals(ECashTranType.BUYCARD.name())) {
 
 			CashWithdrawDao lvCashWithdrawDao = new CashWithdrawDao();
-			lvCashWithdrawDao.queryDocument(new JsonObject().put(FieldName._ID, transID), handler -> {
-				if (handler.succeeded()) {
-					if (!handler.result().isEmpty()) {
+			lvCashWithdrawDao
+					.updateCashWithdrawStatusCard(transID, success ? "U" : "S", new Date().getTime(), amount, fee)
+					.setHandler(handler1 -> {
+						CashWithdrawDao lvCashWithdrawDao2 = new CashWithdrawDao();
 
-						String cardID = handler.result().get(0).getString(FieldName.CARDID);
-						NotifiBuyCard lvNotifiBuyCard = new NotifiBuyCard(cardID, success);
-						lvNotifiBuyCard.generate();
-						if (success) {
-							double fromUserBalance = Double.parseDouble(msg.getString(FieldName.FROMUSERBALANCE));
-							double pamount = Double.parseDouble(msg.getString(FieldName.VALUE));
-							UserBalanceUpdateBean lvFromUserBalance = new UserBalanceUpdateBean();
-							lvFromUserBalance.setAgent("system");
-							lvFromUserBalance.setDw("W");
-							lvFromUserBalance.setAgenttype("system");
-							lvFromUserBalance.setAmount(pamount);
-							lvFromUserBalance.setBalance(fromUserBalance);
-							lvFromUserBalance.setType(ECashWithdrawType.BUYCARD.name());
-							lvFromUserBalance.setUsername(fromUser);
-							lvFromUserBalance.setMessage("Buy card " + toUser);
-							NotifiAccountBalance lvNotifiAccountBalance = new NotifiAccountBalance(lvFromUserBalance);
-							lvNotifiAccountBalance.generate();
-						}
-
-					}
-				}
-			});
+						lvCashWithdrawDao2.queryDocument(new JsonObject().put(FieldName._ID, transID), handler -> {
+							if (handler.succeeded()) {
+								if (!handler.result().isEmpty()) {
+									String cardID = handler.result().get(0).getString(FieldName.CARDID);
+									NotifiBuyCard lvNotifiBuyCard = new NotifiBuyCard(cardID, success);
+									lvNotifiBuyCard.generate();
+									if (success) {
+										double fromUserBalance = Double
+												.parseDouble(msg.getString(FieldName.FROMUSERBALANCE));
+										double pamount = Double.parseDouble(msg.getString(FieldName.VALUE));
+										UserBalanceUpdateBean lvFromUserBalance = new UserBalanceUpdateBean();
+										lvFromUserBalance.setAgent("system");
+										lvFromUserBalance.setDw("W");
+										lvFromUserBalance.setAgenttype("system");
+										lvFromUserBalance.setAmount(pamount);
+										lvFromUserBalance.setBalance(fromUserBalance);
+										lvFromUserBalance.setType(ECashWithdrawType.BUYCARD.name());
+										lvFromUserBalance.setUsername(fromUser);
+										lvFromUserBalance.setMessage("Buy card " + toUser);
+										NotifiAccountBalance lvNotifiAccountBalance = new NotifiAccountBalance(
+												lvFromUserBalance);
+										lvNotifiAccountBalance.generate();
+									}
+								}
+							}
+						});
+					});
 		}
 
 	}

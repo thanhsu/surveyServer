@@ -49,44 +49,7 @@ public class CashTransactionDao extends SurveyBaseDao {
 		return lvFuture;
 	}
 
-	public Future<JsonObject> updateCashTransferStatusCard(String transID, String settleStatus, long settleTime,
-			double amount, double fee) {
-		Future<JsonObject> lvFuture = Future.future();
-		JsonObject data = new JsonObject().put(FieldName.SETTLESTATUS, settleStatus)
-				.put(FieldName.SETTLESTIME, settleTime).put(FieldName.AMOUNT, amount).put(FieldName.FEE, fee);
-		if (settleStatus.equals("U")) {
-			data.put(FieldName.CARDID, "");
-			this.updateDocument(new JsonObject().put(FieldName._ID, transID), data, new UpdateOptions(false),
-					handler -> {
-						if (handler.succeeded()) {
-							lvFuture.complete(new JsonObject());
-						} else {
-							lvFuture.fail(handler.cause().getMessage());
-						}
-					});
-		} else {
-			this.findOneByID(transID).setHandler(handler -> {
-				if (handler.result() != null) {
-					String cardID = handler.result().getString(FieldName.CARDID);
-					CardDao lvCardDao = new CardDao();
-					lvCardDao.retrieveCardDetail(cardID).setHandler(h2 -> {
-						data.put(FieldName.CARDDETAIL, h2.result());
-						this.updateDocument(new JsonObject().put(FieldName._ID, transID), data,
-								new UpdateOptions(false), h3 -> {
-									if (h3.succeeded()) {
-										lvFuture.complete(new JsonObject());
-									} else {
-										lvFuture.fail(h3.cause().getMessage());
-									}
-								});
-					});
-				}
-			});
-
-		}
-
-		return lvFuture;
-	}
+	
 
 	public void retrieveListCashTransferIn(String username, long fromTime, long toTime,
 			Future<JsonArray> resultHandler) {

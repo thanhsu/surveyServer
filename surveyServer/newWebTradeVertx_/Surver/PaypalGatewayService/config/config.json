@@ -41,8 +41,8 @@
 		"username": "thanhsu604@gmail.com",
 		"password": "62016303ts"
 	},
-	"approvalUrl":"http://127.0.0.1:5050/paypal/approval?token=",
-	"cancelUrl":"http://127.0.0.1:5050/paypal/cancel?token=",
+	"approvalUrl":"http://127.0.0.1:5050/api/cash/confirm/paypal/approval?token=",
+	"cancelUrl":"http://127.0.0.1:5050//api/cash/confirm/paypal/cancel?token=",
 	"PaypalConfig":{
 		"PaypalClientID":"AeiHb27zU1XL2zycr2iDaaVEyxZxSTtZOOymWLzd59QbEIgcv995EVVTeohTeNcR73rMzI_iDZBExx5Y",
 		"PaypalSecret":"EEeiBHo0hYDbJMAZ0KWzFKkCZu1KNkwVkEyFq3R9MoA8Fq-qMjOSAaswKu1RJyOeE7okf4dCU3EVk89y",

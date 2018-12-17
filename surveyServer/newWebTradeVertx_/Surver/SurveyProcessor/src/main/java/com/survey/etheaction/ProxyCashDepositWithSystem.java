@@ -13,7 +13,7 @@ public class ProxyCashDepositWithSystem extends BaseEtheProxyAction {
 	public ProxyCashDepositWithSystem() {
 		action = "cashtranser";
 		type = "D";
-		fromuser = "";
+		touser = "";
 		trantype = ECashTranType.CASHDEPOSIT.name();
 	}
 

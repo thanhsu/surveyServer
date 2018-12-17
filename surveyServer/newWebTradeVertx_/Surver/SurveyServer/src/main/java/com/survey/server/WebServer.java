@@ -62,6 +62,7 @@ public class WebServer extends MicroServiceVerticle {
 	private Buffer Webroot = null;
 	private boolean isDebug = false;
 	public static JsonArray LISTACTIONALLOWANONYMOUS = new JsonArray();
+	String fbAppID;
 
 	@Override
 	public void init(Vertx vertx, Context context) {
@@ -74,6 +75,7 @@ public class WebServer extends MicroServiceVerticle {
 		});
 		isDebug = config().getBoolean("DebugMode") == null ? false : config().getBoolean("DebugMode");
 		LISTACTIONALLOWANONYMOUS = config().getJsonArray("ListActionAllowAnonymous");
+		fbAppID = config().getString("FbAppID") == null ? "497321087444409" : config().getString("FbAppID");
 	}
 
 	@Override
@@ -123,6 +125,7 @@ public class WebServer extends MicroServiceVerticle {
 		router.route("/api/survey/:action").handler(this::handlerSurveyAction);
 		router.get("/api/activeuser").handler(this::handlerActiveAccount);
 		router.post("/api/cash/:method/:action").handler(this::handlerCashAction);
+		router.route("/api/cash/confirm/:method/:action").handler(this::handlerCashConfirm);
 		router.route("/api/resetpassword/:step").handler(this::handlerResetPassword);
 		router.route("/api/admin/confirm").handler(this::handlerAdminConfirm);
 
@@ -185,7 +188,33 @@ public class WebServer extends MicroServiceVerticle {
 			if (!session.data().isEmpty()) {
 				redirectTo(RoutingContext, "/m");
 			} else {
-				RoutingContext.response().sendFile("./webroot/home.html");
+				vertx.fileSystem().readFile("./webroot/home.html", handler -> {
+					if (handler.succeeded() && handler.result() != null) {
+						Buffer z;
+						io.vertx.core.buffer.Buffer bf = handler.result();
+						try {
+							Document doc = Jsoup.parse(bf.toString(), "UTF-8");
+							String ggHtml = "<meta charset=\"utf-8\">\r\n"
+									+ "    <meta name=\"google-site-verification\" content=\"UgBZWyHadggxerdmIv2ADcJv78UWnY0E9LK6YjlbkVw\"/>"
+									+ "    <meta name=\"robots\" content=\"all\">";
+
+							String fbHtml = "<meta property=\"og:url\"  content=\""
+									+ RoutingContext.request().absoluteURI() + "\" />\r\n"
+									+ "<meta property=\"fb:app_id\"          content=\"" + config() + "\" /> "
+									+ "<meta property=\"og:title\"  content=\"Go Survey\" />\r\n"
+									+ "<meta property=\"og:description\" content=\"Go Survey\" />\r\n";
+							doc.head().append(ggHtml);
+							doc.head().append(fbHtml);
+							z = Buffer.buffer(doc.html());
+						} catch (Exception e) {
+							z = bf;
+						}
+						RoutingContext.response().setWriteQueueMaxSize(z.length() * 2);
+						RoutingContext.response().putHeader("Content-Type", "text/html;charset=UTF-8");
+						RoutingContext.response().putHeader("Content-Length", (z.length()) + "");
+						RoutingContext.response().write(z).end();
+					}
+				});
 			}
 		});
 
@@ -391,6 +420,8 @@ public class WebServer extends MicroServiceVerticle {
 		if (mvWebConfig.isEmpty()) {
 			initConfig();
 		}
+
+		String url = rtx.request().absoluteURI();
 		JsonObject tmp = new JsonObject().put("config", mvWebConfig);
 		if (rtx.session().data() != null) {
 			tmp.put("logindata", (JsonObject) rtx.session().get("logindata"));
@@ -416,6 +447,11 @@ public class WebServer extends MicroServiceVerticle {
 								JsonObject resp = res.result().body();
 								if (resp.getString(FieldName.CODE).equals(CodeMapping.S0000.name())) {
 									String surveyTitle = resp.getJsonObject(FieldName.DATA).getString(FieldName.TITLE);
+									String des = resp.getJsonObject(FieldName.DATA).getString(FieldName.DESCRIPTION);
+									des = des == null ? surveyTitle : des;
+									String finalDes = des;
+									String image = resp.getJsonObject(FieldName.DATA).getJsonObject(FieldName.SETTING)
+											.getString(FieldName.BACKGROUND_IMAGE);
 									if (Webroot != null) {
 										io.vertx.core.buffer.Buffer bf = Webroot;
 										Buffer z;
@@ -423,10 +459,18 @@ public class WebServer extends MicroServiceVerticle {
 											Document doc = Jsoup.parse(bf.toString(), "UTF-8");
 											doc.head().getElementsByTag("title").html(surveyTitle);
 											String ggHtml = "<meta charset=\"utf-8\">\r\n"
-													+ "    <meta name=\"Description\" CONTENT=\""+surveyTitle+"\">\r\n"
+													+ "    <meta name=\"Description\" CONTENT=\"" + des + "\">\r\n"
 													+ "    <meta name=\"google-site-verification\" content=\"UgBZWyHadggxerdmIv2ADcJv78UWnY0E9LK6YjlbkVw\"/>"
-													+ "    <meta name=\"robots\" content=\"noindex,nofollow\">";
+													+ "    <meta name=\"robots\" content=\"all\">";
+
+											String fbHtml = "<meta property=\"og:url\"  content=\"" + url + "\" />\r\n"
+													+ "<meta property=\"fb:app_id\"          content=\"" + fbAppID
+													+ "\" /> " + "<meta property=\"og:title\"  content=\"" + surveyTitle
+													+ "\" />\r\n" + "<meta property=\"og:description\" content=\"" + des
+													+ "\" />\r\n" + "<meta property=\"og:image\"  content=\"" + image
+													+ "\" />";
 											doc.head().append(ggHtml);
+											doc.head().append(fbHtml);
 											doc.head().append(config);
 											z = Buffer.buffer(doc.html());
 										} catch (Exception e) {
@@ -445,6 +489,23 @@ public class WebServer extends MicroServiceVerticle {
 												try {
 													Document doc = Jsoup.parse(bf.toString(), "UTF-8");
 													doc.head().getElementsByTag("title").html(surveyTitle);
+													String ggHtml = "<meta charset=\"utf-8\">\r\n"
+															+ "    <meta name=\"Description\" CONTENT=\"" + finalDes
+															+ "\">\r\n"
+															+ "    <meta name=\"google-site-verification\" content=\"UgBZWyHadggxerdmIv2ADcJv78UWnY0E9LK6YjlbkVw\"/>"
+															+ "    <meta name=\"robots\" content=\"all\">";
+
+													String fbHtml = "<meta property=\"og:url\"  content=\"" + url
+															+ "\" />\r\n"
+															+ "<meta property=\"fb:app_id\"          content=\""
+															+ fbAppID + "\" /> "
+															+ "<meta property=\"og:title\"  content=\"" + surveyTitle
+															+ "\" />\r\n"
+															+ "<meta property=\"og:description\" content=\"" + finalDes
+															+ "\" />\r\n" + "<meta property=\"og:image\"  content=\""
+															+ image + "\" />";
+													doc.head().append(ggHtml);
+													doc.head().append(fbHtml);
 													doc.head().append(config);
 													z = Buffer.buffer(doc.html());
 												} catch (Exception e) {
@@ -604,6 +665,36 @@ public class WebServer extends MicroServiceVerticle {
 		// MessageDefault.RequestFailed(resultHandler.cause().getMessage()));
 		// }
 		// });
+
+	}
+
+	private void handlerCashConfirm(RoutingContext rtx) {
+		JsonObject js = new JsonObject();
+		js.put(FieldName.METHOD, rtx.pathParam(FieldName.METHOD));
+		js.put(FieldName.RESULT, rtx.pathParam(FieldName.ACTION));
+		js.put(FieldName.ACTION, "confirmcash");
+		for (int i = 0; i < rtx.queryParams().entries().size(); i++) {
+			js.put(rtx.queryParams().entries().get(i).getKey(), rtx.queryParams().entries().get(i).getValue());
+		}
+		discovery.getRecord(
+				new JsonObject().put("name", EventBusDiscoveryConst.SURVEYINTERNALPROCESSORTDISCOVERY.toString()),
+				resultHandler -> {
+					if (resultHandler.succeeded() && resultHandler.result() != null) {
+						Record record = resultHandler.result();
+						mvEventBus.<JsonObject>send(record.getLocation().getString("endpoint"), js, res -> {
+							if (res.succeeded()) {
+								JsonObject resp = res.result().body();
+								
+								doResponseNoRenewCookie(rtx, Json.encodePrettily(resp));
+							} else {
+								doResponse(rtx, MessageDefault.RequestFailed(CodeMapping.C1111.toString(),
+										res.cause().getMessage()));
+							}
+						});
+					} else {
+						doResponse(rtx, MessageDefault.RequestFailed(resultHandler.cause().getMessage()));
+					}
+				});
 
 	}
 

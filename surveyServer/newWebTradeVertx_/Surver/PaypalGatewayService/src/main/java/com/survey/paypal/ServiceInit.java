@@ -72,8 +72,8 @@ public class ServiceInit extends MicroServiceVerticle {
 		String ccy = msg.getString(FieldName.CCY) == null ? "USD" : msg.getString(FieldName.CCY);
 		String remark = msg.getString(FieldName.REMARK);
 		String token = msg.getString(FieldName.PRIVATETOKEN);
-		String lvApprovalUrl = approvalURL + token;
-		String lvCancelUrl = cancelURL + token;
+		String lvApprovalUrl = approvalURL + token+"&i="+tranID;
+		String lvCancelUrl = cancelURL + token+"&i="+tranID;
 		PaypalConnection.getInstance().createPaymentSDK(tranID, "0", total.toString(), x, "0", "Deposit", remark, ccy,
 				new JsonObject(), lvCancelUrl, lvApprovalUrl).setHandler(handler -> {
 					if (handler.succeeded()) {
