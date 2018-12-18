@@ -1,0 +1,30 @@
+{
+	"DebugMode":true,
+	"discoveryaddress": "wtradediscovery",
+	"discoveryname": "myname",
+	"log.path": "./logs/survey",
+	"log.dir": "./logs/survey",
+	"log.SystemSetErr": "true",
+	"log.FileName": "SurveyServer",
+	"log.DayRetain": "365",
+	"log.FileNum": "1000",
+	"log.FileMaxSize": "10485760",
+	"log.Level": "127",
+	"log.ThreadPriority": "4",
+	"log.Reply": "N",
+	"log.SMTPMessageInterval": "300000",
+	"log.SMTPHost": "mail.tx-tech.com",
+	"HttpPort": 80,
+	"HttpSessionTimeout": 6000000,
+	"enabledSSL": false,
+	"SSLPassword":"wibble",
+	"SSLKey":"config/key/itradekeystore.jks",
+	"EmailServiceConfig": {
+		"address": "vertx.mail",
+		"hostname": "localhost",
+		"port": 25
+	},
+	"ListCashMethodSupport":["paypal,PAYPALGATEWAYDISCOVERY"],
+	"ListActionAllowAnonymous":["retrieveconfig","activeaccount","retrievesurvey","checkanswerpermission","answer"]
+	
+}
