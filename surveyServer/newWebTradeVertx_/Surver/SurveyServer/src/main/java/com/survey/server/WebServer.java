@@ -140,6 +140,8 @@ public class WebServer extends MicroServiceVerticle {
 			responseHomeIndex(pRoutingContext);
 		});
 
+		router.route("/explorer").handler(this::handlerExploer);
+
 		router.get("/test/:message").handler(rtx -> {
 			rtx.response().end("OK");
 			mvEventBus.send(EventBusDiscoveryConst.SURVEYPUSHPRIVATESERVERDISCOVEY.value(),
@@ -684,7 +686,7 @@ public class WebServer extends MicroServiceVerticle {
 						mvEventBus.<JsonObject>send(record.getLocation().getString("endpoint"), js, res -> {
 							if (res.succeeded()) {
 								JsonObject resp = res.result().body();
-								
+
 								doResponseNoRenewCookie(rtx, Json.encodePrettily(resp));
 							} else {
 								doResponse(rtx, MessageDefault.RequestFailed(CodeMapping.C1111.toString(),
@@ -882,6 +884,48 @@ public class WebServer extends MicroServiceVerticle {
 				try {
 					Document doc = Jsoup.parse(bf.toString(), "UTF-8");
 					doc.head().append(x);
+					z = Buffer.buffer(doc.html());
+				} catch (Exception e) {
+					z = bf;
+				}
+				rtx.response().setWriteQueueMaxSize(z.length() * 2);
+				rtx.response().putHeader("Content-Type", "text/html;charset=UTF-8");
+				rtx.response().putHeader("Content-Length", (z.length()) + "");
+				rtx.response().write(z).end();
+				Webroot = handler.result();
+			}
+		});
+	}
+
+	private void handlerExploer(RoutingContext rtx) {
+		if (mvWebConfig.isEmpty()) {
+			initConfig();
+		}
+		JsonObject tmp = new JsonObject().put("config", mvWebConfig);
+
+		vertx.fileSystem().readFile("./webroot/index.html", handler -> {
+			if (handler.succeeded() && handler.result() != null) {
+
+				Buffer z;
+				String x = "<script>window._SURVEYCONFIG_= " + Json.encode(tmp) + "</script>";
+				io.vertx.core.buffer.Buffer bf = handler.result();
+				String surveyTitle = "Khám phá khảo sát tại Survey Go";
+				try {
+					Document doc = Jsoup.parse(bf.toString(), "UTF-8");
+					doc.head().append(x);
+					doc.head().getElementsByTag("title").html(surveyTitle);
+					String ggHtml = "<meta charset=\"utf-8\">\r\n" + "    <meta name=\"Description\" CONTENT=\""
+							+ surveyTitle + "\">\r\n"
+							+ "    <meta name=\"google-site-verification\" content=\"UgBZWyHadggxerdmIv2ADcJv78UWnY0E9LK6YjlbkVw\"/>"
+							+ "    <meta name=\"robots\" content=\"all\">";
+
+					String fbHtml = "<meta property=\"og:url\"  content=\"" + rtx.request().absoluteURI() + "\" />\r\n"
+							+ "<meta property=\"fb:app_id\"          content=\"" + fbAppID + "\" /> "
+							+ "<meta property=\"og:title\"  content=\"" + surveyTitle + "\" />\r\n";
+
+					doc.head().append(ggHtml);
+					doc.head().append(fbHtml);
+
 					z = Buffer.buffer(doc.html());
 				} catch (Exception e) {
 					z = bf;

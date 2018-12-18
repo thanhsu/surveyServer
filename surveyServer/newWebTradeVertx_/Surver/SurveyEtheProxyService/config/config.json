@@ -39,5 +39,6 @@
 	"EtheClientID":"webserver3545454",
 	"EtheServerIsSSL": false,
 	"EtheSocketHost":"35.201.171.178",
-	"EtheSocketPort":9000
+	"EtheSocketPort":9000,
+	"EtheInterval":60000
 }

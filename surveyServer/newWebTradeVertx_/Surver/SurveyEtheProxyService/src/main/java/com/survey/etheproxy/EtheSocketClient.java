@@ -19,14 +19,15 @@ import io.vertx.servicediscovery.Record;
 public class EtheSocketClient extends AbstractVerticle {
 	private String host;
 	private int port;
-	private String clientID="webServer";
+	private String clientID = "webServer";
 
 	@Override
 	public void init(Vertx vertx, Context context) {
 		super.init(vertx, context);
 		host = config().getString("EtheSocketHost");
 		port = config().getInteger("EtheSocketPort");
-		clientID =  config().getString("EtheClientID")==null?"webServer": config().getString("EtheClientID");
+		clientID = config().getString("EtheClientID") == null ? "webServer" : config().getString("EtheClientID");
+		Reconnect.clientID = clientID;
 	}
 
 	@Override
@@ -35,7 +36,7 @@ public class EtheSocketClient extends AbstractVerticle {
 		System.out.println("*************************************************");
 		System.out.println(String.format("Init socket connection to %s port %d", host, port));
 		HttpClient client = vertx.createHttpClient();
-		
+
 		client.websocket(port, host, "/", websocket -> {
 			websocket.handler(data -> {
 				System.out.println("Received data " + data.toString());
@@ -56,7 +57,8 @@ public class EtheSocketClient extends AbstractVerticle {
 									VertxServiceCenter.getEventbus().<JsonObject>send(
 											record.getLocation().getString("endpoint"), data.toJsonObject(), res -> {
 												if (res.succeeded()) {
-													System.out.println("Send to Service confirm success:"+res.result().toString());
+													System.out.println("Send to Service confirm success:"
+															+ res.result().toString());
 												} else {
 													System.out.println("Send to service confirm error");
 												}
@@ -70,6 +72,8 @@ public class EtheSocketClient extends AbstractVerticle {
 				// client.close();
 			});
 			websocket.write(new JsonObject().put("clientid", clientID).toBuffer());
+			Reconnect.mvWebSocket = websocket;
+
 		});
 
 		/*

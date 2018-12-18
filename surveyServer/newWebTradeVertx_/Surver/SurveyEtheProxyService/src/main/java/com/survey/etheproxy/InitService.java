@@ -39,5 +39,13 @@ public class InitService extends AbstractVerticle {
 				System.out.println("Deploy EtheSocketClient fail. Cause: "+ res.cause().getMessage());
 			}
 		});
+		
+		vertx.deployVerticle(WorkerReconnect.class, new DeploymentOptions().setWorker(true).setMaxWorkerExecuteTime(600000).setConfig(config()), res->{
+			if(res.succeeded()) {
+				System.out.println("Deploy WorkerReconnect Success!");
+			}else {
+				System.out.println("Deploy WorkerReconnect fail. Cause: "+ res.cause().getMessage());
+			}
+		});
 	}
 }
