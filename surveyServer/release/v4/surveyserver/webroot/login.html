@@ -291,7 +291,7 @@
 					<div class="log-by-other">đăng nhập bằng</div>
 					<div class="log-with-other">
 						<!--  <img src="https://secure.surveymonkey.com/assets/userweb/userweb/233.0.0/assets/images/google.png" /> -->
-						<span class="g-signin2" data-onsuccess="onSuccess"> </span>
+						<span class="g-signin2" data-onsuccess="onSuccessGGLogin"> </span>
 					</div>
 					<div class="log-with-other">
 						<img
@@ -389,7 +389,7 @@
         }
     }
     
-    function onSuccess(googleUser) {
+    function onSuccessGGLogin(googleUser) {
     	console.log('Re_signin');
 	    let fullName = googleUser.getBasicProfile().getName();
 	    let email = googleUser.getBasicProfile().getEmail();
@@ -403,7 +403,7 @@
 				  if (xhr.status === 200) {
 					  $("#gg-progress").css({ visibility: "hidden" })
 						let res =  xhr.responseText;
-						console.log('Signed in as: ' + res);
+						console.log('Signed in code: ' + res.code);
 						
 						if(res.code === "R3333") {
 			                $("#error-username").css({ display: "block" }).text("Email này đã tồn tại trên hệ thống.")
@@ -422,7 +422,7 @@
 			                $("#error-pwd").css({ display: "none" })
 			            }
 			            else {
-			            	
+			            	console.log('Login Success');
 			                window.location = "/m/"
 			            }
 				  }else {
