@@ -421,13 +421,13 @@
                 window.location = "/m/"
             }
 		};
-		xhr.send(JSON.stringify{
+		xhr.send(JSON.stringify({
             "client_token": id_token,
             "method": "google",
             "email":email,
             "fullname":fullName,
             "avatar":avatar
-        });    
+        }));    
 	}
     
 </script>
