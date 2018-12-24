@@ -390,38 +390,46 @@
     }
     
     function onSuccess(googleUser) {
-	    var fullName = googleUser.getBasicProfile().getName();
-	    var email = googleUser.getBasicProfile().getEmail();
-	    var avatar = googleUser.getBasicProfile().getImageUrl();
-		var id_token= googleUser.getAuthResponse().id_token;
-		var xhr = new XMLHttpRequest();
+    	console.log('Re_signin');
+	    let fullName = googleUser.getBasicProfile().getName();
+	    let email = googleUser.getBasicProfile().getEmail();
+	    let avatar = googleUser.getBasicProfile().getImageUrl();
+		let id_token= googleUser.getAuthResponse().id_token;
+		let xhr = new XMLHttpRequest();
 		xhr.open('POST', '/api/login');
 		xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
 		xhr.onload = function() {
-			$("#gg-progress").css({ visibility: "hidden" })
-			let res =  xhr.responseText;
-			console.log('Signed in as: ' + res);
-			
-			
-			if(res.code === "R3333") {
-                $("#error-username").css({ display: "block" }).text("Email này đã tồn tại trên hệ thống.")
-                $("#error-pwd").css({ display: "none" })
-            }
-            else if(res.code === "U1111") {
-                $("#error-username").css({ display: "block" }).text("Không tìm thấy tài khoản này.")
-                $("#error-pwd").css({ display: "none" })
-            }
-            else if(res.code === "U2222") {
-                $("#error-username").css({ display: "none" })
-                $("#error-pwd").css({ display: "block" }).text("Sai mật khẩu.")
-            }
-            else if(res.code === "U3333") {
-                $("#error-username").css({ display: "block" }).text("Tài khoản này đã bị khoá.")
-                $("#error-pwd").css({ display: "none" })
-            }
-            else {
-                window.location = "/m/"
-            }
+			 if (xhr.readyState === xhr.DONE) {
+				  if (xhr.status === 200) {
+					  $("#gg-progress").css({ visibility: "hidden" })
+						let res =  xhr.responseText;
+						console.log('Signed in as: ' + res);
+						
+						if(res.code === "R3333") {
+			                $("#error-username").css({ display: "block" }).text("Email này đã tồn tại trên hệ thống.")
+			                $("#error-pwd").css({ display: "none" })
+			            }
+			            else if(res.code === "U1111") {
+			                $("#error-username").css({ display: "block" }).text("Không tìm thấy tài khoản này.")
+			                $("#error-pwd").css({ display: "none" })
+			            }
+			            else if(res.code === "U2222") {
+			                $("#error-username").css({ display: "none" })
+			                $("#error-pwd").css({ display: "block" }).text("Sai mật khẩu.")
+			            }
+			            else if(res.code === "U3333") {
+			                $("#error-username").css({ display: "block" }).text("Tài khoản này đã bị khoá.")
+			                $("#error-pwd").css({ display: "none" })
+			            }
+			            else {
+			            	
+			                window.location = "/m/"
+			            }
+				  }else {
+					  	$("#error-username").css({ display: "block" }).text("Yêu cầu thất bại.")
+		                $("#error-pwd").css({ display: "none" })
+				  }
+			 }
 		};
 		xhr.send(JSON.stringify({
             "client_token": id_token,
