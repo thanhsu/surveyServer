@@ -398,7 +398,8 @@
 		xhr.open('POST', '/api/login');
 		xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
 		xhr.onload = function() {
-			console.log('Signed in as: ' + xhr.responseText);
+			var res =  xhr.responseText;
+			console.log('Signed in as: ' + res);
 			
 			$("#gg-progress").css({ visibility: "hidden" })
 			if(res.code === "R3333") {
