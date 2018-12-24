@@ -13,7 +13,7 @@
 <script src="./assets/js/index.js"></script>
 <link rel="stylesheet" href="./assets/css/style.css" />
 <meta name="google-signin-client_id"
-	content="610621134830-nu4ovdi0mt6c3lfvgcme14mg72tullhl.apps.googleusercontent.com">
+	content="235104055100-ucqogsakjknke4h9vvnfk9ig44cm0lio.apps.googleusercontent.com">
 <script src="https://apis.google.com/js/platform.js" async defer></script>
 </head>
 <body>
@@ -362,7 +362,7 @@
             $.ajax({
                 type: "POST",
                 contentType: "application/json; charset=utf-8",
-                url: "/m/login",
+                url: "/api/login",
                 data: JSON.stringify({
                     "username": data.username,
                     "password": data.password
@@ -390,20 +390,43 @@
     }
     
     function onSuccess(googleUser) {
-	  	console.log('Signed i');
-	    console.log('Signed in assssss: ' + googleUser.getBasicProfile().getName());
-	    console.log('Signed in assssss: ', googleUser.getBasicProfile());
-		console.log('googleUser.getAuthResponse().id_token' ,googleUser.getAuthResponse().id_token);
+	    var fullName = googleUser.getBasicProfile().getName();
+	    var email = googleUser.getBasicProfile().getEmail();
+	    var avatar = googleUser.getBasicProfile().getImageUrl();
 		var id_token= googleUser.getAuthResponse().id_token;
 		var xhr = new XMLHttpRequest();
 		xhr.open('POST', '/api/login');
 		xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
 		xhr.onload = function() {
-		console.log('Signed in as: ' + xhr.responseText);
+			console.log('Signed in as: ' + xhr.responseText);
+			
+			$("#gg-progress").css({ visibility: "hidden" })
+			if(res.code === "R3333") {
+                $("#error-username").css({ display: "block" }).text("Email này đã tồn tại trên hệ thống.")
+                $("#error-pwd").css({ display: "none" })
+            }
+            else if(res.code === "U1111") {
+                $("#error-username").css({ display: "block" }).text("Không tìm thấy tài khoản này.")
+                $("#error-pwd").css({ display: "none" })
+            }
+            else if(res.code === "U2222") {
+                $("#error-username").css({ display: "none" })
+                $("#error-pwd").css({ display: "block" }).text("Sai mật khẩu.")
+            }
+            else if(res.code === "U3333") {
+                $("#error-username").css({ display: "block" }).text("Tài khoản này đã bị khoá.")
+                $("#error-pwd").css({ display: "none" })
+            }
+            else {
+                window.location = "/m/"
+            }
 		};
-		xhr.sendJSON.stringify({
-            "id_token": id_token,
-            "method": "google"
+		xhr.send(JSON.stringify{
+            "client_token": id_token,
+            "method": "google",
+            "email":email,
+            "fullname":fullName,
+            "avatar":avatar
         });    
 	}
     
