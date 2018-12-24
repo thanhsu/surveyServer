@@ -402,7 +402,7 @@
 			 if (xhr.readyState === xhr.DONE) {
 				  if (xhr.status === 200) {
 					  $("#gg-progress").css({ visibility: "hidden" })
-						let res =  xhr.responseText;
+						let res =  xhr.response;
 						console.log('Signed in code: ' + res.code);
 						
 						if(res.code === "R3333") {
