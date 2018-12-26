@@ -14,10 +14,10 @@
 	"log.SMTPMessageInterval": "300000",
 	"log.SMTPHost": "mail.tx-tech.com",
 	"DBConnectionConfig": {
-		"db_name": "surveytesting",
-		 "connection_string": "mongodb://admin:12wqasxz@ds237808.mlab.com:37808/surveytesting" 
-		/* "connection_string": "mongodb://localhost:27017" */
+		"db_name": "surveydb",
+		"connection_string": "mongodb://localhost:27017"
 	},
+	"connection_string": "mongodb://admin:12wqasxz@ds237808.mlab.com:37808/surveytesting",
 	"ActionMapping": [
 		"login-com.survey.dbservices.action.UserLogin",
 		"register-com.survey.dbservices.action.RegisterAction",
@@ -27,10 +27,8 @@
 		"userinfo-com.survey.dbservices.action.UserInfoAction",
 		"retrieveconfig-com.survey.dbservices.action.RetrieveConfigAction"
 	],
-	"SurveyHost":"https://server.igo-survey.xyz",
-	"SurveyTokenTimeOut":300000,
-	
-	
+	"SurveyHost": "https://server.igo-survey.xyz",
+	"SurveyTokenTimeOut": 300000,
 	"ServiceInternalProcessorConfig": {
 		"isWorker": true,
 		"instance": 10
@@ -42,15 +40,15 @@
 		"username": "contact.go.survey@gmail.com",
 		"password": "12wqasxz"
 	},
-	"PaypalConfig":{
-		"PaypalClientID":"AbbCG7NNwfl16JP3wZ0N6DxMB6_8B8K208LtMieymitsJI_npiNwv0yWorTX_7AgZBg95rBTIjRzKgxp",
-		"PaypalSecret":"EKgknn9Pd02gmoa56qvVQu7U1q0F67Ag_uI5fy_sbH57hvSi09NCS80p5CIe-E8Kngz3brTvMOvJWt7I",
-		"PaypalHost":"https://api.sandbox.paypal.com",
-		"PaypalMode":"sanbox"
+	"PaypalConfig": {
+		"PaypalClientID": "AbbCG7NNwfl16JP3wZ0N6DxMB6_8B8K208LtMieymitsJI_npiNwv0yWorTX_7AgZBg95rBTIjRzKgxp",
+		"PaypalSecret": "EKgknn9Pd02gmoa56qvVQu7U1q0F67Ag_uI5fy_sbH57hvSi09NCS80p5CIe-E8Kngz3brTvMOvJWt7I",
+		"PaypalHost": "https://api.sandbox.paypal.com",
+		"PaypalMode": "sanbox"
 	},
-	"RSAEncrypt":{
-		"PublicKeyPath":"config/key/public512.pem",
-		"PrivateKeyPath":"config/key/key512.pem",
-		"charset":"UTF-8"
+	"RSAEncrypt": {
+		"PublicKeyPath": "config/key/public512.pem",
+		"PrivateKeyPath": "config/key/key512.pem",
+		"charset": "UTF-8"
 	}
 }
