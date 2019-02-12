@@ -31,12 +31,14 @@
 		"post,surveytransactionlist,survey/transaction/get",
 		"post,cashtranser,transaction/transfer",
 		"post,transactionhistory,transaction/history",
-		"post,repushlish,survey/repushlish"
+		"post,repushlish,survey/repushlish",
+		"post,hold,transaction/hold"
 	],
 	"EtheServerIP": "35.201.171.178",
 	"EtheServerPort": 9000,
-	"EtheClientID":"webserver1",
+	"EtheClientID":"webserver3545454",
 	"EtheServerIsSSL": false,
 	"EtheSocketHost":"35.201.171.178",
-	"EtheSocketPort":9000
+	"EtheSocketPort":9000,
+	"EtheInterval":60000
 }
